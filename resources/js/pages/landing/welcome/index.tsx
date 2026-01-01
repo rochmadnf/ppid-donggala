@@ -1,3 +1,5 @@
+import { PublicInfoCard } from '@/components/public-info-card';
+import { Particles } from '@/components/ui/particles';
 import { LandingLayout } from '@/layouts/landing-layouts';
 import { Head } from '@inertiajs/react';
 import { type ReactNode } from 'react';
@@ -23,13 +25,21 @@ export default function WelcomePage() {
                 </div>
 
                 {/* Image */}
-                <div className="hidden shrink-0 grow-0 basis-1/2 overflow-hidden rounded-tl-4xl rounded-tr-xl rounded-b-xl rounded-br-[8rem] shadow-xl shadow-blue-700/25 xl:block">
+                <div className="hidden shrink-0 grow-0 basis-1/2 overflow-hidden rounded-tl-4xl rounded-tr-xl rounded-b-xl rounded-br-[6rem] shadow-xl shadow-blue-700/25 xl:block">
                     <img src="./assets/img/dgl-wisata.png" alt="Donggala Kota Wisata" className="h-auto w-full" />
                 </div>
             </div>
 
             {/* Information Categories */}
-            <div className="mt-24">Card</div>
+            <div className="mt-24">
+                <h4 className="relative mb-8 text-4xl font-bold tracking-wide text-blue-700 before:absolute before:-bottom-2 before:h-1.5 before:w-20 before:bg-yellow-300">
+                    Informasi Publik
+                </h4>
+                <div className="relative flex min-h-85 w-full items-center justify-center overflow-x-auto">
+                    <PublicInfoCard />
+                    <Particles className="absolute inset-0 z-0" color="#172554" quantity={200} size={1} refresh />
+                </div>
+            </div>
         </>
     );
 }
