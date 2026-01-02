@@ -7,7 +7,7 @@ export function Header() {
             <Logo />
 
             {/* Navigation */}
-            <nav className="border-t border-slate-300/75 py-4 text-sm uppercase">
+            <nav className="border-t border-slate-300/50 py-4 text-sm uppercase">
                 <ul className="flex items-center justify-center gap-x-2">
                     <li>
                         <Link className="rounded p-2 transition duration-200 hover:bg-blue-500 hover:text-white" href={route('welcome')}>

@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 
 export function Footer() {
     return (
-        <footer className="flex w-full items-start justify-between gap-x-4 border-t border-slate-300/50 bg-white py-4">
+        <footer className="flex w-full items-start justify-between gap-x-4 border-t border-slate-300/50 bg-white py-8">
             <div>
                 <Link href={route('welcome')}>
                     <img src={'./assets/img/ppid.png'} alt="PPID Logo" className="h-10" title="Pejabat Pengelola Informasi dan Dokumentasi" />

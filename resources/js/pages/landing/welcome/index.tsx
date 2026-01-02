@@ -1,8 +1,10 @@
 import { PublicInfoCard } from '@/components/public-info-card';
+import { TitleDivider } from '@/components/title-divider';
 import { Particles } from '@/components/ui/particles';
 import { LandingLayout } from '@/layouts/landing-layouts';
 import { Head } from '@inertiajs/react';
 import { type ReactNode } from 'react';
+import { menus } from './lib';
 
 export default function WelcomePage() {
     return (
@@ -31,14 +33,12 @@ export default function WelcomePage() {
             </div>
 
             {/* Information Categories */}
-            <div className="mt-24">
-                <h4 className="relative mb-8 text-4xl font-bold tracking-wide text-blue-700 before:absolute before:-bottom-2 before:h-1.5 before:w-20 before:bg-yellow-300">
-                    Informasi Publik
-                </h4>
-                <div className="relative flex min-h-85 w-full items-center justify-center overflow-x-auto">
-                    <PublicInfoCard />
-                    <Particles className="absolute inset-0 z-0" color="#172554" quantity={200} size={1} refresh />
-                </div>
+            <div className="relative mt-28 flex min-h-130 w-full flex-row items-center justify-start gap-x-8 overflow-x-auto overflow-y-hidden px-8 py-6">
+                <TitleDivider title="Informasi Publik" className="absolute top-4 left-2" />
+                {menus.map((menu) => (
+                    <PublicInfoCard key={menu.id} menu={menu} />
+                ))}
+                <Particles className="absolute inset-0 z-0" color="#172554" quantity={200} size={1} refresh />
             </div>
         </>
     );
