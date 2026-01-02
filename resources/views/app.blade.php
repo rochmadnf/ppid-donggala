@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title inertia>{{ config('app.name', 'My App') }}</title>
-
     {{-- Favicon --}}
     <link rel="apple-touch-icon-precomposed" sizes="57x57"
         href="{{ asset('assets/favicon/apple-touch-icon-57x57.png') }}" />
