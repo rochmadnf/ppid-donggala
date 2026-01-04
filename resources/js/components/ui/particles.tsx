@@ -1,4 +1,4 @@
-import React, {
+import {
   type ComponentPropsWithoutRef,
   useEffect,
   useRef,
