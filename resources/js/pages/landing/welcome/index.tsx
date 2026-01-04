@@ -20,7 +20,7 @@ export default function WelcomePage() {
                         Portal PPID <br /> <span className="text-4xl text-blue-700 sm:text-5xl">Kabupaten Donggala</span>
                     </h1>
 
-                    <h5 className="mt-5.5 text-base leading-8 text-gray-600 md:text-xl">
+                    <h5 className="mt-5.5 text-base text-gray-600 md:text-xl md:leading-8">
                         Setiap orang berhak memperoleh Informasi Publik sesuai dengan UU No. 14 Tahun 2008. Website PPID BPS menyediakan Informasi
                         Publik Berkala, Setiap Saat, Serta-merta, dan Informasi lainnya.
                     </h5>
