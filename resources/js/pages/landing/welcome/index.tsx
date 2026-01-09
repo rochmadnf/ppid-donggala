@@ -1,9 +1,10 @@
 import { ButtonFlatIcon } from '@/components/btn-flat-icon';
+import { MetaTag } from '@/components/metatag';
 import { PublicInfoCard } from '@/components/public-info-card';
 import { TitleDivider } from '@/components/title-divider';
 import { Particles } from '@/components/ui/particles';
 import { LandingLayout } from '@/layouts/landing-layouts';
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { MoveRightIcon } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { menus } from './lib';
@@ -11,9 +12,16 @@ import { menus } from './lib';
 export default function WelcomePage() {
     return (
         <>
-            <Head title="PPID Donggala &#8211; Menuju Masyarakat Informasi">
-                <meta name="description" content="Selamat datang di PPID Donggala, sumber informasi resmi Pemerintah Kabupaten Donggala." />
-            </Head>
+            <MetaTag
+                title="PPID Donggala &#8211; Menuju Masyarakat Informasi"
+                description="Selamat datang di PPID Donggala, sumber informasi resmi Pemerintah Kabupaten Donggala."
+            >
+                <meta name="robots" content="index, follow" />
+                <meta name="keywords" content="ppid, ppid donggala, ppid kabupaten donggala, kabupaten donggala, pemda donggala" />
+
+                <meta property="og:url" content={route('welcome')} />
+                <meta property="og:canonical" content={route('welcome')} />
+            </MetaTag>
 
             {/* HERO */}
             <div className="mt-0 grid grid-cols-12 place-content-center items-center gap-x-8 px-0 pt-5 md:mt-10 md:px-6">
