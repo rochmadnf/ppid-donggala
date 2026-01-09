@@ -43,7 +43,10 @@ class HandleInertiaRequests extends Middleware
             'app' => [
                 'name' => config('app.name'),
             ],
-            'ziggy' => fn(): array => [...(new \Tighten\Ziggy\Ziggy())->toArray(), 'location' => $request->url()],
+            'ziggy' => fn(): array => [
+                ...(new \Tighten\Ziggy\Ziggy())->toArray(),
+                'location' => config('app.env') === 'production' ? preg_replace('/^http:/', 'https:', $request->url()) : $request->url()
+            ],
         ];
     }
 }
