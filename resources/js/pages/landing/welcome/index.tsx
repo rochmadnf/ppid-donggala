@@ -20,7 +20,7 @@ export default function WelcomePage() {
                 <meta name="keywords" content="ppid, ppid donggala, ppid kabupaten donggala, kabupaten donggala, pemda donggala" />
 
                 <meta property="og:url" content={route('welcome')} />
-                <meta property="og:canonical" content={route('welcome')} />
+                <link rel="canonical" href={route('welcome')} />
             </MetaTag>
 
             {/* HERO */}
