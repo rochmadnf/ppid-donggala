@@ -7,5 +7,5 @@ export function cn(...inputs: ClassValue[]) {
 
 export function appAsset(path: string) {
     const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost';
-    return `${appUrl}/${path.replace(/^\/+/, '')}`;
+    return `${appUrl}/${path.replace(/^\/+/, '')}?ass_ver=${__ASSET_VERSION__}`;
 }
