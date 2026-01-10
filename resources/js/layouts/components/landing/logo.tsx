@@ -1,5 +1,5 @@
 import type { DrawerProps } from '@/layouts/types';
-import { cn } from '@/lib/utils';
+import { appAsset, cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 
@@ -9,7 +9,7 @@ export type LogoProps = {
     src?: string;
 };
 
-export function Logo({ className, imgClassName, src = './assets/img/ppid.png', openDrawer, setOpenDrawer }: LogoProps & DrawerProps) {
+export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', openDrawer, setOpenDrawer }: LogoProps & DrawerProps) {
     return (
         // Logo
         <div
@@ -19,7 +19,12 @@ export function Logo({ className, imgClassName, src = './assets/img/ppid.png', o
             )}
         >
             <Link href={route('welcome')}>
-                <img src={src} alt="PPID Logo" className={cn('h-8 md:h-10', imgClassName)} title="Pejabat Pengelola Informasi dan Dokumentasi" />
+                <img
+                    src={appAsset(src)}
+                    alt="PPID Logo"
+                    className={cn('h-8 md:h-10', imgClassName)}
+                    title="Pejabat Pengelola Informasi dan Dokumentasi"
+                />
             </Link>
             <div aria-label="logo" className="hidden border-l border-slate-300/50 pl-4 md:block">
                 <h1 className="font-bold text-slate-950">Pejabat Pengelola Informasi dan Dokumentasi</h1>

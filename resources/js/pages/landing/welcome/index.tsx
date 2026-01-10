@@ -4,6 +4,7 @@ import { PublicInfoCard } from '@/components/public-info-card';
 import { TitleDivider } from '@/components/title-divider';
 import { Particles } from '@/components/ui/particles';
 import { LandingLayout } from '@/layouts/landing-layouts';
+import { appAsset } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { MoveRightIcon } from 'lucide-react';
 import { type ReactNode } from 'react';
@@ -39,7 +40,7 @@ export default function WelcomePage() {
 
                 {/* Image */}
                 <div className="hidden overflow-hidden rounded-tl-4xl rounded-tr-xl rounded-b-xl rounded-br-[6rem] shadow-xl shadow-blue-700/25 md:col-span-6 xl:block">
-                    <img src="./assets/img/dgl-wisata.png" alt="Donggala Kota Wisata" className="h-auto w-full" />
+                    <img src={appAsset('/assets/img/dgl-wisata.png')} alt="Donggala Kota Wisata" className="h-auto w-full" />
                 </div>
             </div>
 
@@ -96,7 +97,7 @@ export default function WelcomePage() {
                 </div>
 
                 <div className="hidden md:col-span-5 md:block">
-                    <img src="./assets/icons/req-docs.webp" className="mx-auto w-[75%]" alt="Formulir Pengajuan Informasi" />
+                    <img src={appAsset('/assets/icons/req-docs.webp')} className="mx-auto w-[75%]" alt="Formulir Pengajuan Informasi" />
                 </div>
             </div>
 
