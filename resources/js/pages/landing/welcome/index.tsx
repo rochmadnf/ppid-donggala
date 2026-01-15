@@ -14,8 +14,8 @@ export default function WelcomePage() {
     return (
         <>
             <MetaTag
-                title="PPID Donggala &#8211; Menuju Masyarakat Informasi"
-                description="Selamat datang di PPID Donggala, sumber informasi resmi Pemerintah Kabupaten Donggala."
+                title="PPID Kabupaten Donggala &#8211; Menuju Masyarakat Informasi"
+                description="Selamat datang di PPID Kabupaten Donggala, sumber informasi resmi Pemerintah Kabupaten Donggala."
             >
                 <meta name="robots" content="index, follow" />
                 <meta name="keywords" content="ppid, ppid donggala, ppid kabupaten donggala, kabupaten donggala, pemda donggala" />
