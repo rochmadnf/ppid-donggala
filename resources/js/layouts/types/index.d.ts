@@ -10,3 +10,5 @@ export interface AuthLayoutProps {
     title?: string;
     description?: string;
 }
+
+export interface ConsoleLayoutProps {}

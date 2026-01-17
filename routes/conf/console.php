@@ -1,0 +1,12 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Console;
+
+Route::middleware('auth')->prefix('console')->name('console.')->group(function () {
+    Route::get('/', [Console\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::controller(Console\PublicInformationController::class)->prefix('public-information')->name('public-information.')->group(function () {
+        Route::get('/', 'index')->name('index');
+    });
+});
