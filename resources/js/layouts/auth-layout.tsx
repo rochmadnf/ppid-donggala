@@ -1,6 +1,7 @@
 import AppLogo from '@/components/app-logo';
 import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
+import { Toaster } from 'react-hot-toast';
 import type { AuthLayoutProps } from './types';
 
 export default function AuthLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
@@ -28,6 +29,7 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                     {children}
                 </div>
             </div>
+            <Toaster position="top-center" />
         </div>
     );
 }

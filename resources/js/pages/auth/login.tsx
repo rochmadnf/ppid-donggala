@@ -1,23 +1,31 @@
 import { FormInput } from '@/components/form/input';
 import { MetaTag } from '@/components/metatag';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import { useForm } from '@inertiajs/react';
+import { LoaderCircleIcon } from 'lucide-react';
 import { type FormEventHandler } from 'react';
 
 export default function Login() {
     const form = useForm<{
         username: string;
         password: string;
+        remember_me: boolean;
     }>({
         username: '',
         password: '',
+        remember_me: false,
     });
 
     const hitLoginButton: FormEventHandler = (e) => {
         e.preventDefault();
 
         form.post(route('login'), {
+            onStart: () => {
+                form.clearErrors();
+            },
             onFinish: () => form.reset('password'),
         });
     };
@@ -37,6 +45,7 @@ export default function Login() {
                     name="username"
                     autoFocus
                     autoComplete="username"
+                    tabIndex={1}
                     value={form.data.username}
                     onChange={(e) => form.setData('username', e.target.value)}
                     error={form.errors.username}
@@ -45,6 +54,7 @@ export default function Login() {
                 <FormInput
                     label="Katasandi"
                     type="password"
+                    tabIndex={2}
                     name="password"
                     autoComplete="current-password"
                     value={form.data.password}
@@ -52,9 +62,21 @@ export default function Login() {
                     error={form.errors.password}
                 />
 
+                <div className="flex items-center gap-2.5 md:gap-2">
+                    <Checkbox
+                        id="remember_me"
+                        checked={form.data.remember_me}
+                        className="size-5 cursor-pointer rounded-sm border-blue-500/30 data-[state=checked]:border-blue-700 data-[state=checked]:bg-blue-700 md:size-6"
+                        onCheckedChange={(checked) => form.setData('remember_me', Boolean(checked))}
+                    />
+                    <Label htmlFor="remember_me" className="cursor-pointer text-sm hover:text-slate-900/85 lg:text-[17px]">
+                        Ingat saya
+                    </Label>
+                </div>
+
                 <div className="flex items-center justify-between">
-                    <Button variant="brand" className="h-12 w-full cursor-pointer text-lg" disabled={form.processing}>
-                        Masuk
+                    <Button tabIndex={3} variant="brand" className="h-12 w-full cursor-pointer text-lg" disabled={form.processing}>
+                        {form.processing && <LoaderCircleIcon className="pointer-events-none size-5 animate-spin" />} Masuk
                     </Button>
                 </div>
             </form>
