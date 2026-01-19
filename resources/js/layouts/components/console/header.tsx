@@ -4,8 +4,8 @@ import { usePage } from '@inertiajs/react';
 export function ConsoleHeader() {
     const { page } = usePage<PageDataProps>().props;
     return (
-        <header className="sticky top-0 z-10 flex h-14 w-full items-center border-b border-slate-300/30 bg-blue-600 p-4 text-white">
-            <h1 className="text-xl font-medium tracking-wide">{page.title}</h1>
+        <header className="sticky top-0 z-10 flex h-16 w-full items-center border-b border-line-brand bg-white px-6">
+            <h1 className="text-2xl font-semibold tracking-wider">{page.title}</h1>
         </header>
     );
 }

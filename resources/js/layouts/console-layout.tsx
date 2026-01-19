@@ -1,22 +1,15 @@
-import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import { ConsoleHeader } from './components/console/header';
+import { Sidebar } from './components/console/sidebar';
 import type { ConsoleLayoutProps } from './types';
 
 export default function ConsoleLayout({ children }: PropsWithChildren<ConsoleLayoutProps>) {
     return (
-        <div className="mx-auto grid h-dvh w-full max-w-7xl grid-cols-12 border-0 border-slate-300/30 md:border-x">
+        <div className="mx-auto grid h-dvh w-full max-w-7xl grid-cols-12 border-0 border-line-brand md:border-x">
             {/* Sidebar */}
-            <div className="col-span-3 hidden border-r md:block">
-                <Link href="/console" className="block p-4 text-lg font-semibold">
-                    Dashboard
-                </Link>
-                <Link href="/console/public-information" className="block p-4 text-lg font-semibold">
-                    Informasi Publik
-                </Link>
-            </div>
+            <Sidebar />
             {/* Content */}
-            <div className="relative col-span-9">
+            <div className="relative col-span-9 bg-white">
                 <ConsoleHeader />
                 <div className="">{children}</div>
             </div>
