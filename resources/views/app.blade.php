@@ -49,7 +49,7 @@
     @inertiaHead
 </head>
 
-<body class="font-sans antialiased">
+<body class="font-sans antialiased text-slate-900 bg-white">
     @inertia
 </body>
 
