@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\Auth\AuthenticatedUserResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -38,14 +39,14 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? AuthenticatedUserResource::make($request->user()) : null,
             ],
             'app' => [
                 'name' => config('app.name'),
             ],
             'ziggy' => fn(): array => [
                 ...(new \Tighten\Ziggy\Ziggy())->toArray(),
-                'location' => config('app.env') === 'production' ? preg_replace('/^http:/', 'https:', $request->url()) : $request->url()
+                'location' => config('app.env') === 'production' ? preg_replace('/^https?:\/\//', 'https://', $request->url()) : $request->url()
             ],
         ];
     }
