@@ -66,7 +66,7 @@ export default function Login() {
                     <Checkbox
                         id="remember_me"
                         checked={form.data.remember_me}
-                        className="size-5 cursor-pointer rounded-sm border-blue-500/30 data-[state=checked]:border-blue-700 data-[state=checked]:bg-blue-700 md:size-6"
+                        className="size-5 cursor-pointer rounded-sm border-line-brand data-[state=checked]:border-blue-700 data-[state=checked]:bg-blue-700 md:size-6"
                         onCheckedChange={(checked) => form.setData('remember_me', Boolean(checked))}
                     />
                     <Label htmlFor="remember_me" className="cursor-pointer text-sm hover:text-slate-900/85 lg:text-[17px]">
