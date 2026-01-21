@@ -10,10 +10,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import type { SharedData } from '@/types';
+import type { PageDataProps, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronsUpDownIcon, LayoutPanelLeftIcon, LogOutIcon, PlusIcon, RssIcon } from 'lucide-react';
-import { useState, type PropsWithChildren } from 'react';
+import { ChevronsUpDownIcon, Globe2Icon, LogOutIcon, PlusIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { menuItems, type MenuItemProps } from './config/sidebar';
 
 export function Sidebar() {
     return (
@@ -37,48 +38,81 @@ export function SidebarHeader() {
 }
 
 export function SidebarMenu() {
+    const { page } = usePage<PageDataProps>().props;
+
     return (
-        <ul className="flex flex-1 flex-col gap-y-2.5 p-4">
-            <li className="relative">
-                <Link
-                    href={route('console.dashboard')}
-                    className="inline-flex w-full items-center gap-x-2 rounded-md bg-sidebar-menu-bg px-2 py-1.5 tracking-wide text-blue-700 transition duration-200 [&_svg]:pointer-events-none [&_svg]:size-4"
-                >
-                    <LayoutPanelLeftIcon />
-                    Dashboard
-                </Link>
-            </li>
-            <CollapsibleMenuItem title="Informasi Publik"></CollapsibleMenuItem>
+        <ul className="mx-2 flex flex-1 flex-col gap-y-2.5 rounded-md border border-line-brand px-2.5 pt-2 pb-4">
+            {menuItems.map((menu) => {
+                if (menu.children.length > 0) {
+                    const { id, url, ...menuItemProps } = menu;
+                    const menuIds = [...menu.children.map((child) => child.id), id];
+
+                    return <CollapsibleMenuItem key={id} {...menuItemProps} menuIds={menuIds} isOpen={menuIds.includes(page.id)} pageId={page.id} />;
+                } else {
+                    const { id, children, ...menuItemProps } = menu;
+                    return <SidebarMenuItem key={id} {...menuItemProps} isActive={page.id === id} />;
+                }
+            })}
+            <SidebarMenuItem
+                icon={Globe2Icon}
+                label="Lihat Situs"
+                url={route('welcome')}
+                className="bg-blue-600 px-4 py-3 text-white shadow-blue-500 transition duration-150 hover:bg-blue-700 hover:text-white hover:shadow"
+            />
         </ul>
     );
 }
 
-export interface CollapsibleMenuItemProps {
-    title: string;
-    isOpen?: boolean;
+export function SidebarMenuItem({
+    icon: Icon,
+    label,
+    url,
+    isActive = false,
+    className,
+}: Pick<MenuItemProps, 'icon' | 'label' | 'url'> & { isActive?: boolean; className?: string }) {
+    return (
+        <li className="relative last:mt-auto" title={label}>
+            <Link
+                href={url}
+                className={cn(
+                    'inline-flex w-full items-center gap-x-2 rounded-md px-2 py-1.5 tracking-wide transition duration-200 [&_svg]:pointer-events-none [&_svg]:size-4.5',
+                    isActive
+                        ? 'bg-sidebar-menu-bg text-sidebar-menu-text'
+                        : 'bg-transparent text-sidebar-menu-inactive-text hover:bg-sidebar-menu-bg hover:text-sidebar-menu-text',
+                    className,
+                )}
+            >
+                <Icon />
+                {label}
+            </Link>
+        </li>
+    );
 }
 
-export function CollapsibleMenuItem({ title, isOpen = false }: PropsWithChildren<CollapsibleMenuItemProps>) {
-    const [isCollapsed, setIsCollapsed] = useState(isOpen);
-
+export function CollapsibleMenuItem({
+    label,
+    icon: CollapsibleIcon,
+    children: collapsibleChildren,
+    isOpen = false,
+    pageId,
+    menuIds,
+}: { isOpen?: boolean; pageId: string; menuIds: string[] } & Pick<MenuItemProps, 'children' | 'icon' | 'label'>) {
+    const [isCollapsed, setIsCollapsed] = useState<boolean>(isOpen);
+    useEffect(() => setIsCollapsed(isOpen), [isOpen]);
     return (
-        <Collapsible
-            asChild
-            className="group/menu-trigger relative"
-            title={title}
-            defaultOpen={isCollapsed}
-            onOpenChange={(open) => setIsCollapsed(open)}
-        >
+        <Collapsible asChild className="group/menu-trigger relative" title={label} open={isCollapsed} onOpenChange={(open) => setIsCollapsed(open)}>
             <li>
                 <CollapsibleTrigger asChild>
                     <button
                         className={cn(
-                            'inline-flex w-full cursor-pointer flex-row items-center gap-x-2 rounded-md px-2 py-1.5 tracking-wide text-slate-600 transition duration-200 hover:bg-sidebar-menu-bg hover:text-sidebar-menu-text [&_svg]:pointer-events-none [&_svg]:size-4',
-                            isCollapsed && 'bg-sidebar-menu-bg text-sidebar-menu-text',
+                            'inline-flex w-full cursor-pointer flex-row items-center gap-x-2 rounded-md px-2 py-1.5 tracking-wide transition duration-200 [&_svg]:pointer-events-none [&_svg]:size-4.5',
+                            isCollapsed || menuIds.includes(pageId)
+                                ? 'bg-sidebar-menu-bg text-sidebar-menu-text'
+                                : 'bg-transparent text-sidebar-menu-inactive-text hover:bg-sidebar-menu-bg hover:text-sidebar-menu-text',
                         )}
                     >
-                        <RssIcon />
-                        <span className="flex-1 text-left">{title}</span>
+                        <CollapsibleIcon />
+                        <span className="flex-1 text-left">{label}</span>
                         <PlusIcon className="w-full transition-transform duration-200 group-hover/menu-trigger:rotate-15 group-data-[state=open]/menu-trigger:rotate-45" />
                     </button>
                 </CollapsibleTrigger>
@@ -89,24 +123,29 @@ export function CollapsibleMenuItem({ title, isOpen = false }: PropsWithChildren
                             isCollapsed ? 'border-blue-700/30' : 'border-line-brand',
                         )}
                     >
-                        <li className={cn('group/menu-tree relative')} title="Berkala">
-                            <Link
-                                href={'#'}
-                                className="inline-flex w-full items-center rounded bg-sidebar-menu-bg px-2 py-1.5 text-[15.35px] tracking-wide text-sidebar-menu-text"
-                            >
-                                Berkala
-                            </Link>
-                            <span className="absolute top-1/2 -left-[9.5px] h-5 w-0.5 -translate-y-1/2 rounded bg-sidebar-menu-text"></span>
-                        </li>
-                        <li className={cn('group/menu-tree relative')} title="Setiap Saat">
-                            <Link
-                                href={route('console.public-information.index')}
-                                className="inline-flex w-full items-center rounded bg-transparent px-2 py-1.5 text-[15.35px] tracking-wide text-sidebar-menu-inactive-text transition-colors duration-200 group-hover/menu-tree:bg-sidebar-menu-bg group-hover/menu-tree:text-sidebar-menu-text"
-                            >
-                                Setiap Saat
-                            </Link>
-                            <span className="absolute top-1/2 -left-[9.5px] h-5 w-0.5 -translate-y-1/2 rounded bg-sidebar-menu-text opacity-0 transition-all duration-200 group-hover/menu-tree:opacity-100"></span>
-                        </li>
+                        {collapsibleChildren.map((child) => (
+                            <li className={cn('group/menu-tree relative')} title={child.label} key={child.id}>
+                                <Link
+                                    href={child.url}
+                                    className={cn(
+                                        'inline-flex w-full items-center rounded px-2 py-1.5 text-[15.35px] tracking-wide transition-colors duration-200',
+                                        child.id === pageId
+                                            ? 'bg-sidebar-menu-bg text-sidebar-menu-text'
+                                            : 'bg-transparent text-sidebar-menu-inactive-text group-hover/menu-tree:bg-sidebar-menu-bg group-hover/menu-tree:text-sidebar-menu-text',
+                                    )}
+                                >
+                                    {child.label}
+                                </Link>
+                                <span
+                                    className={cn(
+                                        'absolute top-1/2 -left-[9.5px] h-5 w-0.5 -translate-y-1/2 rounded transition-all duration-200',
+                                        child.id === pageId
+                                            ? 'bg-sidebar-menu-text opacity-100'
+                                            : 'opacity-0 group-hover/menu-tree:bg-sidebar-menu-text group-hover/menu-tree:opacity-100',
+                                    )}
+                                ></span>
+                            </li>
+                        ))}
                     </ul>
                 </CollapsibleContent>
             </li>
@@ -118,7 +157,7 @@ export function SidebarFooter() {
     const { auth } = usePage<SharedData>().props;
 
     return (
-        <div className="flex items-center justify-center p-4">
+        <div className="flex items-center justify-center px-2 pt-0 pb-4">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div className="group/footer flex w-full cursor-pointer items-center justify-between gap-x-2.5 rounded-md border border-line-brand bg-white p-3 transition duration-150 hover:bg-slate-100">
