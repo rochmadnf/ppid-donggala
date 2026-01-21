@@ -5,7 +5,7 @@ import type { ConsoleLayoutProps } from './types';
 
 export default function ConsoleLayout({ children }: PropsWithChildren<ConsoleLayoutProps>) {
     return (
-        <div className="mx-auto grid h-dvh w-full max-w-7xl grid-cols-12 border-0 border-line-brand md:border-x">
+        <div className="mx-auto grid min-h-dvh w-full max-w-7xl grid-cols-12 border-0 border-line-brand md:border-x">
             {/* Sidebar */}
             <Sidebar />
             {/* Content */}
