@@ -4,6 +4,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
@@ -18,20 +19,24 @@ import { menuItems, type MenuItemProps } from './config/sidebar';
 
 export function Sidebar() {
     return (
-        <div className="col-span-3 hidden flex-col justify-between border-r border-line-brand bg-white md:flex md:gap-y-4">
-            <SidebarHeader />
-            <SidebarMenu />
-            <SidebarFooter />
+        <div className="relative col-span-3 hidden border-r border-line-brand bg-white md:block">
+            <aside className="sticky top-0 z-10 flex h-dvh flex-col justify-between gap-y-4">
+                <SidebarHeader />
+                <SidebarMenu />
+                <SidebarFooter />
+            </aside>
         </div>
     );
 }
 
 export function SidebarHeader() {
     return (
-        <div className="flex h-16 items-center border-b border-line-brand px-4">
+        <div className="flex h-header-h shrink-0 items-center border-b border-line-brand px-4" aria-label="sidebar header" data-slot="sidebar-header">
             <AppLogo className="h-auto w-18" />
             <div className="ml-2 border-l border-line-brand pl-2">
-                <h1 className="text-xs font-bold">Pejabat Pengelola Informasi dan Dokumentasi</h1>
+                <h1 className="text-xs font-bold" aria-label="sidebar title" data-slot="sidebar-title">
+                    Pejabat Pengelola Informasi dan Dokumentasi
+                </h1>
             </div>
         </div>
     );
@@ -41,7 +46,12 @@ export function SidebarMenu() {
     const { page } = usePage<PageDataProps>().props;
 
     return (
-        <ul className="mx-2 flex flex-1 flex-col gap-y-2.5 rounded-md border border-line-brand px-2.5 pt-2 pb-4">
+        <ul
+            className={cn(
+                'relative mx-2 flex flex-1 flex-col gap-y-2.5 overflow-y-auto rounded-md px-2.5',
+                'scrollbar-thin scrollbar-thumb-blue-500/50 scrollbar-track-sidebar-menu-bg',
+            )}
+        >
             {menuItems.map((menu) => {
                 if (menu.children.length > 0) {
                     const { id, url, ...menuItemProps } = menu;
@@ -53,12 +63,6 @@ export function SidebarMenu() {
                     return <SidebarMenuItem key={id} {...menuItemProps} isActive={page.id === id} />;
                 }
             })}
-            <SidebarMenuItem
-                icon={Globe2Icon}
-                label="Lihat Situs"
-                url={route('welcome')}
-                className="bg-blue-600 px-4 py-3 text-white shadow-blue-500 transition duration-150 hover:bg-blue-700 hover:text-white hover:shadow"
-            />
         </ul>
     );
 }
@@ -113,7 +117,7 @@ export function CollapsibleMenuItem({
                     >
                         <CollapsibleIcon />
                         <span className="flex-1 text-left">{label}</span>
-                        <PlusIcon className="w-full transition-transform duration-200 group-hover/menu-trigger:rotate-15 group-data-[state=open]/menu-trigger:rotate-45" />
+                        <PlusIcon className="size-4! w-full transition-transform duration-200 group-hover/menu-trigger:rotate-15 group-data-[state=open]/menu-trigger:rotate-45" />
                     </button>
                 </CollapsibleTrigger>
                 <CollapsibleContent asChild>
@@ -157,7 +161,7 @@ export function SidebarFooter() {
     const { auth } = usePage<SharedData>().props;
 
     return (
-        <div className="flex items-center justify-center px-2 pt-0 pb-4">
+        <div className="flex shrink-0 items-center justify-center border-t border-line-brand px-2 py-4">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div className="group/footer flex w-full cursor-pointer items-center justify-between gap-x-2.5 rounded-md border border-line-brand bg-white p-3 transition duration-150 hover:bg-slate-100">
@@ -175,17 +179,26 @@ export function SidebarFooter() {
                 <DropdownMenuContent side="top" className="w-71.5">
                     <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild variant="destructive">
-                        <Link
-                            href={route('logout')}
-                            className="w-full cursor-pointer py-2 text-base font-medium tracking-wide"
-                            as="button"
-                            method="post"
-                        >
-                            <LogOutIcon className="size-5" />
-                            Keluar
-                        </Link>
-                    </DropdownMenuItem>
+                    <DropdownMenuGroup>
+                        <DropdownMenuLabel className="text-sidebar-menu-inactive-text select-none">Lainnya</DropdownMenuLabel>
+                        <DropdownMenuItem asChild variant="primary">
+                            <Link
+                                href={route('welcome')}
+                                className="w-full py-2 text-base font-medium tracking-wide"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Globe2Icon className="size-5 animate-spin [animation-duration:5s]" />
+                                Lihat Situs
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild variant="destructive">
+                            <Link href={route('logout')} className="w-full py-2 text-base font-medium tracking-wide" as="button" method="post">
+                                <LogOutIcon className="size-5" />
+                                Keluar
+                            </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
