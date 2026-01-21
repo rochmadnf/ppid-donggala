@@ -1,4 +1,4 @@
-import { LayoutPanelLeftIcon, SquareChartGanttIcon, type LucideIcon } from 'lucide-react';
+import { CirclePile, LayoutPanelLeftIcon, SquareChartGanttIcon, type LucideIcon } from 'lucide-react';
 
 export type MenuItemProps = {
     id: string;
@@ -38,6 +38,21 @@ export const menuItems: MenuItemProps[] = [
                 label: 'Dikecualikan',
                 url: route('console.public-information.index', { category: 'dikecualikan' }),
             },
+        ],
+    },
+    {
+        id: 'a0e3be1f-c5e5-405a-ba53-a027a8f91f47',
+        label: 'Data Master',
+        icon: CirclePile,
+        url: '#',
+        children: [
+            {
+                id: 'a0e3beae-66d8-4bf3-8863-174f5e278ed3',
+                label: 'Perangkat Daerah',
+                url: route('console.master-data.offices.index'),
+            },
+            { id: 'a0e3d135-24de-4b7f-8ff6-85abd5739e3c', label: 'Pengguna', url: '#' },
+            { id: 'a0e3d19f-84e8-4068-9a16-8e93dc9ef731', label: 'Hak Akses', url: '#' },
         ],
     },
 ];

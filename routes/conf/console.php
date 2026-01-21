@@ -13,4 +13,11 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
         ->group(function () {
             Route::get('', 'index')->name('index');
         });
+
+    Route::controller(Console\MasterData\OfficeController::class)
+        ->prefix('master-data/offices')
+        ->name('master-data.offices.')
+        ->group(function () {
+            Route::get('', 'index')->name('index');
+        });
 });

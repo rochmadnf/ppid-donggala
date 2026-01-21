@@ -22,5 +22,6 @@ export type PageDataProps = {
     page: {
         id: string;
         title: string;
+        description: string;
     };
 };
