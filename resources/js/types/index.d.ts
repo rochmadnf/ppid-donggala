@@ -20,6 +20,7 @@ export interface User {
 
 export type PageDataProps = {
     page: {
+        id: string;
         title: string;
     };
 };
