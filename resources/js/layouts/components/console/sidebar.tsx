@@ -1,5 +1,6 @@
 import AppLogo from '@/components/app-logo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,9 +9,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import type { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronsUpDownIcon, LayoutPanelLeftIcon, LogOutIcon, RssIcon } from 'lucide-react';
+import { ChevronsUpDownIcon, LayoutPanelLeftIcon, LogOutIcon, PlusIcon, RssIcon } from 'lucide-react';
+import { useState, type PropsWithChildren } from 'react';
 
 export function Sidebar() {
     return (
@@ -39,22 +42,75 @@ export function SidebarMenu() {
             <li className="relative">
                 <Link
                     href={route('console.dashboard')}
-                    className="inline-flex w-full items-center gap-x-2 rounded-md bg-blue-100/50 px-2 py-1.5 tracking-wide text-blue-700 transition duration-200 [&_svg]:pointer-events-none [&_svg]:size-4"
+                    className="inline-flex w-full items-center gap-x-2 rounded-md bg-sidebar-menu-bg px-2 py-1.5 tracking-wide text-blue-700 transition duration-200 [&_svg]:pointer-events-none [&_svg]:size-4"
                 >
                     <LayoutPanelLeftIcon />
                     Dashboard
                 </Link>
             </li>
-            <li className="relative">
-                <Link
-                    href="/console/public-information"
-                    className="inline-flex w-full items-center gap-x-2 rounded-md px-2 py-1.5 tracking-wide text-slate-600 transition duration-200 hover:bg-blue-100/50 hover:text-blue-700 [&_svg]:pointer-events-none [&_svg]:size-4"
-                >
-                    <RssIcon />
-                    Informasi Publik
-                </Link>
-            </li>
+            <CollapsibleMenuItem title="Informasi Publik"></CollapsibleMenuItem>
         </ul>
+    );
+}
+
+export interface CollapsibleMenuItemProps {
+    title: string;
+    isOpen?: boolean;
+}
+
+export function CollapsibleMenuItem({ title, isOpen = false }: PropsWithChildren<CollapsibleMenuItemProps>) {
+    const [isCollapsed, setIsCollapsed] = useState(isOpen);
+
+    return (
+        <Collapsible
+            asChild
+            className="group/menu-trigger relative"
+            title={title}
+            defaultOpen={isCollapsed}
+            onOpenChange={(open) => setIsCollapsed(open)}
+        >
+            <li>
+                <CollapsibleTrigger asChild>
+                    <button
+                        className={cn(
+                            'inline-flex w-full cursor-pointer flex-row items-center gap-x-2 rounded-md px-2 py-1.5 tracking-wide text-slate-600 transition duration-200 hover:bg-sidebar-menu-bg hover:text-sidebar-menu-text [&_svg]:pointer-events-none [&_svg]:size-4',
+                            isCollapsed && 'bg-sidebar-menu-bg text-sidebar-menu-text',
+                        )}
+                    >
+                        <RssIcon />
+                        <span className="flex-1 text-left">{title}</span>
+                        <PlusIcon className="w-full transition-transform duration-200 group-hover/menu-trigger:rotate-15 group-data-[state=open]/menu-trigger:rotate-45" />
+                    </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent asChild>
+                    <ul
+                        className={cn(
+                            'ml-3.5 flex flex-col gap-y-2.5 border-l-[1.5px] p-2 pr-0',
+                            isCollapsed ? 'border-blue-700/30' : 'border-line-brand',
+                        )}
+                    >
+                        <li className={cn('group/menu-tree relative')} title="Berkala">
+                            <Link
+                                href={'#'}
+                                className="inline-flex w-full items-center rounded bg-sidebar-menu-bg px-2 py-1.5 text-[15.35px] tracking-wide text-sidebar-menu-text"
+                            >
+                                Berkala
+                            </Link>
+                            <span className="absolute top-1/2 -left-[9.5px] h-5 w-0.5 -translate-y-1/2 rounded bg-sidebar-menu-text"></span>
+                        </li>
+                        <li className={cn('group/menu-tree relative')} title="Setiap Saat">
+                            <Link
+                                href={route('console.public-information.index')}
+                                className="inline-flex w-full items-center rounded bg-transparent px-2 py-1.5 text-[15.35px] tracking-wide text-sidebar-menu-inactive-text transition-colors duration-200 group-hover/menu-tree:bg-sidebar-menu-bg group-hover/menu-tree:text-sidebar-menu-text"
+                            >
+                                Setiap Saat
+                            </Link>
+                            <span className="absolute top-1/2 -left-[9.5px] h-5 w-0.5 -translate-y-1/2 rounded bg-sidebar-menu-text opacity-0 transition-all duration-200 group-hover/menu-tree:opacity-100"></span>
+                        </li>
+                    </ul>
+                </CollapsibleContent>
+            </li>
+        </Collapsible>
     );
 }
 
