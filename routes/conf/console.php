@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Console;
+use App\Http\Controllers\Console\{MasterData, DashboardController, PublicInformationController};
 
 Route::middleware('auth')->prefix('console')->name('console.')->group(function () {
-    Route::get('/', [Console\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::controller(Console\PublicInformationController::class)
+    Route::controller(PublicInformationController::class)
         ->prefix('public-information/{category}')
         ->whereIn('category', ['setiap-saat', 'berkala', 'dikecualikan', 'serta-merta'])
         ->name('public-information.')
@@ -14,10 +14,14 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
             Route::get('', 'index')->name('index');
         });
 
-    Route::controller(Console\MasterData\OfficeController::class)
-        ->prefix('master-data/offices')
-        ->name('master-data.offices.')
-        ->group(function () {
-            Route::get('', 'index')->name('index');
-        });
+    Route::prefix('master-data')->name("master-data.")->group(function () {
+
+        // @offices
+        Route::controller(MasterData\OfficeController::class)
+            ->prefix('offices')
+            ->name('offices.')
+            ->group(function () {
+                Route::get('', 'index')->name('index');
+            });
+    });
 });
