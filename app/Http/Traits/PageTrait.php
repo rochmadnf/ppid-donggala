@@ -4,13 +4,14 @@ namespace App\Http\Traits;
 
 trait PageTrait
 {
-    public function details(string $title, string $desc = ''): array
+    public function pageDetails(string $title, string|bool $id = false, string $desc = '', array $breadcrumbs = []): array
     {
         return [
             'page' => [
-                'id' => $this->pageId,
+                'id' => $id ?: $this->pageId,
                 'title' => $title,
                 'description' => $desc,
+                'breadcrumbs' => $breadcrumbs,
             ],
         ];
     }

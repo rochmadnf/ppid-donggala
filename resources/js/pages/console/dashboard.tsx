@@ -9,14 +9,13 @@ export default function DashboardPage() {
 
     return (
         <>
-            <MetaTag withAppName title={page.title} description="Halaman utama dashboard admin">
+            <MetaTag withAppName title={page.title} description={page.description}>
                 <meta name="robots" content="noindex,nofollow" />
             </MetaTag>
 
             <div className="relative">
-                dss
                 {Array.from({ length: 100 }, (_, i) => i + 1).map((item) => (
-                    <p key={item} className="mb-4 h-12 w-full rounded bg-slate-300/50">
+                    <p key={item} className="mb-4 h-12 w-full rounded bg-line-brand">
                         {item}
                     </p>
                 ))}

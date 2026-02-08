@@ -170,8 +170,8 @@ export function SidebarFooter() {
                             <AvatarFallback>RF</AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left leading-tight">
-                            <span className="truncate font-medium">{auth.user.username}</span>
-                            <span className="truncate text-xs">user_role</span>
+                            <span className="truncate text-lg/tight font-medium">{auth.user.username}</span>
+                            <span className="truncate text-xs">{auth.user.role}</span>
                         </div>
                         <ChevronsUpDownIcon className="size-4 text-slate-600 transition duration-150 group-hover/footer:text-slate-900" />
                     </div>

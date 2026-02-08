@@ -12,7 +12,7 @@ export const menus: MenuProps[] = [
     {
         id: 'informasi-serta-merta',
         title: 'Informasi Serta Merta',
-        description: 'Informasi Publik yang wajib disediakan dan diumumkan secara serta merta tanpa penundaan.',
+        description: 'Informasi Publik yang wajib disediakan dan diumumkan secara serta-merta tanpa penundaan.',
         icon: NotebookTextIcon,
         url: '#',
     },
