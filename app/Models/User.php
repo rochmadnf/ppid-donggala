@@ -9,9 +9,9 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, Notifiable, HasUuids, \Spatie\Permission\Traits\HasRoles;
 
-    protected $fillable = ['username', 'email', 'password'];
+    protected $fillable = ['username', 'email', 'password', 'deactivated_at'];
 
     protected $hidden = ['password', 'remember_token'];
 

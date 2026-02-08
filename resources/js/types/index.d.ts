@@ -6,6 +6,7 @@ export interface SharedData {
     };
     app: {
         name: string;
+        version: string;
     };
     ziggy: Config & { location: string };
     [key: string]: unknown;
@@ -16,6 +17,8 @@ export interface User {
     username: string;
     email: string;
     avatar: string;
+    role: string;
+    permissions: string[];
 }
 
 export type PageDataProps = {
@@ -23,5 +26,13 @@ export type PageDataProps = {
         id: string;
         title: string;
         description: string;
+        breadcrumbs: {
+            group_id: string;
+            items: {
+                id: string;
+                label: string;
+                url: string;
+            }[];
+        };
     };
 };

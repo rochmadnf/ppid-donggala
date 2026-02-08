@@ -17,5 +17,7 @@ class UserSeeder extends Seeder
             'email' => 'rochmadnf@donggala.go.id',
             'password' => 'P4$$w0rd',
         ]);
+
+        $s->assignRole(config('permission.superior_role_name'));
     }
 }

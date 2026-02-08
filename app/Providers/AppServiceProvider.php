@@ -22,5 +22,9 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production') {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
+
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            return $user->hasRole(config('permission.superior_role_name')) ? true : null;
+        });
     }
 }

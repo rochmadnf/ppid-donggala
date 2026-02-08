@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('username')->unique()->index();
             $table->string('email')->nullable();
             $table->string('password');
+            $table->timestamp('deactivated_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
