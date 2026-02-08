@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'app' => [
                 'name' => config('app.name'),
+                'version' => config('app.version'),
             ],
             'ziggy' => fn(): array => [
                 ...(new \Tighten\Ziggy\Ziggy())->toArray(),
