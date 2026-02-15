@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircleIcon } from 'lucide-react';
-import { type FormEventHandler } from 'react';
+import type { SubmitEventHandler } from 'react';
 
 export default function Login() {
     const form = useForm<{
@@ -19,7 +19,7 @@ export default function Login() {
         remember_me: false,
     });
 
-    const hitLoginButton: FormEventHandler = (e) => {
+    const hitLoginButton: SubmitEventHandler = (e) => {
         e.preventDefault();
 
         form.post(route('login'), {
