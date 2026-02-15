@@ -9,9 +9,7 @@ export default function DashboardPage() {
 
     return (
         <>
-            <MetaTag withAppName title={page.title} description={page.description}>
-                <meta name="robots" content="noindex,nofollow" />
-            </MetaTag>
+            <MetaTag withAppName title={page.title} description={page.description} robots="00" />
 
             <div className="relative">
                 {Array.from({ length: 100 }, (_, i) => i + 1).map((item) => (

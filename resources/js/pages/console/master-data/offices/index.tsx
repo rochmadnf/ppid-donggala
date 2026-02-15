@@ -9,7 +9,7 @@ export default function OfficeIndexPage() {
 
     return (
         <>
-            <MetaTag withAppName {...page}>
+            <MetaTag robots="00" withAppName {...page}>
                 <meta name="og:url" content={route('console.master-data.offices.index')} />
                 <link rel="canonical" href={route('console.master-data.offices.index')} />
             </MetaTag>

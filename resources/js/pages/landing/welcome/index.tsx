@@ -17,7 +17,6 @@ export default function WelcomePage() {
                 title="PPID Kabupaten Donggala &#8211; Menuju Masyarakat Informasi"
                 description="Selamat datang di PPID Kabupaten Donggala, sumber informasi resmi Pemerintah Kabupaten Donggala."
             >
-                <meta name="robots" content="index, follow" />
                 <meta name="keywords" content="ppid, ppid donggala, ppid kabupaten donggala, kabupaten donggala, pemda donggala" />
 
                 <meta property="og:url" content={route('welcome')} />
