@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\{RedirectResponse, Request};
 use Illuminate\Support\Facades\Auth;
 use Inertia\Response as InertiaResponse;
 
@@ -24,7 +24,7 @@ class AuthenticatedSessionController extends Controller
         return redirect()->intended(route('console.dashboard', absolute: false));
     }
 
-    public function logout(\Illuminate\Http\Request $request): RedirectResponse
+    public function logout(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
 

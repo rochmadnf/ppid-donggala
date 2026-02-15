@@ -21,12 +21,15 @@ class LoginRequest extends FormRequest
         return [
             'username' => ['required', 'string', 'min:5'],
             'password' => ['required', 'string', 'min:8'],
+            'remember_me' => ['nullable', 'boolean'],
         ];
     }
 
     public function authenticate()
     {
-        if (!Auth::attempt($this->only('username', 'password'), $this->boolean('remember_me'))) {
+        $validData = collect($this->validated());
+
+        if (!Auth::guard('web')->attempt($validData->except('remember_me')->toArray(), $validData->get('remember_me', false))) {
             throw ValidationException::withMessages([
                 'username' => trans('auth.failed'),
             ]);
