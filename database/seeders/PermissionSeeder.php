@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PermissionSeeder extends Seeder
@@ -12,11 +11,12 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
+        // set models
         $roleModel = app(config('permission.models.role'));
         $permissionModel = app(config('permission.models.permission'));
 
         // create main role
-        $roleModel::create(['name' => config('permission.superior_role_name')]);
+        $roleModel::firstOrCreate(['name' => config('permission.superior_role_name')], []);
 
         // create permissions
         collect([
@@ -43,13 +43,20 @@ class PermissionSeeder extends Seeder
         ])->each(function ($permission) use ($permissionModel) {
             $groupName = $permission['name'];
 
-            collect($permission['children'])->each(function ($child) use ($groupName, $permissionModel) {
-                $permissionModel::create([
-                    'group_name' => $groupName,
-                    'name' => $child['name'],
-                    'label' => $child['label'],
-                ]);
-            });
+            collect($permission['children'])
+                ->each(function ($child) use ($groupName, $permissionModel) {
+                    $p = $permissionModel::firstOrCreate(
+                        [
+                            'name' => $child['name'],
+                        ],
+                        [
+                            'group_name' => $groupName,
+                            'label' => $child['label'],
+                        ]
+                    );
+
+                    $this->command->info("Permission '{$child['name']}'" . ($p->wasRecentlyCreated ? " created." : " exists."));
+                });
         });
     }
 }
