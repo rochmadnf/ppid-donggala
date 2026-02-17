@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 class OfficeSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Pemerintah Kabupaten Donggala',
                 'alias' => 'Pemda Donggala',
-                'address' => 'Jl. Jati, Kompleks Perkantoran PemdaKelurahan Gunung Bale Banawa',
+                'address' => 'Jl. Jati, Kompleks Perkantoran Pemda Kelurahan Gunung Bale Banawa',
                 'phone' => null,
                 'site_url' => 'https://donggala.go.id',
             ],
@@ -35,7 +35,7 @@ class OfficeSeeder extends Seeder
                 'site_url' => 'https://dishubdonggala.com',
             ]
         ])->each(function ($office) {
-            \App\Models\MasterData\Office::create($office);
+            \App\Models\MasterData\Office::updateOrCreate(['name' => $office['name']], Arr::except($office, ['name']));
         });
     }
 }
