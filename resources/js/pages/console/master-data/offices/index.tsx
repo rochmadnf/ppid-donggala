@@ -3,9 +3,10 @@ import ConsoleLayout from '@/layouts/console-layout';
 import type { PageDataProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
+import type { OfficeIndexProps } from './types';
 
 export default function OfficeIndexPage() {
-    const { page } = usePage<PageDataProps>().props;
+    const { page, resources } = usePage<PageDataProps & OfficeIndexProps>().props;
 
     return (
         <>

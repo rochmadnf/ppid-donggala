@@ -9,6 +9,11 @@ class OfficeController extends Controller
 {
     use \App\Http\Traits\PageTrait;
 
+    public function __construct(private readonly \App\Repositories\Contracts\MasterData\OfficeRepositoryInterface $officeRepository)
+    {
+        //
+    }
+
     protected string $pageId = 'a0e3beae-66d8-4bf3-8863-174f5e278ed3';
 
     protected function breadcrumbs(): array
@@ -27,12 +32,16 @@ class OfficeController extends Controller
 
     public function index(): InertiaResponse
     {
-        return inertia('console/master-data/offices/index', [
-            ...$this->pageDetails(
-                title: 'Perangkat Daerah',
-                desc: 'Daftar Perangkat Daerah pada lingkup kerja Pemerintahan Kabupaten Donggala.',
-                breadcrumbs: $this->breadcrumbs(),
-            ),
-        ]);
+        return inertia(
+            'console/master-data/offices/index',
+            [
+                ...$this->pageDetails(
+                    title: 'Perangkat Daerah',
+                    desc: 'Daftar Perangkat Daerah pada lingkup kerja Pemerintahan Kabupaten Donggala.',
+                    breadcrumbs: $this->breadcrumbs(),
+                ),
+                "resources" => $this->officeRepository->paginate(),
+            ]
+        );
     }
 }

@@ -21,7 +21,7 @@ export interface User {
     permissions: string[];
 }
 
-export type PageDataProps = {
+export interface PageDataProps {
     page: {
         id: string;
         title: string;
@@ -35,4 +35,5 @@ export type PageDataProps = {
             }[];
         };
     };
-};
+    [key: string]: unknown;
+}
