@@ -30,6 +30,11 @@ class Office extends Model
         ];
     }
 
+    public function scopeWithMerger($query)
+    {
+        return $query->with(['mergerOf', 'mergedBy']);
+    }
+
     /**
      * Standalone office
      * office that is not involved in any merger
@@ -64,6 +69,11 @@ class Office extends Model
     public function scopeSubsidiary(Builder $query): void
     {
         $query->whereDoesntHave('mergerOf')->whereHas('mergedBy');
+    }
+
+    public function scopeExcludeMerged(Builder $query): void
+    {
+        $query->whereDoesntHave('mergedBy');
     }
 
     public function mergerOf(): BelongsToMany
