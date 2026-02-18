@@ -6,7 +6,17 @@
  * All controls are disabled when the cropper is not ready.
  */
 
-import { FlipHorizontalIcon, FlipVerticalIcon, RatioIcon, RotateCcwIcon, RotateCwIcon, UndoIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import {
+    AlignCenterIcon,
+    FlipHorizontalIcon,
+    FlipVerticalIcon,
+    RatioIcon,
+    RotateCcwIcon,
+    RotateCwIcon,
+    UndoIcon,
+    ZoomInIcon,
+    ZoomOutIcon,
+} from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -27,6 +37,7 @@ export interface CropperControlsProps {
     // -- Callbacks from useCropper --
     setPreset: (key: string) => void;
     setAspectRatio: (ratio: number | null) => void;
+    centerImage: () => void;
     zoomIn: () => void;
     zoomOut: () => void;
     rotateLeft: () => void;
@@ -49,6 +60,7 @@ export function CropperControls({
     presets,
     setPreset,
     setAspectRatio,
+    centerImage,
     zoomIn,
     zoomOut,
     rotateLeft,
@@ -109,6 +121,7 @@ export function CropperControls({
             <div className="flex items-center justify-center">
                 <div className="inline-flex items-center gap-0.5 rounded-full bg-neutral-800/80 p-1 shadow-lg backdrop-blur-sm">
                     {/* Zoom */}
+                    <ToolButton icon={AlignCenterIcon} label="Center image" disabled={disabled} onClick={centerImage} />
                     <ToolButton icon={ZoomInIcon} label="Zoom in" disabled={disabled} onClick={zoomIn} />
                     <ToolButton icon={ZoomOutIcon} label="Zoom out" disabled={disabled} onClick={zoomOut} />
 

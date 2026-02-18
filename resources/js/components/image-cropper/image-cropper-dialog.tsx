@@ -67,6 +67,7 @@ export function ImageCropperDialog({
         changeVersion,
         setPreset,
         setAspectRatio,
+        centerImage,
         zoomIn,
         zoomOut,
         rotateLeft,
@@ -250,6 +251,7 @@ export function ImageCropperDialog({
                                     presets={presets}
                                     setPreset={setPreset}
                                     setAspectRatio={setAspectRatio}
+                                    centerImage={centerImage}
                                     zoomIn={zoomIn}
                                     zoomOut={zoomOut}
                                     rotateLeft={rotateLeft}

@@ -61,6 +61,7 @@ export interface UseCropperReturn {
     setPreset: (key: string) => void;
 
     // -- Actions --
+    centerImage: () => void;
     zoomIn: () => void;
     zoomOut: () => void;
     rotateLeft: () => void;
@@ -453,6 +454,11 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
         return cropperRef.current?.getCropperSelection() ?? null;
     }, []);
 
+    const centerImage = useCallback(() => {
+        getImage()?.$center('contain');
+        notifyChange();
+    }, [getImage, notifyChange]);
+
     // ---- Actions ----------------------------------------------------------
     const zoomIn = useCallback(() => {
         getImage()?.$zoom(0.1);
@@ -588,6 +594,7 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
 
         setPreset,
 
+        centerImage,
         zoomIn,
         zoomOut,
         rotateLeft,
