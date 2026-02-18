@@ -9,6 +9,7 @@
  *  - Apply and switch presets dynamically
  *  - Provide zoom, rotate, flip, reset actions
  *  - Generate cropped output (canvas / blob)
+ *  - Enforce selection boundary constraints (canvas / image / none)
  */
 
 import Cropper, { type CropperImage, type CropperSelection } from 'cropperjs';
@@ -20,6 +21,8 @@ import { BUILT_IN_PRESETS, type CropPreset, getPreset, mergePresets } from './pr
 // Types
 // ---------------------------------------------------------------------------
 
+export type WithinMode = 'canvas' | 'image' | 'none';
+
 export interface UseCropperOptions {
     /** Image source URL (blob URL, data URL, or remote URL) */
     imageSrc: string | null;
@@ -27,6 +30,13 @@ export interface UseCropperOptions {
     defaultPreset?: string;
     /** Additional presets merged with built-ins */
     customPresets?: CropPreset[];
+    /**
+     * Boundary constraint mode.
+     * - 'canvas'  : selection stays within the cropper canvas (default)
+     * - 'image'   : selection stays within the image (even when transformed)
+     * - 'none'    : no constraint
+     */
+    within?: WithinMode;
 }
 
 export interface UseCropperReturn {
@@ -42,6 +52,10 @@ export interface UseCropperReturn {
     presets: CropPreset[];
     /** Monotonic counter that increments on every programmatic change */
     changeVersion: number;
+    /** Current boundary constraint mode */
+    within: WithinMode;
+    /** Update boundary constraint mode at runtime */
+    setWithin: (mode: WithinMode) => void;
 
     // -- Preset --
     setPreset: (key: string) => void;
@@ -92,13 +106,24 @@ const CROPPER_TEMPLATE = `
 // Hook
 // ---------------------------------------------------------------------------
 
-export function useCropper({ imageSrc, defaultPreset, customPresets = [] }: UseCropperOptions): UseCropperReturn {
+export function useCropper({ imageSrc, defaultPreset, customPresets = [], within: initialWithin = 'image' }: UseCropperOptions): UseCropperReturn {
     const imageRef = useRef<HTMLImageElement | null>(null);
     const cropperRef = useRef<Cropper | null>(null);
 
     const [isReady, setIsReady] = useState(false);
     const [activePresetKey, setActivePresetKey] = useState(defaultPreset ?? '');
     const [changeVersion, setChangeVersion] = useState(0);
+    const [within, setWithin] = useState<WithinMode>(initialWithin);
+
+    /**
+     * Keep a ref in sync with `within` so that event listeners (which close
+     * over the ref) always read the latest value without needing to be
+     * re-registered whenever the mode changes.
+     */
+    const withinRef = useRef<WithinMode>(within);
+    useEffect(() => {
+        withinRef.current = within;
+    }, [within]);
 
     // ---- Merged presets (memoised) ----------------------------------------
     const allPresets = useMemo(() => mergePresets(BUILT_IN_PRESETS, customPresets), [customPresets]);
@@ -126,6 +151,29 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [] }: UseC
         }
     }, []);
 
+    // ---- Boundary helpers -------------------------------------------------
+
+    /**
+     * Returns true when `inner` is fully contained within `outer`.
+     * Both rects are expected to be raw DOMRect values.
+     * `canvasRect` is used to translate absolute page coordinates into
+     * canvas-local coordinates (mirrors the Vue inSelection helper).
+     */
+    const inBounds = useCallback((innerRect: DOMRect, outerRect: DOMRect, canvasRect: DOMRect): boolean => {
+        const epsilon = 1.5;
+        const innerX = innerRect.left - canvasRect.left;
+        const innerY = innerRect.top - canvasRect.top;
+        const outerX = outerRect.left - canvasRect.left;
+        const outerY = outerRect.top - canvasRect.top;
+
+        return (
+            innerX >= outerX - epsilon &&
+            innerY >= outerY - epsilon &&
+            innerX + innerRect.width <= outerX + outerRect.width + epsilon &&
+            innerY + innerRect.height <= outerY + outerRect.height + epsilon
+        );
+    }, []);
+
     // ---- Init / destroy CropperJS on image change -------------------------
     useEffect(() => {
         const img = imageRef.current;
@@ -135,6 +183,13 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [] }: UseC
         }
 
         let cancelled = false;
+
+        // Store cleanup references so we can remove them in the effect teardown
+        let boundSelectionChange: ((e: Event) => void) | null = null;
+        let boundImageTransform: ((e: Event) => void) | null = null;
+        let selectionEl: HTMLElement | null = null;
+        let imageEl: HTMLElement | null = null;
+        let imageBoundsInCanvas: { x: number; y: number; width: number; height: number } | null = null;
 
         const init = () => {
             if (cancelled) return;
@@ -155,6 +210,167 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [] }: UseC
                 applyShapeMask(selection, activePreset.shape);
             }
 
+            // ----------------------------------------------------------------
+            // Boundary: constrain selection move / resize
+            // ----------------------------------------------------------------
+            const refreshImageBounds = () => {
+                const canvas = cropper.getCropperCanvas();
+                const image = cropper.getCropperImage();
+                if (!canvas || !image) {
+                    imageBoundsInCanvas = null;
+                    return;
+                }
+
+                const canvasRect = (canvas as unknown as HTMLElement).getBoundingClientRect();
+                const imageRect = (image as unknown as HTMLElement).getBoundingClientRect();
+
+                imageBoundsInCanvas = {
+                    x: imageRect.left - canvasRect.left,
+                    y: imageRect.top - canvasRect.top,
+                    width: imageRect.width,
+                    height: imageRect.height,
+                };
+            };
+
+            refreshImageBounds();
+
+            const onSelectionChange = (event: Event) => {
+                const mode = withinRef.current;
+                if (mode === 'none') return;
+
+                const canvas = cropper.getCropperCanvas();
+                if (!canvas) return;
+
+                const canvasEl = canvas as unknown as HTMLElement;
+                const canvasRect = canvasEl.getBoundingClientRect();
+
+                const customEvent = event as CustomEvent<{
+                    x?: number;
+                    y?: number;
+                    width?: number;
+                    height?: number;
+                }>;
+                const detail = customEvent.detail;
+
+                if (
+                    detail &&
+                    typeof detail.x === 'number' &&
+                    typeof detail.y === 'number' &&
+                    typeof detail.width === 'number' &&
+                    typeof detail.height === 'number'
+                ) {
+                    const epsilon = 1.5;
+
+                    let maxX = 0;
+                    let maxY = 0;
+                    let maxWidth = canvasRect.width;
+                    let maxHeight = canvasRect.height;
+
+                    if (mode === 'image') {
+                        if (!imageBoundsInCanvas) {
+                            refreshImageBounds();
+                        }
+
+                        if (!imageBoundsInCanvas) return;
+
+                        maxX = imageBoundsInCanvas.x;
+                        maxY = imageBoundsInCanvas.y;
+                        maxWidth = imageBoundsInCanvas.width;
+                        maxHeight = imageBoundsInCanvas.height;
+                    }
+
+                    const outOfBounds =
+                        detail.x < maxX - epsilon ||
+                        detail.y < maxY - epsilon ||
+                        detail.x + detail.width > maxX + maxWidth + epsilon ||
+                        detail.y + detail.height > maxY + maxHeight + epsilon;
+
+                    if (outOfBounds) {
+                        event.preventDefault();
+                    }
+
+                    return;
+                }
+
+                const sel = cropper.getCropperSelection();
+                if (!sel) return;
+                const selRect = (sel as unknown as HTMLElement).getBoundingClientRect();
+
+                let maxRect: DOMRect;
+
+                if (mode === 'canvas') {
+                    // The canvas itself is the boundary — build a synthetic DOMRect
+                    maxRect = new DOMRect(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+                } else {
+                    // mode === 'image'
+                    const image = cropper.getCropperImage();
+                    if (!image) return;
+                    maxRect = (image as unknown as HTMLElement).getBoundingClientRect();
+                }
+
+                if (!inBounds(selRect, maxRect, canvasRect)) {
+                    event.preventDefault();
+                }
+            };
+
+            // ----------------------------------------------------------------
+            // Boundary: constrain image transforms when within === 'image'
+            // Mirrors the Vue clone trick exactly.
+            // ----------------------------------------------------------------
+            const onImageTransform = (event: Event) => {
+                if (withinRef.current !== 'image') return;
+
+                const canvas = cropper.getCropperCanvas();
+                const image = cropper.getCropperImage();
+                const sel = cropper.getCropperSelection();
+                if (!canvas || !image || !sel) return;
+
+                const customEvent = event as CustomEvent<{ matrix: number[] }>;
+                const canvasEl = canvas as unknown as HTMLElement;
+                const canvasRect = canvasEl.getBoundingClientRect();
+                const selRect = (sel as unknown as HTMLElement).getBoundingClientRect();
+
+                // 1. Clone the image element
+                const imageHTMLEl = image as unknown as HTMLElement;
+                const clone = imageHTMLEl.cloneNode() as HTMLElement;
+
+                // 2. Apply the pending transform to the clone
+                clone.style.transform = `matrix(${customEvent.detail.matrix.join(', ')})`;
+
+                // 3. Make it invisible so it doesn't flash
+                clone.style.opacity = '0';
+                clone.style.position = 'absolute';
+                clone.style.pointerEvents = 'none';
+
+                // 4. Temporarily append to canvas so the browser can calculate layout
+                canvasEl.appendChild(clone);
+
+                // 5. Read where the image *would* be after the transform
+                const cloneRect = clone.getBoundingClientRect();
+
+                // 6. Remove the clone immediately
+                canvasEl.removeChild(clone);
+
+                // 7. If the selection would no longer be inside the image, cancel
+                if (!inBounds(selRect, cloneRect, canvasRect)) {
+                    event.preventDefault();
+                    return;
+                }
+
+                requestAnimationFrame(() => {
+                    refreshImageBounds();
+                });
+            };
+
+            selectionEl = selection as unknown as HTMLElement;
+            imageEl = cropper.getCropperImage() as unknown as HTMLElement;
+
+            boundSelectionChange = onSelectionChange;
+            boundImageTransform = onImageTransform;
+
+            selectionEl?.addEventListener('change', boundSelectionChange);
+            imageEl?.addEventListener('transform', boundImageTransform);
+
             setIsReady(true);
             notifyChange();
         };
@@ -169,6 +385,15 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [] }: UseC
         return () => {
             cancelled = true;
             img.removeEventListener('load', init);
+
+            // Remove boundary listeners before destroying
+            if (selectionEl && boundSelectionChange) {
+                selectionEl.removeEventListener('change', boundSelectionChange);
+            }
+            if (imageEl && boundImageTransform) {
+                imageEl.removeEventListener('transform', boundImageTransform);
+            }
+
             if (cropperRef.current) {
                 cropperRef.current.destroy();
                 cropperRef.current = null;
@@ -337,6 +562,8 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [] }: UseC
         preset: activePreset,
         presets: allPresets,
         changeVersion,
+        within,
+        setWithin,
 
         setPreset,
 

@@ -1,11 +1,3 @@
-/**
- * Image Cropper — Barrel exports
- *
- * Re-exports all public modules for convenient single-path imports:
- *
- *   import { ImageCropperDialog, useCropper, type CropPreset } from '@/components/image-cropper';
- */
-
 // Types & presets
 export { BUILT_IN_PRESETS, getPreset, mergePresets, type CropPreset } from './presets';
 
