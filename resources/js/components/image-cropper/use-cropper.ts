@@ -200,7 +200,10 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
                 cropperRef.current = null;
             }
 
-            const cropper = new Cropper(img, { template: CROPPER_TEMPLATE });
+            const cropper = new Cropper(img, {
+                container: img.parentElement ?? undefined,
+                template: CROPPER_TEMPLATE,
+            });
             cropperRef.current = cropper;
 
             // Apply initial preset
@@ -370,6 +373,15 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
 
             selectionEl?.addEventListener('change', boundSelectionChange);
             imageEl?.addEventListener('transform', boundImageTransform);
+
+            requestAnimationFrame(() => {
+                const initialImage = cropper.getCropperImage();
+                const initialSelection = cropper.getCropperSelection();
+
+                initialImage?.$center('contain');
+                initialSelection?.$center();
+                refreshImageBounds();
+            });
 
             setIsReady(true);
             notifyChange();

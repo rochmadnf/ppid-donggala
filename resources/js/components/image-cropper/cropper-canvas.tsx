@@ -37,7 +37,7 @@ export function CropperCanvas({ src, imageRef, shape = 'rect', className }: Crop
             data-slot="cropper-canvas-wrapper"
             className={cn(
                 // Pintura-style: dark immersive workspace, rounded, no visible border
-                'relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-neutral-900',
+                'relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-neutral-900',
                 'min-h-64 sm:min-h-96',
                 className,
             )}
@@ -47,7 +47,7 @@ export function CropperCanvas({ src, imageRef, shape = 'rect', className }: Crop
                 src={src}
                 alt="Image to crop"
                 crossOrigin="anonymous"
-                className="block max-h-[60vh] w-full object-contain"
+                className="block h-full max-h-full w-full object-contain"
                 draggable={false}
             />
         </div>
