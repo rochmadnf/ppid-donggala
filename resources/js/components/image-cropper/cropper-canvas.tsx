@@ -42,14 +42,7 @@ export function CropperCanvas({ src, imageRef, shape = 'rect', className }: Crop
                 className,
             )}
         >
-            <img
-                ref={imageRef}
-                src={src}
-                alt="Image to crop"
-                crossOrigin="anonymous"
-                className="block h-full max-h-full w-full object-contain"
-                draggable={false}
-            />
+            <img ref={imageRef} src={src} alt="Image to crop" crossOrigin="anonymous" className="block max-h-full max-w-full" draggable={false} />
         </div>
     );
 }

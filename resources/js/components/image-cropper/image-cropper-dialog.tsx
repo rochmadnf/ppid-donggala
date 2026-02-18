@@ -228,8 +228,8 @@ export function ImageCropperDialog({
                                 </div>
 
                                 {/* Preview sidebar (desktop) */}
-                                {isReady && (
-                                    <div className="hidden items-center border-l border-white/6 px-4 sm:flex">
+                                <div className="hidden w-37 items-center justify-center border-l border-white/6 px-4 sm:flex">
+                                    {isReady && (
                                         <CropperPreview
                                             cropper={cropper}
                                             isReady={isReady}
@@ -238,8 +238,8 @@ export function ImageCropperDialog({
                                             height={previewSize.height}
                                             changeVersion={changeVersion}
                                         />
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
 
                             {/* Bottom controls bar */}

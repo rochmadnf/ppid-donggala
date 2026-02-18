@@ -86,7 +86,7 @@ const CROPPER_TEMPLATE = `
     <cropper-image rotatable scalable translatable></cropper-image>
     <cropper-shade hidden></cropper-shade>
     <cropper-handle action="select" plain></cropper-handle>
-    <cropper-selection initial-coverage="0.8" movable resizable zoomable outlined>
+    <cropper-selection initial-coverage="0.8" movable resizable zoomable>
       <cropper-grid role="grid" covered></cropper-grid>
       <cropper-crosshair centered></cropper-crosshair>
       <cropper-handle action="move" theme-color="rgba(255,255,255,0.35)"></cropper-handle>
@@ -205,6 +205,15 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
                 template: CROPPER_TEMPLATE,
             });
             cropperRef.current = cropper;
+
+            const canvasHost = cropper.getCropperCanvas() as unknown as HTMLElement | null;
+            if (canvasHost) {
+                canvasHost.style.display = 'block';
+                canvasHost.style.width = '100%';
+                canvasHost.style.height = '100%';
+                canvasHost.style.minWidth = '0';
+                canvasHost.style.minHeight = '0';
+            }
 
             // Apply initial preset
             const selection = cropper.getCropperSelection();
