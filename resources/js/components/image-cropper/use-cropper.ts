@@ -56,6 +56,8 @@ export interface UseCropperReturn {
     within: WithinMode;
     /** Update boundary constraint mode at runtime */
     setWithin: (mode: WithinMode) => void;
+    /** Force cropper layout reflow + recenter (useful after dynamic layout changes) */
+    reflow: () => void;
 
     // -- Preset --
     setPreset: (key: string) => void;
@@ -115,6 +117,7 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
     const [activePresetKey, setActivePresetKey] = useState(defaultPreset ?? '');
     const [changeVersion, setChangeVersion] = useState(0);
     const [within, setWithin] = useState<WithinMode>(initialWithin);
+    const refreshImageBoundsRef = useRef<(() => void) | null>(null);
 
     /**
      * Keep a ref in sync with `within` so that event listeners (which close
@@ -151,6 +154,36 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
             el.style.overflow = '';
         }
     }, []);
+
+    // ---- Force reflow helper ---------------------------------------------
+    const reflow = useCallback(() => {
+        const cropper = cropperRef.current;
+        const img = imageRef.current;
+        if (!cropper || !img) return;
+
+        const canvasHost = cropper.getCropperCanvas() as unknown as HTMLElement | null;
+        const parent = img.parentElement;
+
+        if (canvasHost && parent) {
+            const width = parent.clientWidth;
+            const height = parent.clientHeight;
+
+            if (width > 0 && height > 0) {
+                canvasHost.style.display = 'block';
+                canvasHost.style.width = `${width}px`;
+                canvasHost.style.height = `${height}px`;
+                canvasHost.style.minWidth = '0';
+                canvasHost.style.minHeight = '0';
+            }
+        }
+
+        const image = cropper.getCropperImage();
+        const selection = cropper.getCropperSelection();
+        image?.$center('contain');
+        selection?.$center();
+        refreshImageBoundsRef.current?.();
+        notifyChange();
+    }, [notifyChange]);
 
     // ---- Boundary helpers -------------------------------------------------
 
@@ -191,6 +224,7 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
         let selectionEl: HTMLElement | null = null;
         let imageEl: HTMLElement | null = null;
         let imageBoundsInCanvas: { x: number; y: number; width: number; height: number } | null = null;
+        let resizeObserver: ResizeObserver | null = null;
 
         const init = () => {
             if (cancelled) return;
@@ -244,6 +278,8 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
                     height: imageRect.height,
                 };
             };
+
+            refreshImageBoundsRef.current = refreshImageBounds;
 
             refreshImageBounds();
 
@@ -384,14 +420,14 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
             selectionEl?.addEventListener('change', boundSelectionChange);
             imageEl?.addEventListener('transform', boundImageTransform);
 
-            requestAnimationFrame(() => {
-                const initialImage = cropper.getCropperImage();
-                const initialSelection = cropper.getCropperSelection();
-
-                initialImage?.$center('contain');
-                initialSelection?.$center();
-                refreshImageBounds();
-            });
+            if (img.parentElement) {
+                resizeObserver = new ResizeObserver(() => {
+                    requestAnimationFrame(() => {
+                        reflow();
+                    });
+                });
+                resizeObserver.observe(img.parentElement);
+            }
 
             setIsReady(true);
             notifyChange();
@@ -415,6 +451,11 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
             if (imageEl && boundImageTransform) {
                 imageEl.removeEventListener('transform', boundImageTransform);
             }
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+                resizeObserver = null;
+            }
+            refreshImageBoundsRef.current = null;
 
             if (cropperRef.current) {
                 cropperRef.current.destroy();
@@ -424,6 +465,29 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [imageSrc]);
+
+    // ---- Stabilise first render after upload (like HMR/save effect) -----
+    useEffect(() => {
+        if (!isReady || !imageSrc) return;
+
+        let raf1 = 0;
+        let raf2 = 0;
+        const timeoutId = setTimeout(() => {
+            reflow();
+        }, 80);
+
+        raf1 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(() => {
+                reflow();
+            });
+        });
+
+        return () => {
+            clearTimeout(timeoutId);
+            if (raf1) cancelAnimationFrame(raf1);
+            if (raf2) cancelAnimationFrame(raf2);
+        };
+    }, [isReady, imageSrc, reflow]);
 
     // ---- React to preset changes ------------------------------------------
     useEffect(() => {
@@ -591,6 +655,7 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
         changeVersion,
         within,
         setWithin,
+        reflow,
 
         setPreset,
 
