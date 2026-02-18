@@ -4,6 +4,8 @@
  * Renders the <img> element that CropperJS v2 wraps with its custom elements.
  * This component is intentionally logic-free — it only handles rendering
  * and delegates all behaviour to the `useCropper` hook via the `imageRef`.
+ *
+ * Styled to match Pintura — dark immersive workspace, no border chrome.
  */
 
 import * as React from 'react';
@@ -34,27 +36,18 @@ export function CropperCanvas({ src, imageRef, shape = 'rect', className }: Crop
         <div
             data-slot="cropper-canvas-wrapper"
             className={cn(
-                'relative w-full overflow-hidden rounded-lg border bg-muted',
-                // Min height ensures the cropper has a usable area on small screens
-                'min-h-70 sm:min-h-90',
+                // Pintura-style: dark immersive workspace, rounded, no visible border
+                'relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-neutral-900',
+                'min-h-64 sm:min-h-96',
                 className,
             )}
         >
-            {/*
-             * The <img> is the only element CropperJS needs.
-             * CropperJS v2 wraps it with custom elements (<cropper-canvas>, etc.)
-             * during initialisation and removes them on destroy.
-             *
-             * `display: block` prevents the inline‐image gap.
-             * `max-h / max-w` ensure the image fits within the container.
-             */}
             <img
                 ref={imageRef}
                 src={src}
                 alt="Image to crop"
                 crossOrigin="anonymous"
-                className="block max-h-[70vh] w-full object-contain"
-                // Prevent native drag behaviour (CropperJS handles gestures)
+                className="block max-h-[60vh] w-full object-contain"
                 draggable={false}
             />
         </div>

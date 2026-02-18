@@ -147,11 +147,11 @@ export function ImageDropzone({ onImageSelect, maxSizeMB = 5, disabled = false, 
             onDragLeave={onDragLeave}
             onDrop={onDrop}
             className={cn(
-                'relative flex min-h-50 cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-6 text-center transition-colors',
-                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
-                isDragOver && !disabled && 'border-primary bg-primary/5',
-                !isDragOver && !disabled && 'border-muted-foreground/25 hover:border-primary/50 hover:bg-accent/50',
-                disabled && 'pointer-events-none opacity-50',
+                'relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-8 text-center transition-all',
+                'focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 focus-visible:outline-none',
+                isDragOver && !disabled && 'scale-[1.01] border-white/60 bg-white/5',
+                !isDragOver && !disabled && 'border-neutral-700 hover:border-neutral-500 hover:bg-white/2',
+                disabled && 'pointer-events-none opacity-40',
                 className,
             )}
         >
@@ -168,21 +168,28 @@ export function ImageDropzone({ onImageSelect, maxSizeMB = 5, disabled = false, 
             />
 
             {/* Icon & text */}
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-3">
                 {isDragOver ? (
-                    <UploadCloudIcon className="size-10 text-primary" aria-hidden />
+                    <div className="rounded-full bg-white/10 p-3">
+                        <UploadCloudIcon className="size-8 text-white" aria-hidden />
+                    </div>
                 ) : (
-                    <ImageIcon className="size-10 text-muted-foreground" aria-hidden />
+                    <div className="rounded-full bg-neutral-800 p-3">
+                        <ImageIcon className="size-8 text-neutral-400" aria-hidden />
+                    </div>
                 )}
 
-                <p className="text-sm font-medium">{isDragOver ? 'Drop your image here' : 'Drag & drop an image, or click to browse'}</p>
-
-                <p className="text-xs text-muted-foreground">JPEG, PNG, WebP — max {maxSizeMB} MB</p>
+                <div className="space-y-1">
+                    <p className="text-sm font-medium text-neutral-200">
+                        {isDragOver ? 'Drop your image here' : 'Drag & drop an image, or click to browse'}
+                    </p>
+                    <p className="text-xs text-neutral-500">JPEG, PNG, WebP — max {maxSizeMB} MB</p>
+                </div>
             </div>
 
             {/* Error message */}
             {error && (
-                <div role="alert" className="mt-2 flex items-center gap-1.5 text-xs text-destructive">
+                <div role="alert" className="flex items-center gap-1.5 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-400">
                     <XCircleIcon className="size-3.5 shrink-0" aria-hidden />
                     <span>{error}</span>
                 </div>

@@ -1,21 +1,19 @@
 /**
- * ImageCropperDialog — Full-featured image crop dialog
+ * ImageCropperDialog — Pintura-style image crop editor
  *
- * Composes all image cropper modules inside a shadcn Dialog:
- *   1. Upload image (drag & drop or click)
- *   2. Select a preset (built-in or custom)
- *   3. Crop, zoom, rotate, flip
- *   4. Preview result
- *   5. Confirm → export blob
+ * Full-panel dark editor dialog with:
+ *   - Dark workspace background
+ *   - Centered canvas with floating controls
+ *   - Bottom toolbar + preset pills
+ *   - Compact header and action bar
  *
- * Responsive: stacks vertically on mobile, side-by-side on desktop.
+ * Flow: Upload → Select preset → Crop → Preview → Confirm
  */
 
-import { CheckIcon, Loader2Icon } from 'lucide-react';
+import { CheckIcon, ImageIcon, Loader2Icon, XIcon } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { CropperCanvas } from './cropper-canvas';
 import { CropperControls } from './cropper-controls';
@@ -85,8 +83,8 @@ export function ImageCropperDialog({
 
     // ---- Preview dimensions (scaled down from output) ---------------------
     const previewSize = useMemo(() => {
-        if (!preset) return { width: 120, height: 120 };
-        const maxDim = 120;
+        if (!preset) return { width: 100, height: 100 };
+        const maxDim = 100;
         const ratio = preset.outputWidth / preset.outputHeight;
         if (ratio >= 1) {
             return { width: maxDim, height: Math.round(maxDim / ratio) };
@@ -96,7 +94,6 @@ export function ImageCropperDialog({
 
     // ---- Handle image selection from dropzone -----------------------------
     const handleImageSelect = useCallback((file: File) => {
-        // Revoke previous blob URL to free memory
         setImageSrc((prev) => {
             if (prev) URL.revokeObjectURL(prev);
             return URL.createObjectURL(file);
@@ -112,7 +109,6 @@ export function ImageCropperDialog({
             const blob = await getCroppedBlob('image/png', 0.92);
             if (blob) {
                 onConfirm(blob, preset);
-                // Clean up and close
                 setImageSrc((prev) => {
                     if (prev) URL.revokeObjectURL(prev);
                     return null;
@@ -127,112 +123,146 @@ export function ImageCropperDialog({
     }, [preset, getCroppedBlob, onConfirm, onOpenChange]);
 
     // ---- Handle dialog close (cleanup) ------------------------------------
-    const handleOpenChange = useCallback(
-        (next: boolean) => {
-            if (!next) {
-                // Revoke blob URL on close
-                setImageSrc((prev) => {
-                    if (prev) URL.revokeObjectURL(prev);
-                    return null;
-                });
-            }
-            onOpenChange(next);
-        },
-        [onOpenChange],
-    );
+    const handleClose = useCallback(() => {
+        setImageSrc((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+        });
+        onOpenChange(false);
+    }, [onOpenChange]);
+
+    if (!open) return null;
 
     // ---- Render -----------------------------------------------------------
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="flex max-h-[90vh] max-w-3xl flex-col overflow-hidden">
-                <DialogHeader>
-                    <DialogTitle>Crop Image</DialogTitle>
-                    <DialogDescription>Upload an image, select a preset, and adjust the crop area.</DialogDescription>
-                </DialogHeader>
+        <div role="dialog" aria-modal="true" aria-label="Crop image" className="fixed inset-0 z-50 flex flex-col">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={handleClose} />
 
-                {/* ---- Main content area (scrollable) ---- */}
-                <div className="flex-1 overflow-y-auto">
+            {/* Editor panel */}
+            <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col p-3 sm:p-4">
+                {/* ---- Top bar ---- */}
+                <div className="flex items-center justify-between pb-3">
+                    <div className="flex items-center gap-2.5">
+                        <div className="rounded-lg bg-neutral-800 p-1.5">
+                            <ImageIcon className="size-4 text-neutral-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-sm font-semibold text-white">Crop Image</h2>
+                            {preset && (
+                                <p className="text-[11px] text-neutral-500">
+                                    {preset.label} · {preset.outputWidth}×{preset.outputHeight}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        {/* Re-upload */}
+                        {imageSrc && (
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setImageSrc((prev) => {
+                                        if (prev) URL.revokeObjectURL(prev);
+                                        return null;
+                                    })
+                                }
+                                disabled={isExporting}
+                                className="rounded-lg px-3 py-1.5 text-xs font-medium text-neutral-400 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
+                            >
+                                Change image
+                            </button>
+                        )}
+
+                        {/* Confirm */}
+                        {imageSrc && (
+                            <Button
+                                type="button"
+                                size="sm"
+                                disabled={!isReady || isExporting}
+                                onClick={handleConfirm}
+                                className="rounded-lg bg-white text-neutral-900 hover:bg-neutral-200"
+                            >
+                                {isExporting ? (
+                                    <>
+                                        <Loader2Icon className="size-3.5 animate-spin" />
+                                        Exporting…
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckIcon className="size-3.5" />
+                                        Done
+                                    </>
+                                )}
+                            </Button>
+                        )}
+
+                        {/* Close */}
+                        <button
+                            type="button"
+                            onClick={handleClose}
+                            className="inline-flex size-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-white/10 hover:text-white"
+                            aria-label="Close"
+                        >
+                            <XIcon className="size-4" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* ---- Main workspace ---- */}
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-neutral-900/90 ring-1 ring-white/6">
                     {!imageSrc ? (
                         /* Step 1 — Upload */
-                        <ImageDropzone onImageSelect={handleImageSelect} maxSizeMB={maxSizeMB} />
+                        <div className="flex flex-1 items-center justify-center p-6">
+                            <ImageDropzone onImageSelect={handleImageSelect} maxSizeMB={maxSizeMB} className="w-full max-w-md" />
+                        </div>
                     ) : (
-                        /* Step 2–4 — Crop */
-                        <div className="flex flex-col gap-4">
-                            {/* Canvas + Preview row */}
-                            <div className="flex flex-col items-start gap-4 sm:flex-row">
-                                {/* Cropper */}
-                                <div className="min-w-0 flex-1">
-                                    <CropperCanvas src={imageSrc} imageRef={imageRef} shape={preset?.shape} />
+                        /* Step 2–4 — Crop workspace */
+                        <div className="flex min-h-0 flex-1 flex-col">
+                            {/* Canvas + Preview */}
+                            <div className="flex min-h-0 flex-1 items-stretch gap-0">
+                                {/* Canvas area */}
+                                <div className="flex min-w-0 flex-1 items-center justify-center p-3 sm:p-4">
+                                    <CropperCanvas src={imageSrc} imageRef={imageRef} shape={preset?.shape} className="border-0 bg-transparent" />
                                 </div>
 
-                                {/* Preview sidebar */}
+                                {/* Preview sidebar (desktop) */}
                                 {isReady && (
-                                    <CropperPreview
-                                        cropper={cropper}
-                                        isReady={isReady}
-                                        shape={preset?.shape}
-                                        width={previewSize.width}
-                                        height={previewSize.height}
-                                        changeVersion={changeVersion}
-                                        className="shrink-0"
-                                    />
+                                    <div className="hidden items-center border-l border-white/6 px-4 sm:flex">
+                                        <CropperPreview
+                                            cropper={cropper}
+                                            isReady={isReady}
+                                            shape={preset?.shape}
+                                            width={previewSize.width}
+                                            height={previewSize.height}
+                                            changeVersion={changeVersion}
+                                        />
+                                    </div>
                                 )}
                             </div>
 
-                            {/* Controls */}
-                            <CropperControls
-                                isReady={isReady}
-                                preset={preset}
-                                presets={presets}
-                                setPreset={setPreset}
-                                setAspectRatio={setAspectRatio}
-                                zoomIn={zoomIn}
-                                zoomOut={zoomOut}
-                                rotateLeft={rotateLeft}
-                                rotateRight={rotateRight}
-                                flipX={flipX}
-                                flipY={flipY}
-                                reset={reset}
-                            />
+                            {/* Bottom controls bar */}
+                            <div className="border-t border-white/6 px-3 py-2.5 sm:px-4">
+                                <CropperControls
+                                    isReady={isReady}
+                                    preset={preset}
+                                    presets={presets}
+                                    setPreset={setPreset}
+                                    setAspectRatio={setAspectRatio}
+                                    zoomIn={zoomIn}
+                                    zoomOut={zoomOut}
+                                    rotateLeft={rotateLeft}
+                                    rotateRight={rotateRight}
+                                    flipX={flipX}
+                                    flipY={flipY}
+                                    reset={reset}
+                                />
+                            </div>
                         </div>
                     )}
                 </div>
-
-                {/* ---- Footer ---- */}
-                {imageSrc && (
-                    <DialogFooter>
-                        {/* Re-upload */}
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() =>
-                                setImageSrc((prev) => {
-                                    if (prev) URL.revokeObjectURL(prev);
-                                    return null;
-                                })
-                            }
-                            disabled={isExporting}
-                        >
-                            Change Image
-                        </Button>
-
-                        {/* Confirm */}
-                        <Button type="button" disabled={!isReady || isExporting} onClick={handleConfirm}>
-                            {isExporting ? (
-                                <>
-                                    <Loader2Icon className="size-4 animate-spin" />
-                                    Exporting…
-                                </>
-                            ) : (
-                                <>
-                                    <CheckIcon className="size-4" />
-                                    Confirm
-                                </>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                )}
-            </DialogContent>
-        </Dialog>
+            </div>
+        </div>
     );
 }

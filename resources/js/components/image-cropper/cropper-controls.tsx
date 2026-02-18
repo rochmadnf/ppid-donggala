@@ -1,14 +1,13 @@
 /**
- * CropperControls — Toolbar for image manipulation
+ * CropperControls — Pintura-style bottom toolbar
  *
- * Renders preset selector, zoom, rotate, flip, and reset controls.
+ * Dark floating toolbar with grouped icon buttons and compact preset pills.
  * Uses shadcn Button with lucide-react icons.
  * All controls are disabled when the cropper is not ready.
  */
 
-import { FlipHorizontalIcon, FlipVerticalIcon, RatioIcon, RefreshCwIcon, RotateCcwIcon, RotateCwIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import { FlipHorizontalIcon, FlipVerticalIcon, RatioIcon, RotateCcwIcon, RotateCwIcon, UndoIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 import type { CropPreset } from './presets';
@@ -62,71 +61,74 @@ export function CropperControls({
     const disabled = !isReady;
 
     return (
-        <div data-slot="cropper-controls" className={cn('flex flex-col gap-3', className)}>
-            {/* ---- Preset selector ---- */}
+        <div data-slot="cropper-controls" className={cn('flex flex-col gap-2.5', className)}>
+            {/* ---- Preset selector row (compact pills) ---- */}
             {presets.length > 1 && (
-                <div className="flex flex-col gap-1.5">
-                    <span className="text-xs font-medium text-muted-foreground">Preset</span>
-                    <div className="flex flex-wrap gap-1.5">
-                        {presets.map((p) => (
-                            <Button
-                                key={p.key}
-                                type="button"
-                                size="sm"
-                                variant={preset?.key === p.key ? 'default' : 'outline'}
-                                disabled={disabled}
-                                onClick={() => setPreset(p.key)}
-                                aria-pressed={preset?.key === p.key}
-                                aria-label={`Preset: ${p.label}`}
-                            >
-                                {p.label}
-                            </Button>
-                        ))}
-
-                        {/* Free crop toggle */}
-                        <Button
+                <div className="flex items-center justify-center gap-1">
+                    {presets.map((p) => (
+                        <button
+                            key={p.key}
                             type="button"
-                            size="sm"
-                            variant={preset?.aspectRatio === null ? 'default' : 'ghost'}
                             disabled={disabled}
-                            onClick={() => setAspectRatio(null)}
-                            aria-label="Free crop (no aspect ratio)"
+                            onClick={() => setPreset(p.key)}
+                            aria-pressed={preset?.key === p.key}
+                            aria-label={`Preset: ${p.label}`}
+                            className={cn(
+                                'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                                'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none',
+                                'disabled:pointer-events-none disabled:opacity-40',
+                                preset?.key === p.key ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-400 hover:bg-white/10 hover:text-white',
+                            )}
                         >
-                            <RatioIcon className="mr-1 size-3.5" />
-                            Free
-                        </Button>
-                    </div>
+                            {p.label}
+                        </button>
+                    ))}
+
+                    {/* Free crop pill */}
+                    <button
+                        type="button"
+                        disabled={disabled}
+                        onClick={() => setAspectRatio(null)}
+                        aria-label="Free crop (no aspect ratio)"
+                        className={cn(
+                            'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                            'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none',
+                            'disabled:pointer-events-none disabled:opacity-40',
+                            preset?.aspectRatio === null
+                                ? 'bg-white text-neutral-900 shadow-sm'
+                                : 'text-neutral-400 hover:bg-white/10 hover:text-white',
+                        )}
+                    >
+                        <RatioIcon className="size-3" />
+                        Free
+                    </button>
                 </div>
             )}
 
-            {/* ---- Action buttons ---- */}
-            <div className="flex flex-wrap items-center gap-1">
-                {/* Zoom */}
-                <ControlGroup label="Zoom">
-                    <IconButton icon={ZoomInIcon} label="Zoom in" disabled={disabled} onClick={zoomIn} />
-                    <IconButton icon={ZoomOutIcon} label="Zoom out" disabled={disabled} onClick={zoomOut} />
-                </ControlGroup>
+            {/* ---- Tool bar (icon buttons in a dark pill) ---- */}
+            <div className="flex items-center justify-center">
+                <div className="inline-flex items-center gap-0.5 rounded-full bg-neutral-800/80 p-1 shadow-lg backdrop-blur-sm">
+                    {/* Zoom */}
+                    <ToolButton icon={ZoomInIcon} label="Zoom in" disabled={disabled} onClick={zoomIn} />
+                    <ToolButton icon={ZoomOutIcon} label="Zoom out" disabled={disabled} onClick={zoomOut} />
 
-                <Separator />
+                    <ToolDivider />
 
-                {/* Rotate */}
-                <ControlGroup label="Rotate">
-                    <IconButton icon={RotateCcwIcon} label="Rotate left 90°" disabled={disabled} onClick={rotateLeft} />
-                    <IconButton icon={RotateCwIcon} label="Rotate right 90°" disabled={disabled} onClick={rotateRight} />
-                </ControlGroup>
+                    {/* Rotate */}
+                    <ToolButton icon={RotateCcwIcon} label="Rotate left 90°" disabled={disabled} onClick={rotateLeft} />
+                    <ToolButton icon={RotateCwIcon} label="Rotate right 90°" disabled={disabled} onClick={rotateRight} />
 
-                <Separator />
+                    <ToolDivider />
 
-                {/* Flip */}
-                <ControlGroup label="Flip">
-                    <IconButton icon={FlipHorizontalIcon} label="Flip horizontal" disabled={disabled} onClick={flipX} />
-                    <IconButton icon={FlipVerticalIcon} label="Flip vertical" disabled={disabled} onClick={flipY} />
-                </ControlGroup>
+                    {/* Flip */}
+                    <ToolButton icon={FlipHorizontalIcon} label="Flip horizontal" disabled={disabled} onClick={flipX} />
+                    <ToolButton icon={FlipVerticalIcon} label="Flip vertical" disabled={disabled} onClick={flipY} />
 
-                <Separator />
+                    <ToolDivider />
 
-                {/* Reset */}
-                <IconButton icon={RefreshCwIcon} label="Reset" disabled={disabled} onClick={reset} />
+                    {/* Reset */}
+                    <ToolButton icon={UndoIcon} label="Reset" disabled={disabled} onClick={reset} />
+                </div>
             </div>
         </div>
     );
@@ -136,22 +138,8 @@ export function CropperControls({
 // Internal sub-components
 // ---------------------------------------------------------------------------
 
-/** Visually groups related controls */
-function ControlGroup({ label, children }: { label: string; children: React.ReactNode }) {
-    return (
-        <div role="group" aria-label={label} className="flex items-center gap-0.5">
-            {children}
-        </div>
-    );
-}
-
-/** Thin vertical divider between control groups */
-function Separator() {
-    return <div aria-hidden className="mx-1 h-6 w-px bg-border" />;
-}
-
-/** Icon-only button wired to an action */
-function IconButton({
+/** Dark circular icon button for the floating toolbar */
+function ToolButton({
     icon: Icon,
     label,
     disabled,
@@ -163,8 +151,25 @@ function IconButton({
     onClick: () => void;
 }) {
     return (
-        <Button type="button" variant="ghost" size="icon-sm" disabled={disabled} onClick={onClick} aria-label={label} title={label}>
+        <button
+            type="button"
+            disabled={disabled}
+            onClick={onClick}
+            aria-label={label}
+            title={label}
+            className={cn(
+                'inline-flex size-8 items-center justify-center rounded-full text-neutral-300 transition-colors',
+                'hover:bg-white/15 hover:text-white',
+                'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none',
+                'disabled:pointer-events-none disabled:opacity-40',
+            )}
+        >
             <Icon className="size-4" />
-        </Button>
+        </button>
     );
+}
+
+/** Subtle divider dot between tool groups */
+function ToolDivider() {
+    return <div aria-hidden className="mx-0.5 size-0.5 rounded-full bg-neutral-600" />;
 }

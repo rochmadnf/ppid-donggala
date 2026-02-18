@@ -124,8 +124,11 @@ export function CropperPreview({ cropper, isReady, shape = 'rect', width = 120, 
     // ---- Render -----------------------------------------------------------
     return (
         <div data-slot="cropper-preview" className={cn('flex flex-col items-center gap-2', className)}>
-            <span className="text-xs font-medium text-muted-foreground">Preview</span>
-            <div className={cn('overflow-hidden border bg-muted', shape === 'circle' ? 'rounded-full' : 'rounded-md')} style={{ width, height }}>
+            <span className="text-[10px] font-medium tracking-wider text-neutral-500 uppercase">Preview</span>
+            <div
+                className={cn('overflow-hidden bg-neutral-800 ring-1 ring-white/10', shape === 'circle' ? 'rounded-full' : 'rounded-lg')}
+                style={{ width, height }}
+            >
                 <canvas ref={canvasRef} width={width} height={height} className={cn('block', !hasPreview && 'opacity-0')} aria-label="Crop preview" />
             </div>
         </div>
