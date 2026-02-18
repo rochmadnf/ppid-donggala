@@ -5,9 +5,17 @@ export interface OfficeName {
     alias: string;
 }
 
+export type OfficeMerger = Pick<OfficeDataProps, 'id' | 'name' | 'site_url'>[];
 export interface OfficeDataProps {
     id: string;
     name: OfficeName;
+    address: string;
+    phone: string | null;
+    merger: {
+        of: OfficeMerger;
+        by: OfficeMerger;
+    };
+    site_url: string | null;
 }
 
 export interface OfficeIndexProps {
