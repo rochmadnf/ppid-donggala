@@ -1,4 +1,4 @@
-import { CirclePile, LayoutPanelLeftIcon, SquareChartGanttIcon, type LucideIcon } from 'lucide-react';
+import { CirclePile, IdCardLanyardIcon, LayoutPanelLeftIcon, SquareChartGanttIcon, type LucideIcon } from 'lucide-react';
 
 export type MenuItemProps = {
     id: string;
@@ -17,6 +17,21 @@ export const menuItems: MenuItemProps[] = [
         url: route('console.dashboard'),
         permissions: ['*'],
         children: [],
+    },
+    {
+        id: 'a11f84e6-b499-40b0-a1cb-44d66ba1c327',
+        label: 'Profil',
+        icon: IdCardLanyardIcon,
+        url: '#',
+        permissions: ['read p-ppid'],
+        children: [
+            {
+                id: 'a11f855c-7ee6-4b28-9e15-c745222360c6',
+                label: 'PPID',
+                url: route('console.profile.ppid.index'),
+                permissions: ['read p-ppid'],
+            },
+        ],
     },
     {
         id: 'a0e34919-8d50-488b-90b6-20fcea5aa2ee',
