@@ -19,6 +19,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
             isCode: ctx.editor.isActive('code'),
             isHighlight: ctx.editor.isActive('highlight'),
             isLink: ctx.editor.isActive('link'),
+            isInFirstNode: ctx.editor.state.selection.$from.index(0) === 0,
         }),
     });
 
@@ -40,7 +41,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <TiptapBubbleMenu
             editor={editor}
             options={{
-                placement: 'top',
+                placement: state.isInFirstNode ? 'bottom' : 'top',
             }}
         >
             <div className="bubble-menu">
