@@ -1,3 +1,4 @@
+import { TextEditor } from '@/components/form/text-editor';
 import { MetaTag } from '@/components/metatag';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/tabs';
 import ConsoleLayout from '@/layouts/console-layout';
@@ -35,7 +36,9 @@ export default function PpidIndexPage() {
                         />
                     ))}
                 </TabsList>
-                <TabsContent className="rounded-t-none border-t-0 py-8">content</TabsContent>
+                <TabsContent className="rounded-t-none border-t-0 py-8">
+                    <TextEditor />
+                </TabsContent>
             </Tabs>
         </>
     );

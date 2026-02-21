@@ -58,6 +58,8 @@
     --color-sidebar-menu-text: var(--color-blue-700);
     --color-sidebar-menu-inactive-text: var(--color-slate-600);
     --spacing-header-h: calc(var(--spacing) * 16);
+
+    --radius-text-editor: var(--radius-md);
 }
 
 :root {
