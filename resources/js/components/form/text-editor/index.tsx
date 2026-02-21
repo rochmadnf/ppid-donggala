@@ -7,6 +7,7 @@ import TaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Typography from '@tiptap/extension-typography';
+import UniqueID from '@tiptap/extension-unique-id';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -84,7 +85,16 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
         content: [
             {
                 type: 'paragraph',
-                content: [],
+                attrs: {
+                    id: '540f9bb0-028b-4f78-a063-aa77c7ae5e0a',
+                    textAlign: 'left',
+                },
+                content: [
+                    {
+                        type: 'text',
+                        text: '',
+                    },
+                ],
             },
         ],
     };
@@ -124,6 +134,10 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
             Color,
             Typography,
             SlashCommand,
+            UniqueID.configure({
+                types: ['heading', 'paragraph'],
+                attributeName: 'nid',
+            }),
         ],
         editorProps: {
             attributes: {
