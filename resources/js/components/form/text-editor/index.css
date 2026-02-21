@@ -26,7 +26,7 @@
     .text-editor-button {
         @apply inline-flex cursor-pointer items-center justify-center rounded-lg p-1.5 text-sm font-medium text-gray-600 transition-colors enabled:hover:bg-gray-100 enabled:hover:text-gray-900 disabled:cursor-not-allowed disabled:text-gray-300 [&_svg]:size-4;
 
-        &.is-active {
+        &[data-active] {
             @apply bg-blue-50 text-blue-600;
         }
     }
@@ -43,7 +43,7 @@
     .bubble-menu-button {
         @apply inline-flex cursor-pointer items-center justify-center rounded-md p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 [&_svg]:size-4;
 
-        &.is-active {
+        &[data-active] {
             @apply bg-blue-50 text-blue-600;
         }
     }
@@ -90,22 +90,35 @@
         @apply min-h-[300px];
     }
 
+    .tiptap,
     .tiptap.ProseMirror {
         &:first-child {
             @apply mt-0;
         }
 
         /* ── Headings ──────────────────────────────────────── */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            @apply text-gray-950;
+        }
         h1 {
-            @apply mb-4 text-[2em] leading-tight font-bold tracking-[-0.03em] text-gray-900 not-first:mt-8;
+            @apply mb-4 text-[2em] leading-tight font-bold tracking-[-0.03em] not-first:mt-8 md:text-4xl;
         }
 
         h2 {
-            @apply mb-3 text-[1.5em] leading-tight font-semibold tracking-[-0.02em] text-gray-900 not-first:mt-6;
+            @apply mb-3 text-[1.5em] leading-tight font-semibold tracking-[-0.02em] not-first:mt-6 md:text-3xl;
         }
 
         h3 {
-            @apply mb-2 text-[1.25em] leading-snug font-semibold tracking-[-0.01em] text-gray-900 not-first:mt-5;
+            @apply mb-2 text-[1.25em] leading-snug font-semibold tracking-[-0.01em] not-first:mt-5 md:text-2xl;
+        }
+
+        h4 {
+            @apply mb-2 text-[1em] leading-snug font-semibold tracking-[-0.01em] not-first:mt-5 md:text-xl;
         }
 
         /* ── Paragraph ─────────────────────────────────────── */
@@ -120,7 +133,8 @@
         /* ── Placeholder for empty headings ───────────────── */
         h1.is-empty::before,
         h2.is-empty::before,
-        h3.is-empty::before {
+        h3.is-empty::before,
+        h4.is-empty::before {
             @apply pointer-events-none float-left h-0 font-normal text-gray-300 content-[attr(data-placeholder)];
         }
 
@@ -226,12 +240,14 @@
         }
 
         /* ── Strikethrough ─────────────────────────────────── */
-        s {
+        s,
+        del {
             @apply text-gray-400;
         }
 
         /* ── Underline ─────────────────────────────────────── */
-        u {
+        u,
+        ins {
             @apply underline decoration-gray-400 underline-offset-2;
         }
     }

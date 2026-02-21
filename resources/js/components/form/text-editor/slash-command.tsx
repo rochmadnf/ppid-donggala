@@ -14,7 +14,7 @@ import {
     QuoteIcon,
     TextIcon,
 } from 'lucide-react';
-import { forwardRef, useEffect, useImperativeHandle, useState, type ReactNode } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type ReactNode } from 'react';
 
 export interface SlashCommandItem {
     title: string;
@@ -128,10 +128,20 @@ interface CommandListRef {
 
 const CommandList = forwardRef<CommandListRef, CommandListProps>(({ items, command }, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
     useEffect(() => {
         setSelectedIndex(0);
     }, [items]);
+
+    // Scroll selected item into view
+    useEffect(() => {
+        const el = itemRefs.current[selectedIndex];
+        if (el) {
+            el.scrollIntoView({ block: 'nearest' });
+        }
+    }, [selectedIndex]);
 
     useImperativeHandle(ref, () => ({
         onKeyDown: ({ event }: SuggestionKeyDownProps) => {
@@ -166,10 +176,13 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>(({ items, comma
     }
 
     return (
-        <div className="slash-command-menu">
+        <div className="slash-command-menu" ref={containerRef}>
             {items.map((item, index) => (
                 <button
                     key={item.title}
+                    ref={(el) => {
+                        itemRefs.current[index] = el;
+                    }}
                     type="button"
                     className={`slash-command-item ${index === selectedIndex ? 'is-selected' : ''}`}
                     onClick={() => command(item)}

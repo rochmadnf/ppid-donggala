@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils';
 import type { Editor } from '@tiptap/react';
+import { useEditorState } from '@tiptap/react';
 import { BubbleMenu as TiptapBubbleMenu } from '@tiptap/react/menus';
 import { BoldIcon, CodeIcon, HighlighterIcon, ItalicIcon, LinkIcon, StrikethroughIcon, UnderlineIcon } from 'lucide-react';
 import { useCallback } from 'react';
@@ -9,6 +9,19 @@ interface EditorBubbleMenuProps {
 }
 
 export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
+    const state = useEditorState({
+        editor,
+        selector: (ctx) => ({
+            isBold: ctx.editor.isActive('bold'),
+            isItalic: ctx.editor.isActive('italic'),
+            isUnderline: ctx.editor.isActive('underline'),
+            isStrike: ctx.editor.isActive('strike'),
+            isCode: ctx.editor.isActive('code'),
+            isHighlight: ctx.editor.isActive('highlight'),
+            isLink: ctx.editor.isActive('link'),
+        }),
+    });
+
     const setLink = useCallback(() => {
         const previousUrl = editor.getAttributes('link').href;
         const url = window.prompt('Masukkan URL:', previousUrl);
@@ -34,7 +47,8 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={cn('bubble-menu-button', editor.isActive('bold') ? 'is-active' : '')}
+                    className="bubble-menu-button"
+                    data-active={state.isBold || undefined}
                     title="Tebal"
                 >
                     <BoldIcon />
@@ -42,7 +56,8 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={cn('bubble-menu-button', editor.isActive('italic') ? 'is-active' : '')}
+                    className="bubble-menu-button"
+                    data-active={state.isItalic || undefined}
                     title="Miring"
                 >
                     <ItalicIcon />
@@ -50,7 +65,8 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleUnderline().run()}
-                    className={cn('bubble-menu-button', editor.isActive('underline') ? 'is-active' : '')}
+                    className="bubble-menu-button"
+                    data-active={state.isUnderline || undefined}
                     title="Garis Bawah"
                 >
                     <UnderlineIcon />
@@ -58,7 +74,8 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleStrike().run()}
-                    className={cn('bubble-menu-button', editor.isActive('strike') ? 'is-active' : '')}
+                    className="bubble-menu-button"
+                    data-active={state.isStrike || undefined}
                     title="Coret"
                 >
                     <StrikethroughIcon />
@@ -66,7 +83,8 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleCode().run()}
-                    className={cn('bubble-menu-button', editor.isActive('code') ? 'is-active' : '')}
+                    className="bubble-menu-button"
+                    data-active={state.isCode || undefined}
                     title="Kode"
                 >
                     <CodeIcon />
@@ -74,18 +92,14 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleHighlight().run()}
-                    className={cn('bubble-menu-button', editor.isActive('highlight') ? 'is-active' : '')}
+                    className="bubble-menu-button"
+                    data-active={state.isHighlight || undefined}
                     title="Sorot"
                 >
                     <HighlighterIcon />
                 </button>
                 <div className="bubble-menu-separator" />
-                <button
-                    type="button"
-                    onClick={setLink}
-                    className={cn('bubble-menu-button', editor.isActive('link') ? 'is-active' : '')}
-                    title="Tautan"
-                >
+                <button type="button" onClick={setLink} className="bubble-menu-button" data-active={state.isLink || undefined} title="Tautan">
                     <LinkIcon />
                 </button>
             </div>

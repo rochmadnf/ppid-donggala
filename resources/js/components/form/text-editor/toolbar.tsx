@@ -1,11 +1,14 @@
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { Editor } from '@tiptap/react';
+import { useEditorState } from '@tiptap/react';
 import {
     AlignCenterIcon,
     AlignJustifyIcon,
     AlignLeftIcon,
     AlignRightIcon,
     BoldIcon,
+    CheckIcon,
     ChevronDownIcon,
     CodeIcon,
     Heading1Icon,
@@ -28,7 +31,7 @@ import {
     UnderlineIcon,
     UndoIcon,
 } from 'lucide-react';
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, type ReactNode } from 'react';
 import { TextEditorButton, TextEditorButtonGroup, TextEditorSeparator } from './index';
 
 // ─── Block type selector (Notion-like heading/paragraph picker) ─────────────
@@ -68,49 +71,42 @@ const blockTypes: BlockTypeItem[] = [
 ];
 
 export function BlockTypeSelector({ editor }: { editor: Editor }) {
-    const [open, setOpen] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const activeBlock = blockTypes.find((b) => b.isActive(editor)) ?? blockTypes[0];
+    const { activeBlockLabel, activeBlockIcon } = useEditorState({
+        editor,
+        selector: (ctx) => {
+            const active = blockTypes.find((b) => b.isActive(ctx.editor)) ?? blockTypes[0];
+            return {
+                activeBlockLabel: active.label,
+                activeBlockIcon: active.icon,
+            };
+        },
+    });
 
     return (
-        <div className="relative" ref={containerRef}>
-            <TextEditorButton onClick={() => setOpen(!open)} className="gap-1 pr-1.5 text-xs font-medium" aria-expanded={open}>
-                {activeBlock.icon}
-                <span className="hidden sm:inline">{activeBlock.label}</span>
-                <ChevronDownIcon className="size-3 opacity-50" />
-            </TextEditorButton>
-            {open && (
-                <>
-                    <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-                    <div className="absolute top-full left-0 z-50 mt-1 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-                        {blockTypes.map((block) => (
-                            <button
-                                key={block.label}
-                                type="button"
-                                className={cn(
-                                    'flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors hover:bg-gray-100',
-                                    block.isActive(editor) && 'bg-blue-50 text-blue-700',
-                                )}
-                                onClick={() => {
-                                    block.action(editor);
-                                    setOpen(false);
-                                }}
-                            >
-                                {block.icon}
-                                {block.label}
-                            </button>
-                        ))}
-                    </div>
-                </>
-            )}
-        </div>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <TextEditorButton className="gap-1 pr-1.5 text-xs font-medium">
+                    {activeBlockIcon}
+                    <span className="hidden sm:inline">{activeBlockLabel}</span>
+                    <ChevronDownIcon className="size-3 opacity-50" />
+                </TextEditorButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-44">
+                {blockTypes.map((block) => (
+                    <DropdownMenuItem key={block.label} className={cn(block.isActive(editor) && 'bg-accent')} onSelect={() => block.action(editor)}>
+                        {block.icon}
+                        <span className="flex-1">{block.label}</span>
+                        {block.isActive(editor) && <CheckIcon className="size-4 text-blue-600" />}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }
 
 // ─── Link dialog ────────────────────────────────────────────────────────────
 
-export function LinkButton({ editor }: { editor: Editor }) {
+export function LinkButton({ editor, isActive }: { editor: Editor; isActive: boolean }) {
     const setLink = useCallback(() => {
         const previousUrl = editor.getAttributes('link').href;
         const url = window.prompt('Masukkan URL:', previousUrl);
@@ -128,46 +124,9 @@ export function LinkButton({ editor }: { editor: Editor }) {
     }, [editor]);
 
     return (
-        <TextEditorButton onClick={setLink} className={cn(editor.isActive('link') && 'is-active')} title="Tautan">
+        <TextEditorButton onClick={setLink} data-active={isActive || undefined} title="Tautan">
             <LinkIcon />
         </TextEditorButton>
-    );
-}
-
-// ─── Text Alignment Buttons ─────────────────────────────────────────────────
-
-export function AlignmentButtons({ editor }: { editor: Editor }) {
-    return (
-        <TextEditorButtonGroup>
-            <TextEditorButton
-                onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                className={cn(editor.isActive({ textAlign: 'left' }) && 'is-active')}
-                title="Rata Kiri"
-            >
-                <AlignLeftIcon />
-            </TextEditorButton>
-            <TextEditorButton
-                onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                className={cn(editor.isActive({ textAlign: 'center' }) && 'is-active')}
-                title="Rata Tengah"
-            >
-                <AlignCenterIcon />
-            </TextEditorButton>
-            <TextEditorButton
-                onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                className={cn(editor.isActive({ textAlign: 'right' }) && 'is-active')}
-                title="Rata Kanan"
-            >
-                <AlignRightIcon />
-            </TextEditorButton>
-            <TextEditorButton
-                onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-                className={cn(editor.isActive({ textAlign: 'justify' }) && 'is-active')}
-                title="Rata Kiri-Kanan"
-            >
-                <AlignJustifyIcon />
-            </TextEditorButton>
-        </TextEditorButtonGroup>
     );
 }
 
@@ -181,6 +140,29 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
+    // Subscribe to editor state changes so toolbar buttons re-render on formatting changes
+    const state = useEditorState({
+        editor,
+        selector: (ctx) => ({
+            isBold: ctx.editor.isActive('bold'),
+            isItalic: ctx.editor.isActive('italic'),
+            isUnderline: ctx.editor.isActive('underline'),
+            isStrike: ctx.editor.isActive('strike'),
+            isCode: ctx.editor.isActive('code'),
+            isHighlight: ctx.editor.isActive('highlight'),
+            isLink: ctx.editor.isActive('link'),
+            isAlignLeft: ctx.editor.isActive({ textAlign: 'left' }),
+            isAlignCenter: ctx.editor.isActive({ textAlign: 'center' }),
+            isAlignRight: ctx.editor.isActive({ textAlign: 'right' }),
+            isAlignJustify: ctx.editor.isActive({ textAlign: 'justify' }),
+            isBulletList: ctx.editor.isActive('bulletList'),
+            isOrderedList: ctx.editor.isActive('orderedList'),
+            isTaskList: ctx.editor.isActive('taskList'),
+            isBlockquote: ctx.editor.isActive('blockquote'),
+            isCodeBlock: ctx.editor.isActive('codeBlock'),
+        }),
+    });
+
     return (
         <>
             {/* Save */}
@@ -211,42 +193,42 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
             <TextEditorButtonGroup>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={cn(editor.isActive('bold') && 'is-active')}
+                    data-active={state.isBold || undefined}
                     title="Tebal (Ctrl+B)"
                 >
                     <BoldIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={cn(editor.isActive('italic') && 'is-active')}
+                    data-active={state.isItalic || undefined}
                     title="Miring (Ctrl+I)"
                 >
                     <ItalicIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleUnderline().run()}
-                    className={cn(editor.isActive('underline') && 'is-active')}
+                    data-active={state.isUnderline || undefined}
                     title="Garis Bawah (Ctrl+U)"
                 >
                     <UnderlineIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleStrike().run()}
-                    className={cn(editor.isActive('strike') && 'is-active')}
+                    data-active={state.isStrike || undefined}
                     title="Coret (Ctrl+Shift+S)"
                 >
                     <StrikethroughIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleCode().run()}
-                    className={cn(editor.isActive('code') && 'is-active')}
+                    data-active={state.isCode || undefined}
                     title="Kode Inline"
                 >
                     <CodeIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleHighlight().run()}
-                    className={cn(editor.isActive('highlight') && 'is-active')}
+                    data-active={state.isHighlight || undefined}
                     title="Sorot"
                 >
                     <HighlighterIcon />
@@ -256,12 +238,41 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
             <TextEditorSeparator />
 
             {/* Link */}
-            <LinkButton editor={editor} />
+            <LinkButton editor={editor} isActive={state.isLink} />
 
             <TextEditorSeparator />
 
             {/* Alignment */}
-            <AlignmentButtons editor={editor} />
+            <TextEditorButtonGroup>
+                <TextEditorButton
+                    onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                    data-active={state.isAlignLeft || undefined}
+                    title="Rata Kiri"
+                >
+                    <AlignLeftIcon />
+                </TextEditorButton>
+                <TextEditorButton
+                    onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                    data-active={state.isAlignCenter || undefined}
+                    title="Rata Tengah"
+                >
+                    <AlignCenterIcon />
+                </TextEditorButton>
+                <TextEditorButton
+                    onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                    data-active={state.isAlignRight || undefined}
+                    title="Rata Kanan"
+                >
+                    <AlignRightIcon />
+                </TextEditorButton>
+                <TextEditorButton
+                    onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+                    data-active={state.isAlignJustify || undefined}
+                    title="Rata Kiri-Kanan"
+                >
+                    <AlignJustifyIcon />
+                </TextEditorButton>
+            </TextEditorButtonGroup>
 
             <TextEditorSeparator />
 
@@ -269,21 +280,21 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
             <TextEditorButtonGroup>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    className={cn(editor.isActive('bulletList') && 'is-active')}
+                    data-active={state.isBulletList || undefined}
                     title="Daftar Bullet"
                 >
                     <ListIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                    className={cn(editor.isActive('orderedList') && 'is-active')}
+                    data-active={state.isOrderedList || undefined}
                     title="Daftar Nomor"
                 >
                     <ListOrderedIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleTaskList().run()}
-                    className={cn(editor.isActive('taskList') && 'is-active')}
+                    data-active={state.isTaskList || undefined}
                     title="Daftar Tugas"
                 >
                     <ListTodoIcon />
@@ -296,14 +307,14 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
             <TextEditorButtonGroup>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                    className={cn(editor.isActive('blockquote') && 'is-active')}
+                    data-active={state.isBlockquote || undefined}
                     title="Kutipan"
                 >
                     <QuoteIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                    className={cn(editor.isActive('codeBlock') && 'is-active')}
+                    data-active={state.isCodeBlock || undefined}
                     title="Blok Kode"
                 >
                     <SquareCodeIcon />
