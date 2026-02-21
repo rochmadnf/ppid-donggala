@@ -1,11 +1,20 @@
 import { cn } from '@/lib/utils';
+import Color from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
+import Image from '@tiptap/extension-image';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle } from '@tiptap/extension-text-style';
+import Typography from '@tiptap/extension-typography';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { RedoIcon, SaveIcon, UndoIcon } from 'lucide-react';
 import type { ButtonHTMLAttributes, HTMLAttributes, PropsWithChildren } from 'react';
+import { EditorBubbleMenu } from './bubble-menu';
 import './index.css';
+import { SlashCommand } from './slash-command';
+import { Toolbar } from './toolbar';
 
 export function TextEditorButtonGroup({
     children,
@@ -65,71 +74,64 @@ export function TextEditorSeparator({ className, ...props }: HTMLAttributes<HTML
 
 export type TextEditorProps = {
     variant?: 'notion';
+    content?: Record<string, unknown>;
+    onSave?: (json: Record<string, unknown>) => void;
 };
 
-export function TextEditor({ variant = 'notion' }: TextEditorProps) {
-    const initContent = {
+export function TextEditor({ variant = 'notion', content, onSave }: TextEditorProps) {
+    const defaultContent = {
         type: 'doc',
         content: [
             {
-                type: 'heading',
-                attrs: {
-                    level: 1,
-                },
-                content: [
-                    {
-                        type: 'text',
-                        text: 'Profil Singkat',
-                    },
-                ],
-            },
-            {
                 type: 'paragraph',
-                attrs: {
-                    textAlign: 'justify',
-                },
-                content: [
-                    {
-                        type: 'text',
-                        text: 'Keterbukaan Informasi menjadi hal yang sangat penting untuk mewujudkan ',
-                    },
-                    {
-                        type: 'text',
-                        marks: [
-                            {
-                                type: 'italic',
-                            },
-                        ],
-                        text: 'Good Governance',
-                    },
-                    {
-                        type: 'text',
-                        text: ' dalam mendorong tata kelola pemerintahan yang baik, transparan, partisipatif dan dapat dipertanggungjawabkan.',
-                    },
-                ],
+                content: [],
             },
         ],
     };
+
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
                 undoRedo: {
-                    depth: 15,
+                    depth: 30,
                 },
             }),
-            Placeholder.configure({ placeholder: `Mulai menulis..., Ketik '/' untuk perintah` }),
-            TextAlign.configure({
-                types: ['paragraph'],
-                defaultAlignment: 'justify',
+            Placeholder.configure({
+                placeholder: ({ node }) => {
+                    if (node.type.name === 'heading') {
+                        return `Heading ${node.attrs.level}`;
+                    }
+                    return "Ketik '/' untuk perintah, atau mulai menulis...";
+                },
+                includeChildren: true,
             }),
+            TextAlign.configure({
+                types: ['heading', 'paragraph'],
+                defaultAlignment: 'left',
+            }),
+            Highlight.configure({
+                multicolor: true,
+            }),
+            TaskList,
+            TaskItem.configure({
+                nested: true,
+            }),
+            Image.configure({
+                inline: false,
+                allowBase64: true,
+            }),
+            TextStyle,
+            Color,
+            Typography,
+            SlashCommand,
         ],
         editorProps: {
             attributes: {
-                class: 'focus:outline-none outline-none caret-blue-500',
+                class: 'text-editor-content focus:outline-none outline-none caret-blue-500',
             },
         },
         immediatelyRender: import.meta.env.VITE_APP_ENV === 'production' ? false : true,
-        content: initContent,
+        content: content ?? defaultContent,
     });
 
     const { canUndo, canRedo } = useEditorState({
@@ -146,28 +148,25 @@ export function TextEditor({ variant = 'notion' }: TextEditorProps) {
         return null;
     }
 
+    const handleSave = () => {
+        const json = editor.getJSON();
+        if (onSave) {
+            onSave(json);
+        } else {
+            console.log(json);
+        }
+    };
+
     if (variant === 'notion') {
         return (
             <TextEditorWrapper>
                 <TextEditorHeader>
                     <TextEditorHeaderActions>
-                        <TextEditorButton
-                            onClick={() => {
-                                console.log(editor.getJSON());
-                            }}
-                        >
-                            <SaveIcon />
-                        </TextEditorButton>
-                        <TextEditorSeparator />
-                        <TextEditorButton onClick={() => editor.chain().focus().undo().run()} disabled={!canUndo}>
-                            <UndoIcon />
-                        </TextEditorButton>
-                        <TextEditorButton onClick={() => editor.chain().focus().redo().run()} disabled={!canRedo}>
-                            <RedoIcon />
-                        </TextEditorButton>
+                        <Toolbar editor={editor} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
                     </TextEditorHeaderActions>
                 </TextEditorHeader>
                 <EditorContent editor={editor} className="p-4" />
+                <EditorBubbleMenu editor={editor} />
             </TextEditorWrapper>
         );
     }

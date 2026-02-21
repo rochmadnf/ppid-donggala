@@ -1,0 +1,238 @@
+@reference '@css/app.css';
+
+@layer components {
+    /* ── Wrapper ──────────────────────────────────────────────────────── */
+    .text-editor-wrapper {
+        @apply relative rounded-text-editor border border-line-brand bg-white font-inter!;
+        @media screen and (max-width: 480px) {
+            @apply h-screen w-screen overflow-auto;
+        }
+    }
+
+    /* ── Header / Toolbar ─────────────────────────────────────────────── */
+    .text-editor-header {
+        @apply sticky top-header-h z-9 flex w-full items-center rounded-t-text-editor border-b border-b-line-brand bg-white px-2 py-1.5 shadow-xs;
+        @apply flex-wrap gap-y-1;
+    }
+
+    .text-editor-header-actions {
+        @apply flex flex-row flex-wrap items-center gap-0.5;
+    }
+
+    .text-editor-button-group {
+        @apply relative flex align-middle data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:items-center data-[orientation=horizontal]:gap-0.5;
+    }
+
+    .text-editor-button {
+        @apply inline-flex cursor-pointer items-center justify-center rounded-lg p-1.5 text-sm font-medium text-gray-600 transition-colors enabled:hover:bg-gray-100 enabled:hover:text-gray-900 disabled:cursor-not-allowed disabled:text-gray-300 [&_svg]:size-4;
+
+        &.is-active {
+            @apply bg-blue-50 text-blue-600;
+        }
+    }
+
+    .text-editor-separator {
+        @apply mx-0.5 h-5 w-px bg-gray-200;
+    }
+
+    /* ── Bubble Menu ──────────────────────────────────────────────────── */
+    .bubble-menu {
+        @apply flex items-center gap-0.5 rounded-lg border border-gray-200 bg-white px-1 py-1 shadow-lg;
+    }
+
+    .bubble-menu-button {
+        @apply inline-flex cursor-pointer items-center justify-center rounded-md p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 [&_svg]:size-4;
+
+        &.is-active {
+            @apply bg-blue-50 text-blue-600;
+        }
+    }
+
+    .bubble-menu-separator {
+        @apply mx-0.5 h-5 w-px bg-gray-200;
+    }
+
+    /* ── Slash Command Menu ───────────────────────────────────────────── */
+    .slash-command-popup {
+        @apply pointer-events-auto;
+    }
+
+    .slash-command-menu {
+        @apply max-h-80 w-72 overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg;
+    }
+
+    .slash-command-item {
+        @apply flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-gray-50;
+
+        &.is-selected {
+            @apply bg-gray-100;
+        }
+    }
+
+    .slash-command-item-icon {
+        @apply flex size-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500;
+    }
+
+    .slash-command-item-content {
+        @apply flex flex-col;
+    }
+
+    .slash-command-item-title {
+        @apply text-sm font-medium text-gray-900;
+    }
+
+    .slash-command-item-description {
+        @apply text-xs text-gray-500;
+    }
+
+    /* ── Editor Content (ProseMirror) ─────────────────────────────────── */
+    .text-editor-content {
+        @apply min-h-[300px];
+    }
+
+    .tiptap.ProseMirror {
+        &:first-child {
+            @apply mt-0;
+        }
+
+        /* ── Headings ──────────────────────────────────────── */
+        h1 {
+            @apply mb-4 text-[2em] leading-tight font-bold tracking-[-0.03em] text-gray-900 not-first:mt-8;
+        }
+
+        h2 {
+            @apply mb-3 text-[1.5em] leading-tight font-semibold tracking-[-0.02em] text-gray-900 not-first:mt-6;
+        }
+
+        h3 {
+            @apply mb-2 text-[1.25em] leading-snug font-semibold tracking-[-0.01em] text-gray-900 not-first:mt-5;
+        }
+
+        /* ── Paragraph ─────────────────────────────────────── */
+        p {
+            @apply mb-3 text-base leading-relaxed text-gray-700;
+
+            &.is-empty::before {
+                @apply pointer-events-none float-left h-0 font-normal text-gray-400 content-[attr(data-placeholder)];
+            }
+        }
+
+        /* ── Placeholder for empty headings ───────────────── */
+        h1.is-empty::before,
+        h2.is-empty::before,
+        h3.is-empty::before {
+            @apply pointer-events-none float-left h-0 font-normal text-gray-300 content-[attr(data-placeholder)];
+        }
+
+        /* ── Lists ─────────────────────────────────────────── */
+        ul {
+            @apply my-3 ml-1 list-disc pl-5;
+
+            li {
+                @apply mb-1 text-base leading-relaxed text-gray-700;
+
+                p {
+                    @apply mb-1;
+                }
+            }
+        }
+
+        ol {
+            @apply my-3 ml-1 list-decimal pl-5;
+
+            li {
+                @apply mb-1 text-base leading-relaxed text-gray-700;
+
+                p {
+                    @apply mb-1;
+                }
+            }
+        }
+
+        /* ── Task List ─────────────────────────────────────── */
+        ul[data-type='taskList'] {
+            @apply my-3 ml-0 list-none pl-0;
+
+            li[data-type='taskItem'] {
+                @apply mb-1 flex items-start gap-2;
+
+                > label {
+                    @apply mt-1 flex shrink-0 items-center;
+
+                    input[type='checkbox'] {
+                        @apply size-4 cursor-pointer rounded border-gray-300 text-blue-600 accent-blue-600;
+                    }
+                }
+
+                > div {
+                    @apply flex-1 text-base leading-relaxed text-gray-700;
+
+                    p {
+                        @apply mb-0;
+                    }
+                }
+
+                &[data-checked='true'] > div {
+                    @apply text-gray-400 line-through;
+                }
+            }
+        }
+
+        /* ── Blockquote ────────────────────────────────────── */
+        blockquote {
+            @apply my-4 border-l-[3px] border-gray-300 bg-gray-50/50 py-1 pr-4 pl-4 text-gray-600 italic;
+
+            p {
+                @apply mb-2 last:mb-0;
+            }
+        }
+
+        /* ── Code Inline ───────────────────────────────────── */
+        code {
+            @apply rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[0.875em] text-rose-600;
+        }
+
+        /* ── Code Block ────────────────────────────────────── */
+        pre {
+            @apply my-4 overflow-x-auto rounded-lg bg-gray-900 p-4 font-mono text-sm leading-relaxed text-gray-100;
+
+            code {
+                @apply bg-transparent p-0 text-inherit;
+            }
+        }
+
+        /* ── Horizontal Rule ───────────────────────────────── */
+        hr {
+            @apply my-6 border-t border-gray-200;
+        }
+
+        /* ── Link ──────────────────────────────────────────── */
+        a {
+            @apply cursor-pointer text-blue-600 underline decoration-blue-300 underline-offset-2 transition-colors hover:text-blue-800 hover:decoration-blue-500;
+        }
+
+        /* ── Highlight ─────────────────────────────────────── */
+        mark {
+            @apply rounded-sm bg-yellow-200 px-0.5;
+        }
+
+        /* ── Image ─────────────────────────────────────────── */
+        img {
+            @apply my-4 max-w-full rounded-lg;
+
+            &.ProseMirror-selectednode {
+                @apply ring-2 ring-blue-400 ring-offset-2;
+            }
+        }
+
+        /* ── Strikethrough ─────────────────────────────────── */
+        s {
+            @apply text-gray-400;
+        }
+
+        /* ── Underline ─────────────────────────────────────── */
+        u {
+            @apply underline decoration-gray-400 underline-offset-2;
+        }
+    }
+}
