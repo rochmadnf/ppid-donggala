@@ -1,3 +1,4 @@
+import { TooltipProvider } from '@/components/ui/tooltip';
 import type { PageDataProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
@@ -19,7 +20,9 @@ export default function ConsoleLayout({ children }: PropsWithChildren<ConsoleLay
                         <h1 className="scroll-m-24 text-3xl font-semibold tracking-tight">{page.title}</h1>
                         <p className="w-full text-[1rem] text-balance text-muted-foreground">{page.description}</p>
                     </div>
-                    <div className="w-full flex-1">{children}</div>
+                    <div className="w-full flex-1">
+                        <TooltipProvider>{children}</TooltipProvider>
+                    </div>
                 </div>
             </div>
         </div>

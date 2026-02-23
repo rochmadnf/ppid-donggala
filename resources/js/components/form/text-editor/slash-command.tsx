@@ -6,6 +6,7 @@ import {
     Heading1Icon,
     Heading2Icon,
     Heading3Icon,
+    Heading4Icon,
     ImageIcon,
     ListIcon,
     ListOrderedIcon,
@@ -17,6 +18,7 @@ import {
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type ReactNode } from 'react';
 
 export interface SlashCommandItem {
+    id: number;
     title: string;
     description: string;
     icon: ReactNode;
@@ -25,6 +27,7 @@ export interface SlashCommandItem {
 
 const getSuggestionItems = (): SlashCommandItem[] => [
     {
+        id: 1,
         title: 'Teks',
         description: 'Mulai menulis teks biasa.',
         icon: <TextIcon className="size-5" />,
@@ -33,6 +36,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 2,
         title: 'Heading 1',
         description: 'Judul bagian besar.',
         icon: <Heading1Icon className="size-5" />,
@@ -41,6 +45,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 3,
         title: 'Heading 2',
         description: 'Judul bagian sedang.',
         icon: <Heading2Icon className="size-5" />,
@@ -49,6 +54,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 4,
         title: 'Heading 3',
         description: 'Judul bagian kecil.',
         icon: <Heading3Icon className="size-5" />,
@@ -57,6 +63,16 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 5,
+        title: 'Heading 4',
+        description: 'Judul bagian kecil.',
+        icon: <Heading4Icon className="size-5" />,
+        command: (editor) => {
+            editor.chain().focus().toggleHeading({ level: 4 }).run();
+        },
+    },
+    {
+        id: 6,
         title: 'Daftar Bullet',
         description: 'Buat daftar bullet sederhana.',
         icon: <ListIcon className="size-5" />,
@@ -65,6 +81,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 7,
         title: 'Daftar Nomor',
         description: 'Buat daftar dengan nomor.',
         icon: <ListOrderedIcon className="size-5" />,
@@ -73,6 +90,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 8,
         title: 'Daftar Tugas',
         description: 'Lacak tugas dengan daftar centang.',
         icon: <ListTodoIcon className="size-5" />,
@@ -81,6 +99,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 9,
         title: 'Kutipan',
         description: 'Tambahkan kutipan atau callout.',
         icon: <QuoteIcon className="size-5" />,
@@ -89,6 +108,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 10,
         title: 'Blok Kode',
         description: 'Tulis potongan kode.',
         icon: <CodeIcon className="size-5" />,
@@ -97,6 +117,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 11,
         title: 'Gambar',
         description: 'Sisipkan gambar dari URL.',
         icon: <ImageIcon className="size-5" />,
@@ -108,6 +129,7 @@ const getSuggestionItems = (): SlashCommandItem[] => [
         },
     },
     {
+        id: 12,
         title: 'Garis Pemisah',
         description: 'Pisahkan bagian secara visual.',
         icon: <MinusIcon className="size-5" />,

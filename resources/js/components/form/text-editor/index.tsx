@@ -1,5 +1,20 @@
+import {
+    DropdownMenu,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
 import Color from '@tiptap/extension-color';
+import DragHandle from '@tiptap/extension-drag-handle-react';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
 import TaskItem from '@tiptap/extension-task-item';
@@ -11,19 +26,20 @@ import UniqueID from '@tiptap/extension-unique-id';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import type { ButtonHTMLAttributes, HTMLAttributes, PropsWithChildren } from 'react';
+import { ALargeSmallIcon, CircleIcon, GripVerticalIcon, PaintbrushIcon, PlusIcon, RepeatIcon, TrashIcon } from 'lucide-react';
+import { useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
 import { EditorBubbleMenu } from './bubble-menu';
-import './index.css';
 import { SlashCommand } from './slash-command';
 import { Toolbar } from './toolbar';
 
 export function TextEditorButtonGroup({
+    className,
     children,
     orientation = 'horizontal',
     ...props
-}: HTMLAttributes<HTMLDivElement> & { orientation?: 'horizontal' | 'vertical' }) {
+}: PropsWithChildren<HTMLAttributes<HTMLDivElement> & { orientation?: 'horizontal' | 'vertical' } & { className?: string }>) {
     return (
-        <div className="text-editor-button-group" data-orientation={orientation} role="group" {...props}>
+        <div {...props} className={cn('text-editor-button-group', className)} data-orientation={orientation} role="group">
             {children}
         </div>
     );
@@ -89,12 +105,6 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                     id: '540f9bb0-028b-4f78-a063-aa77c7ae5e0a',
                     textAlign: 'left',
                 },
-                content: [
-                    {
-                        type: 'text',
-                        text: '',
-                    },
-                ],
             },
         ],
     };
@@ -141,7 +151,7 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
         ],
         editorProps: {
             attributes: {
-                class: 'text-editor-content focus:outline-none outline-none caret-blue-500',
+                class: 'text-editor-content pl-10',
             },
         },
         immediatelyRender: import.meta.env.VITE_APP_ENV === 'production' ? false : true,
@@ -157,6 +167,9 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
             };
         },
     });
+
+    // state management
+    const [activeNode, setActiveNode] = useState<{ node: any; pos: number } | null>(null);
 
     if (!editor) {
         return null;
@@ -180,6 +193,127 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                     </TextEditorHeaderActions>
                 </TextEditorHeader>
                 <EditorContent editor={editor} className="p-4" />
+                <DragHandle
+                    editor={editor}
+                    computePositionConfig={{
+                        placement: 'left-start',
+                        strategy: 'absolute',
+                    }}
+                    onNodeChange={({ node, pos }) => {
+                        if (!node || pos == null) {
+                            setActiveNode(null);
+                            return;
+                        }
+
+                        setActiveNode({ node, pos });
+                    }}
+                >
+                    <TextEditorButtonGroup className="mr-1.5 pt-0.5 data-[orientation=horizontal]:gap-0.5">
+                        <TextEditorButton className="px-0.5 py-1">
+                            <PlusIcon />
+                        </TextEditorButton>
+
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <TextEditorButton
+                                            className="px-0.5 py-1"
+                                            onClick={() => {
+                                                if (activeNode) {
+                                                    editor
+                                                        .chain()
+                                                        .focus()
+                                                        .setTextSelection({
+                                                            from: activeNode.pos,
+                                                            to: activeNode.pos + activeNode.node.nodeSize,
+                                                        })
+                                                        .run();
+                                                }
+                                            }}
+                                        >
+                                            <GripVerticalIcon />
+                                        </TextEditorButton>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="space-y-1 py-1 text-center">
+                                    <p>
+                                        <strong>Drag</strong> untuk pindah blok
+                                    </p>
+                                    <p>
+                                        <strong>Klik</strong> untuk buka menu
+                                    </p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent side="left" className="z-11 w-40 rounded-md border border-line-brand bg-white p-1.5">
+                                <DropdownMenuGroup>
+                                    <DropdownMenuLabel className="text-xs text-muted-foreground">Teks</DropdownMenuLabel>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>
+                                            <PaintbrushIcon />
+                                            Warna
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <DropdownMenuLabel className="text-sm text-gray-500">Teks</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem variant="nohover" className="text-red-500">
+                                                    <ALargeSmallIcon className="size-5 text-red-500" />
+                                                    Teks Merah
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="text-gray-700"
+                                                    onClick={() => {
+                                                        editor.chain().focus().setColor('var(--color-gray-700)').run();
+                                                    }}
+                                                >
+                                                    <ALargeSmallIcon className="size-5 text-gray-700" />
+                                                    Teks Default
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="text-blue-500"
+                                                    onClick={() => {
+                                                        editor.chain().focus().setColor('var(--color-blue-500)').run();
+                                                    }}
+                                                >
+                                                    <ALargeSmallIcon className="size-5 text-blue-500" />
+                                                    Teks Biru
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuLabel className="text-sm text-gray-500">Latar Belakang</DropdownMenuLabel>
+                                                <DropdownMenuItem
+                                                    className="text-blue-500"
+                                                    onClick={() => {
+                                                        editor.commands.toggleHighlight({ color: 'var(--color-blue-300)' });
+                                                        editor.commands.focus();
+                                                    }}
+                                                >
+                                                    <CircleIcon className="size-5 fill-blue-300 stroke-blue-400" />
+                                                    Latar Belakang Biru
+                                                </DropdownMenuItem>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>
+                                            <RepeatIcon />
+                                            Ubah jadi
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <DropdownMenuItem>Red</DropdownMenuItem>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                    <DropdownMenuItem variant="destructive" onClick={() => console.log(activeNode)}>
+                                        <TrashIcon />
+                                        Hapus Blok
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </TextEditorButtonGroup>
+                </DragHandle>
                 <EditorBubbleMenu editor={editor} />
             </TextEditorWrapper>
         );

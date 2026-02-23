@@ -43,7 +43,7 @@ function DropdownMenuItem({
     ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
     inset?: boolean;
-    variant?: 'default' | 'destructive' | 'primary';
+    variant?: 'default' | 'destructive' | 'primary' | 'nohover';
 }) {
     return (
         <DropdownMenuPrimitive.Item
@@ -51,7 +51,7 @@ function DropdownMenuItem({
             data-inset={inset}
             data-variant={variant}
             className={cn(
-                "relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+                "relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8 data-[variant=nohover]:focus:text-current [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
                 'data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:*:[svg]:text-destructive!',
                 'data-[variant=primary]:text-blue-600 data-[variant=primary]:focus:bg-blue-500/15 data-[variant=primary]:focus:text-blue-600 data-[variant=primary]:*:[svg]:text-blue-600!',
                 className,
