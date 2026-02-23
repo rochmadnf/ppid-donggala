@@ -209,7 +209,15 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                     }}
                 >
                     <TextEditorButtonGroup className="mr-1.5 pt-0.5 data-[orientation=horizontal]:gap-0.5">
-                        <TextEditorButton className="px-0.5 py-1">
+                        <TextEditorButton
+                            className="px-0.5 py-1"
+                            onClick={() => {
+                                if (activeNode) {
+                                    const endPos = activeNode.pos + activeNode.node.nodeSize;
+                                    editor.chain().focus().setTextSelection(endPos).insertContent({ type: 'paragraph' }).insertContent('/').run();
+                                }
+                            }}
+                        >
                             <PlusIcon />
                         </TextEditorButton>
 
