@@ -26,7 +26,7 @@ import UniqueID from '@tiptap/extension-unique-id';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { ALargeSmallIcon, CircleIcon, GripVerticalIcon, PaintbrushIcon, PlusIcon, RepeatIcon, TrashIcon } from 'lucide-react';
+import { ALargeSmallIcon, CircleIcon, GripVerticalIcon, PaintbrushIcon, PlusIcon, RemoveFormattingIcon, RepeatIcon, TrashIcon } from 'lucide-react';
 import { useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
 import { EditorBubbleMenu } from './bubble-menu';
 import { SlashCommand } from './slash-command';
@@ -214,7 +214,13 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                             onClick={() => {
                                 if (activeNode) {
                                     const endPos = activeNode.pos + activeNode.node.nodeSize;
-                                    editor.chain().focus().setTextSelection(endPos).insertContent({ type: 'paragraph' }).insertContent('/').run();
+                                    editor
+                                        .chain()
+                                        .focus()
+                                        .insertContentAt(endPos, { type: 'paragraph' })
+                                        .setTextSelection(endPos + 1)
+                                        .insertContent('/')
+                                        .run();
                                 }
                             }}
                         >
@@ -229,14 +235,7 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                                             className="px-0.5 py-1"
                                             onClick={() => {
                                                 if (activeNode) {
-                                                    editor
-                                                        .chain()
-                                                        .focus()
-                                                        .setTextSelection({
-                                                            from: activeNode.pos,
-                                                            to: activeNode.pos + activeNode.node.nodeSize,
-                                                        })
-                                                        .run();
+                                                    editor.chain().focus().setNodeSelection(activeNode.pos).run();
                                                 }
                                             }}
                                         >
@@ -321,7 +320,18 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                                             </DropdownMenuSubContent>
                                         </DropdownMenuPortal>
                                     </DropdownMenuSub>
-                                    <DropdownMenuItem variant="destructive" onClick={() => console.log(activeNode)}>
+                                    <DropdownMenuItem onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>
+                                        <RemoveFormattingIcon />
+                                        Reset Format
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        variant="destructive"
+                                        onClick={() => {
+                                            if (activeNode) {
+                                                editor.chain().focus().deleteSelection().run();
+                                            }
+                                        }}
+                                    >
                                         <TrashIcon />
                                         Hapus Blok
                                     </DropdownMenuItem>
