@@ -245,7 +245,15 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                                     </p>
                                 </TooltipContent>
                             </Tooltip>
-                            <DropdownMenuContent side="left" className="z-11 w-40 rounded-md border border-line-brand bg-white p-1.5">
+                            <DropdownMenuContent
+                                onCloseAutoFocus={(e) => {
+                                    e.preventDefault();
+
+                                    editor.commands.focus('end');
+                                }}
+                                side="left"
+                                className="z-11 w-40 rounded-md border border-line-brand bg-white p-1.5"
+                            >
                                 <DropdownMenuGroup>
                                     <DropdownMenuLabel className="text-xs text-muted-foreground">Teks</DropdownMenuLabel>
                                     <DropdownMenuSub>
@@ -257,7 +265,7 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                                             <DropdownMenuSubContent>
                                                 <DropdownMenuLabel className="text-sm text-gray-500">Teks</DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem variant="nohover" className="text-red-500">
+                                                <DropdownMenuItem className="text-red-500">
                                                     <ALargeSmallIcon className="size-5 text-red-500" />
                                                     Teks Merah
                                                 </DropdownMenuItem>
