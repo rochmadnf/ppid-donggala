@@ -30,6 +30,7 @@ import {
     StrikethroughIcon,
     UnderlineIcon,
     UndoIcon,
+    type LucideIcon,
 } from 'lucide-react';
 import { useCallback, type ReactNode } from 'react';
 import { TextEditorButton, TextEditorButtonGroup, TextEditorSeparator } from './index';
@@ -104,6 +105,49 @@ export function BlockTypeSelector({ editor }: { editor: Editor }) {
     );
 }
 
+export function TextAlignmentButton({ editor }: { editor: Editor }) {
+    const { isAlignCenter, isAlignLeft, isAlignRight, isAlignJustify } = useEditorState({
+        editor,
+        selector: (ctx) => ({
+            isAlignLeft: ctx.editor.isActive({ textAlign: 'left' }),
+            isAlignCenter: ctx.editor.isActive({ textAlign: 'center' }),
+            isAlignRight: ctx.editor.isActive({ textAlign: 'right' }),
+            isAlignJustify: ctx.editor.isActive({ textAlign: 'justify' }),
+        }),
+    });
+
+    const alignments: { label: string; icon: LucideIcon; value: string; isActive: boolean }[] = [
+        { label: 'Rata Kiri', icon: AlignLeftIcon, value: 'left', isActive: isAlignLeft },
+        { label: 'Rata Tengah', icon: AlignCenterIcon, value: 'center', isActive: isAlignCenter },
+        { label: 'Rata Kanan', icon: AlignRightIcon, value: 'right', isActive: isAlignRight },
+        { label: 'Rata Kiri-Kanan', icon: AlignJustifyIcon, value: 'justify', isActive: isAlignJustify },
+    ];
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <TextEditorButton className="gap-1 pr-1.5" title="Rata Teks">
+                    {alignments.map(({ isActive, icon: Icon }) => isActive && <Icon key={Icon.name} className="size-4" />)}
+                    <ChevronDownIcon className="size-3 opacity-50" />
+                </TextEditorButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-44 flex-col gap-y-1 p-1">
+                {alignments.map(({ label, value, icon: Icon, isActive }) => (
+                    <DropdownMenuItem
+                        key={value}
+                        className={cn(isActive && 'bg-accent')}
+                        onClick={() => editor?.chain().focus().setTextAlign(value).run()}
+                    >
+                        <Icon className="size-4" />
+                        <span className="flex-1">{label}</span>
+                        {isActive && <CheckIcon className="size-4 text-blue-600" />}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
 // ─── Link dialog ────────────────────────────────────────────────────────────
 
 export function LinkButton({ editor, isActive }: { editor: Editor; isActive: boolean }) {
@@ -151,10 +195,6 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
             isCode: ctx.editor.isActive('code'),
             isHighlight: ctx.editor.isActive('highlight'),
             isLink: ctx.editor.isActive('link'),
-            isAlignLeft: ctx.editor.isActive({ textAlign: 'left' }),
-            isAlignCenter: ctx.editor.isActive({ textAlign: 'center' }),
-            isAlignRight: ctx.editor.isActive({ textAlign: 'right' }),
-            isAlignJustify: ctx.editor.isActive({ textAlign: 'justify' }),
             isBulletList: ctx.editor.isActive('bulletList'),
             isOrderedList: ctx.editor.isActive('orderedList'),
             isTaskList: ctx.editor.isActive('taskList'),
@@ -244,40 +284,8 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
 
             {/* Alignment */}
             <TextEditorButtonGroup>
-                <TextEditorButton
-                    onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                    data-active={state.isAlignLeft || undefined}
-                    title="Rata Kiri"
-                >
-                    <AlignLeftIcon />
-                </TextEditorButton>
-                <TextEditorButton
-                    onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                    data-active={state.isAlignCenter || undefined}
-                    title="Rata Tengah"
-                >
-                    <AlignCenterIcon />
-                </TextEditorButton>
-                <TextEditorButton
-                    onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                    data-active={state.isAlignRight || undefined}
-                    title="Rata Kanan"
-                >
-                    <AlignRightIcon />
-                </TextEditorButton>
-                <TextEditorButton
-                    onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-                    data-active={state.isAlignJustify || undefined}
-                    title="Rata Kiri-Kanan"
-                >
-                    <AlignJustifyIcon />
-                </TextEditorButton>
-            </TextEditorButtonGroup>
+                <TextAlignmentButton editor={editor} />
 
-            <TextEditorSeparator />
-
-            {/* Lists */}
-            <TextEditorButtonGroup>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                     data-active={state.isBulletList || undefined}
