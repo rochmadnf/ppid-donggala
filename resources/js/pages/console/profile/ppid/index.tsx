@@ -36,7 +36,7 @@ export default function PpidIndexPage() {
                         />
                     ))}
                 </TabsList>
-                <TabsContent className="rounded-t-none border-t-0 py-8">
+                <TabsContent className="rounded-t-none border-t-0 px-0 py-8">
                     <TextEditor />
                 </TabsContent>
             </Tabs>

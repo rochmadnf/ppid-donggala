@@ -26,9 +26,19 @@ import UniqueID from '@tiptap/extension-unique-id';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { ALargeSmallIcon, CircleIcon, GripVerticalIcon, PaintbrushIcon, PlusIcon, RemoveFormattingIcon, RepeatIcon, TrashIcon } from 'lucide-react';
+import {
+    ALargeSmallIcon,
+    CircleIcon,
+    CopyPlusIcon,
+    GripVerticalIcon,
+    MoveVerticalIcon,
+    PaintbrushIcon,
+    PlusIcon,
+    RemoveFormattingIcon,
+    RepeatIcon,
+    TrashIcon,
+} from 'lucide-react';
 import { useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
-import { EditorBubbleMenu } from './bubble-menu';
 import { SlashCommand } from './slash-command';
 import { Toolbar } from './toolbar';
 
@@ -151,7 +161,7 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
         ],
         editorProps: {
             attributes: {
-                class: 'text-editor-content pl-10',
+                class: 'text-editor-content pl-14 pt-4',
             },
         },
         immediatelyRender: import.meta.env.VITE_APP_ENV === 'production' ? false : true,
@@ -184,15 +194,22 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
         }
     };
 
+    const goToLastPositionOnCurrentNode = () => {
+        const { $from } = editor.state.selection;
+        const endPos = $from.end($from.depth);
+
+        editor.commands.focus(endPos);
+    };
+
     if (variant === 'notion') {
         return (
-            <TextEditorWrapper>
+            <TextEditorWrapper className="border-x-0 border-b-0">
                 <TextEditorHeader>
                     <TextEditorHeaderActions>
                         <Toolbar editor={editor} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
                     </TextEditorHeaderActions>
                 </TextEditorHeader>
-                <EditorContent editor={editor} className="p-4" />
+                <EditorContent editor={editor} className="px-4" />
                 <DragHandle
                     editor={editor}
                     computePositionConfig={{
@@ -211,6 +228,7 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                     <TextEditorButtonGroup className="mr-1.5 pt-0.5 data-[orientation=horizontal]:gap-0.5">
                         <TextEditorButton
                             className="px-0.5 py-1"
+                            title="Tambah Blok Baru"
                             onClick={() => {
                                 if (activeNode) {
                                     const endPos = activeNode.pos + activeNode.node.nodeSize;
@@ -226,6 +244,18 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                         >
                             <PlusIcon />
                         </TextEditorButton>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <TextEditorButton className="px-0.5 py-1">
+                                    <MoveVerticalIcon className="size-3.5" />
+                                </TextEditorButton>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                                <p>
+                                    <strong>Drag</strong> untuk pindah blok
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
 
                         <DropdownMenu>
                             <Tooltip>
@@ -245,9 +275,6 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="space-y-1 py-1 text-center">
                                     <p>
-                                        <strong>Drag</strong> untuk pindah blok
-                                    </p>
-                                    <p>
                                         <strong>Klik</strong> untuk buka menu
                                     </p>
                                 </TooltipContent>
@@ -255,8 +282,6 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                             <DropdownMenuContent
                                 onCloseAutoFocus={(e) => {
                                     e.preventDefault();
-
-                                    editor.commands.focus('end');
                                 }}
                                 side="left"
                                 className="z-11 w-40 rounded-md border border-line-brand bg-white p-1.5"
@@ -325,10 +350,25 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                                         Reset Format
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
+                                        onClick={() => {
+                                            const { from, to } = editor.state.selection;
+                                            const slice = editor.state.doc.slice(from, to);
+                                            editor.chain().focus().insertContentAt(to, slice.content).run();
+                                        }}
+                                    >
+                                        <CopyPlusIcon />
+                                        Duplikasi Blok
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
                                         variant="destructive"
                                         onClick={() => {
                                             if (activeNode) {
-                                                editor.chain().focus().deleteSelection().run();
+                                                editor
+                                                    .chain()
+                                                    .focus()
+                                                    .deleteRange({ from: activeNode.pos, to: activeNode.pos + activeNode.node.nodeSize })
+                                                    .run();
+                                                goToLastPositionOnCurrentNode();
                                             }
                                         }}
                                     >
@@ -340,7 +380,7 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
                         </DropdownMenu>
                     </TextEditorButtonGroup>
                 </DragHandle>
-                <EditorBubbleMenu editor={editor} />
+                {/* <EditorBubbleMenu editor={editor} /> */}
             </TextEditorWrapper>
         );
     }

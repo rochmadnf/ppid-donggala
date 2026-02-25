@@ -391,13 +391,13 @@
         /* ── Strikethrough ─────────────────────────────────── */
         s,
         del {
-            @apply text-gray-400;
+            @apply text-current/95;
         }
 
         /* ── Underline ─────────────────────────────────────── */
         u,
         ins {
-            @apply underline decoration-gray-400 underline-offset-2;
+            @apply underline underline-offset-2;
         }
     }
 }
