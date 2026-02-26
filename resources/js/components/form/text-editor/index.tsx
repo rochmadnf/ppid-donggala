@@ -1,5 +1,6 @@
 import {
     DropdownMenu,
+    DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -12,7 +13,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
 import Color from '@tiptap/extension-color';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Highlight from '@tiptap/extension-highlight';
