@@ -33,13 +33,11 @@ import {
     GripVerticalIcon,
     MoveVerticalIcon,
     PaintbrushIcon,
-    PlusIcon,
     RemoveFormattingIcon,
     RepeatIcon,
     TrashIcon,
 } from 'lucide-react';
 import { useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
-import { SlashCommand } from './slash-command';
 import { Toolbar } from './toolbar';
 
 export function TextEditorButtonGroup({
@@ -100,12 +98,12 @@ export function TextEditorSeparator({ className, ...props }: HTMLAttributes<HTML
 }
 
 export type TextEditorProps = {
-    variant?: 'notion';
+    variant?: 'default';
     content?: Record<string, unknown>;
     onSave?: (json: Record<string, unknown>) => void;
 };
 
-export function TextEditor({ variant = 'notion', content, onSave }: TextEditorProps) {
+export function TextEditor({ variant = 'default', content, onSave }: TextEditorProps) {
     const defaultContent = {
         type: 'doc',
         content: [
@@ -153,7 +151,6 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
             TextStyle,
             Color,
             Typography,
-            SlashCommand,
             UniqueID.configure({
                 types: ['heading', 'paragraph'],
                 attributeName: 'nid',
@@ -161,7 +158,7 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
         ],
         editorProps: {
             attributes: {
-                class: 'text-editor-content pl-14 pt-4',
+                class: 'text-editor-content pl-10 pt-4',
             },
         },
         immediatelyRender: import.meta.env.VITE_APP_ENV === 'production' ? false : true,
@@ -201,187 +198,167 @@ export function TextEditor({ variant = 'notion', content, onSave }: TextEditorPr
         editor.commands.focus(endPos);
     };
 
-    if (variant === 'notion') {
-        return (
-            <TextEditorWrapper className="border-x-0 border-b-0">
-                <TextEditorHeader>
-                    <TextEditorHeaderActions>
-                        <Toolbar editor={editor} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
-                    </TextEditorHeaderActions>
-                </TextEditorHeader>
-                <EditorContent editor={editor} className="px-4" />
-                <DragHandle
-                    editor={editor}
-                    computePositionConfig={{
-                        placement: 'left-start',
-                        strategy: 'absolute',
-                    }}
-                    onNodeChange={({ node, pos }) => {
-                        if (!node || pos == null) {
-                            setActiveNode(null);
-                            return;
-                        }
+    return (
+        <TextEditorWrapper className="border-x-0 border-b-0">
+            <TextEditorHeader>
+                <TextEditorHeaderActions>
+                    <Toolbar editor={editor} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
+                </TextEditorHeaderActions>
+            </TextEditorHeader>
+            <EditorContent editor={editor} className="px-4" />
+            <DragHandle
+                editor={editor}
+                computePositionConfig={{
+                    placement: 'left-start',
+                    strategy: 'absolute',
+                }}
+                onNodeChange={({ node, pos }) => {
+                    if (!node || pos == null) {
+                        setActiveNode(null);
+                        return;
+                    }
 
-                        setActiveNode({ node, pos });
-                    }}
-                >
-                    <TextEditorButtonGroup className="mr-1.5 pt-0.5 data-[orientation=horizontal]:gap-0.5">
-                        <TextEditorButton
-                            className="px-0.5 py-1"
-                            title="Tambah Blok Baru"
-                            onClick={() => {
-                                if (activeNode) {
-                                    const endPos = activeNode.pos + activeNode.node.nodeSize;
-                                    editor
-                                        .chain()
-                                        .focus()
-                                        .insertContentAt(endPos, { type: 'paragraph' })
-                                        .setTextSelection(endPos + 1)
-                                        .insertContent('/')
-                                        .run();
-                                }
-                            }}
-                        >
-                            <PlusIcon />
-                        </TextEditorButton>
+                    setActiveNode({ node, pos });
+                }}
+            >
+                <TextEditorButtonGroup className="mr-1.5 pt-0.5 data-[orientation=horizontal]:gap-0.5">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <TextEditorButton className="px-0.5 py-1">
+                                <MoveVerticalIcon className="size-3.5" />
+                            </TextEditorButton>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                            <p>
+                                <strong>Drag</strong> untuk pindah blok
+                            </p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    <DropdownMenu>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <TextEditorButton className="px-0.5 py-1">
-                                    <MoveVerticalIcon className="size-3.5" />
-                                </TextEditorButton>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                                <p>
-                                    <strong>Drag</strong> untuk pindah blok
-                                </p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <DropdownMenu>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <TextEditorButton
-                                            className="px-0.5 py-1"
-                                            onClick={() => {
-                                                if (activeNode) {
-                                                    editor.chain().focus().setNodeSelection(activeNode.pos).run();
-                                                }
-                                            }}
-                                        >
-                                            <GripVerticalIcon />
-                                        </TextEditorButton>
-                                    </DropdownMenuTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="space-y-1 py-1 text-center">
-                                    <p>
-                                        <strong>Klik</strong> untuk buka menu
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent
-                                onCloseAutoFocus={(e) => {
-                                    e.preventDefault();
-                                }}
-                                side="left"
-                                className="z-11 w-40 rounded-md border border-line-brand bg-white p-1.5"
-                            >
-                                <DropdownMenuGroup>
-                                    <DropdownMenuLabel className="text-xs text-muted-foreground">Teks</DropdownMenuLabel>
-                                    <DropdownMenuSub>
-                                        <DropdownMenuSubTrigger>
-                                            <PaintbrushIcon />
-                                            Warna
-                                        </DropdownMenuSubTrigger>
-                                        <DropdownMenuPortal>
-                                            <DropdownMenuSubContent>
-                                                <DropdownMenuLabel className="text-sm text-gray-500">Teks</DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem className="text-red-500">
-                                                    <ALargeSmallIcon className="size-5 text-red-500" />
-                                                    Teks Merah
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    className="text-gray-700"
-                                                    onClick={() => {
-                                                        editor.chain().focus().setColor('var(--color-gray-700)').run();
-                                                    }}
-                                                >
-                                                    <ALargeSmallIcon className="size-5 text-gray-700" />
-                                                    Teks Default
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    className="text-blue-500"
-                                                    onClick={() => {
-                                                        editor.chain().focus().setColor('var(--color-blue-500)').run();
-                                                    }}
-                                                >
-                                                    <ALargeSmallIcon className="size-5 text-blue-500" />
-                                                    Teks Biru
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuLabel className="text-sm text-gray-500">Latar Belakang</DropdownMenuLabel>
-                                                <DropdownMenuItem
-                                                    className="text-blue-500"
-                                                    onClick={() => {
-                                                        editor.commands.toggleHighlight({ color: 'var(--color-blue-300)' });
-                                                        editor.commands.focus();
-                                                    }}
-                                                >
-                                                    <CircleIcon className="size-5 fill-blue-300 stroke-blue-400" />
-                                                    Latar Belakang Biru
-                                                </DropdownMenuItem>
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuPortal>
-                                    </DropdownMenuSub>
-                                    <DropdownMenuSub>
-                                        <DropdownMenuSubTrigger>
-                                            <RepeatIcon />
-                                            Ubah jadi
-                                        </DropdownMenuSubTrigger>
-                                        <DropdownMenuPortal>
-                                            <DropdownMenuSubContent>
-                                                <DropdownMenuItem>Red</DropdownMenuItem>
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuPortal>
-                                    </DropdownMenuSub>
-                                    <DropdownMenuItem onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>
-                                        <RemoveFormattingIcon />
-                                        Reset Format
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            const { from, to } = editor.state.selection;
-                                            const slice = editor.state.doc.slice(from, to);
-                                            editor.chain().focus().insertContentAt(to, slice.content).run();
-                                        }}
-                                    >
-                                        <CopyPlusIcon />
-                                        Duplikasi Blok
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        variant="destructive"
+                                <DropdownMenuTrigger asChild>
+                                    <TextEditorButton
+                                        className="px-0.5 py-1"
                                         onClick={() => {
                                             if (activeNode) {
-                                                editor
-                                                    .chain()
-                                                    .focus()
-                                                    .deleteRange({ from: activeNode.pos, to: activeNode.pos + activeNode.node.nodeSize })
-                                                    .run();
-                                                goToLastPositionOnCurrentNode();
+                                                editor.chain().focus().setNodeSelection(activeNode.pos).run();
                                             }
                                         }}
                                     >
-                                        <TrashIcon />
-                                        Hapus Blok
-                                    </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </TextEditorButtonGroup>
-                </DragHandle>
-                {/* <EditorBubbleMenu editor={editor} /> */}
-            </TextEditorWrapper>
-        );
-    }
+                                        <GripVerticalIcon />
+                                    </TextEditorButton>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="space-y-1 py-1 text-center">
+                                <p>
+                                    <strong>Klik</strong> untuk buka menu
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <DropdownMenuContent
+                            onCloseAutoFocus={(e) => {
+                                e.preventDefault();
+                            }}
+                            side="left"
+                            className="z-11 w-40 rounded-md border border-line-brand bg-white p-1.5"
+                        >
+                            <DropdownMenuGroup>
+                                <DropdownMenuLabel className="text-xs text-muted-foreground">Teks</DropdownMenuLabel>
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>
+                                        <PaintbrushIcon />
+                                        Warna
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuLabel className="text-sm text-gray-500">Teks</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem className="text-red-500">
+                                                <ALargeSmallIcon className="size-5 text-red-500" />
+                                                Teks Merah
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="text-gray-700"
+                                                onClick={() => {
+                                                    editor.chain().focus().setColor('var(--color-gray-700)').run();
+                                                }}
+                                            >
+                                                <ALargeSmallIcon className="size-5 text-gray-700" />
+                                                Teks Default
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="text-blue-500"
+                                                onClick={() => {
+                                                    editor.chain().focus().setColor('var(--color-blue-500)').run();
+                                                }}
+                                            >
+                                                <ALargeSmallIcon className="size-5 text-blue-500" />
+                                                Teks Biru
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel className="text-sm text-gray-500">Latar Belakang</DropdownMenuLabel>
+                                            <DropdownMenuItem
+                                                className="text-blue-500"
+                                                onClick={() => {
+                                                    editor.commands.toggleHighlight({ color: 'var(--color-blue-300)' });
+                                                    editor.commands.focus();
+                                                }}
+                                            >
+                                                <CircleIcon className="size-5 fill-blue-300 stroke-blue-400" />
+                                                Latar Belakang Biru
+                                            </DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                </DropdownMenuSub>
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>
+                                        <RepeatIcon />
+                                        Ubah jadi
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuItem>Red</DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                </DropdownMenuSub>
+                                <DropdownMenuItem onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>
+                                    <RemoveFormattingIcon />
+                                    Reset Format
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        const { from, to } = editor.state.selection;
+                                        const slice = editor.state.doc.slice(from, to);
+                                        editor.chain().focus().insertContentAt(to, slice.content).run();
+                                    }}
+                                >
+                                    <CopyPlusIcon />
+                                    Duplikasi Blok
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={() => {
+                                        if (activeNode) {
+                                            editor
+                                                .chain()
+                                                .focus()
+                                                .deleteRange({ from: activeNode.pos, to: activeNode.pos + activeNode.node.nodeSize })
+                                                .run();
+                                            goToLastPositionOnCurrentNode();
+                                        }
+                                    }}
+                                >
+                                    <TrashIcon />
+                                    Hapus Blok
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </TextEditorButtonGroup>
+            </DragHandle>
+            {/* <EditorBubbleMenu editor={editor} /> */}
+        </TextEditorWrapper>
+    );
 }

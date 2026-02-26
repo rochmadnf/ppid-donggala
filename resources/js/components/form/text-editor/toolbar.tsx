@@ -105,6 +105,8 @@ export function BlockTypeSelector({ editor }: { editor: Editor }) {
     );
 }
 
+export type ToolbarButtonItem = { label: string; icon: LucideIcon; value: string; isActive: boolean; shortcut?: string };
+
 export function TextAlignmentButton({ editor }: { editor: Editor }) {
     const { isAlignCenter, isAlignLeft, isAlignRight, isAlignJustify } = useEditorState({
         editor,
@@ -116,11 +118,11 @@ export function TextAlignmentButton({ editor }: { editor: Editor }) {
         }),
     });
 
-    const alignments: { label: string; icon: LucideIcon; value: string; isActive: boolean }[] = [
-        { label: 'Rata Kiri', icon: AlignLeftIcon, value: 'left', isActive: isAlignLeft },
-        { label: 'Rata Tengah', icon: AlignCenterIcon, value: 'center', isActive: isAlignCenter },
-        { label: 'Rata Kanan', icon: AlignRightIcon, value: 'right', isActive: isAlignRight },
-        { label: 'Rata Kiri-Kanan', icon: AlignJustifyIcon, value: 'justify', isActive: isAlignJustify },
+    const alignments: ToolbarButtonItem[] = [
+        { label: 'Rata Kiri', icon: AlignLeftIcon, value: 'left', isActive: isAlignLeft, shortcut: 'Ctrl/⌘ + Shift + L' },
+        { label: 'Rata Tengah', icon: AlignCenterIcon, value: 'center', isActive: isAlignCenter, shortcut: 'Ctrl/⌘ + Shift + E' },
+        { label: 'Rata Kanan', icon: AlignRightIcon, value: 'right', isActive: isAlignRight, shortcut: 'Ctrl/⌘ + Shift + R' },
+        { label: 'Rata Kiri-Kanan', icon: AlignJustifyIcon, value: 'justify', isActive: isAlignJustify, shortcut: 'Ctrl/⌘ + Shift + J' },
     ];
 
     return (
@@ -132,14 +134,16 @@ export function TextAlignmentButton({ editor }: { editor: Editor }) {
                 </TextEditorButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-44 flex-col gap-y-1 p-1">
-                {alignments.map(({ label, value, icon: Icon, isActive }) => (
+                {alignments.map(({ label, value, icon: Icon, isActive, shortcut }) => (
                     <DropdownMenuItem
                         key={value}
                         className={cn(isActive && 'bg-accent')}
                         onClick={() => editor?.chain().focus().setTextAlign(value).run()}
                     >
                         <Icon className="size-4" />
-                        <span className="flex-1">{label}</span>
+                        <span className="flex-1" title={`${shortcut}`}>
+                            {label}
+                        </span>
                         {isActive && <CheckIcon className="size-4 text-blue-600" />}
                     </DropdownMenuItem>
                 ))}
