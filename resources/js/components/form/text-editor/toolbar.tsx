@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -17,8 +18,10 @@ import {
     Heading2Icon,
     Heading3Icon,
     HighlighterIcon,
+    ImageIcon,
     ItalicIcon,
     Link2Icon,
+    LinkIcon,
     ListIcon,
     ListOrderedIcon,
     ListTodoIcon,
@@ -32,6 +35,7 @@ import {
     StrikethroughIcon,
     UnderlineIcon,
     UndoIcon,
+    UploadIcon,
     type LucideIcon,
 } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
@@ -208,6 +212,83 @@ export function LinkButton({ editor, isActive }: { editor: Editor; isActive: boo
         </DropdownMenu>
     );
 }
+// ─── Image Button ────────────────────────────────────────────────────────────
+
+export function ImageButton({ editor }: { editor: Editor }) {
+    const [imageUrl, setImageUrl] = useState<string>('');
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+    const onChange = (src: string) => {
+        editor.chain().focus().setImage({ src }).run();
+    };
+
+    const onUpload = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/png, image/jpeg, image/jpg, image/webp';
+
+        input.onchange = async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+
+            if (file) {
+                const imageurl = URL.createObjectURL(file);
+                onChange(imageurl);
+            }
+        };
+
+        input.click();
+    };
+
+    const handleImageUrlSubmit = () => {
+        if (imageUrl) {
+            onChange(imageUrl);
+            setImageUrl('');
+            setDialogOpen(false);
+        }
+    };
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <TextEditorButton title="Sisipkan Gambar">
+                        <ImageIcon />
+                    </TextEditorButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="">
+                    <DropdownMenuItem onClick={onUpload}>
+                        <UploadIcon /> Unggah
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setDialogOpen(true)}>
+                        <LinkIcon /> Sisipkan dari Tautan
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Sisipkan Gambar dari Tautan</DialogTitle>
+                    </DialogHeader>
+                    <Input
+                        placeholder="Masukkan tautan gambar..."
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleImageUrlSubmit();
+                            }
+                        }}
+                    />
+                    <DialogFooter>
+                        <Button variant="brand" onClick={handleImageUrlSubmit} disabled={!imageUrl}>
+                            <CheckIcon className="size-4" />
+                            Sisipkan
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+}
 
 // ─── Full Toolbar ───────────────────────────────────────────────────────────
 
@@ -311,10 +392,8 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
             </TextEditorButtonGroup>
 
             <TextEditorSeparator />
-
-            {/* Link */}
             <LinkButton editor={editor} isActive={state.isLink} />
-
+            <ImageButton editor={editor} />
             <TextEditorSeparator />
 
             {/* Alignment */}

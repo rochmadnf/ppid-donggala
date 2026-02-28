@@ -153,6 +153,13 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
             Image.configure({
                 inline: false,
                 allowBase64: true,
+                resize: {
+                    enabled: true,
+                    directions: ['top', 'bottom', 'left', 'right'],
+                    minWidth: 50,
+                    minHeight: 50,
+                    alwaysPreserveAspectRatio: true,
+                },
             }),
             TextStyle,
             Color,
