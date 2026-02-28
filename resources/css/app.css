@@ -397,6 +397,41 @@
             }
         }
 
+        /* ── Image Resize Handles ──────────────────────────── */
+        [data-resize-container] {
+            @apply relative;
+
+            &[data-resize-state='true'] {
+                @apply select-none;
+            }
+        }
+
+        [data-resize-wrapper] {
+            @apply relative inline-block;
+
+            &:hover [data-resize-handle],
+            &:has([data-resize-handle]:active) [data-resize-handle] {
+                @apply opacity-100;
+            }
+        }
+
+        [data-resize-handle] {
+            @apply absolute z-10 size-3 rounded-full border-2 border-blue-500 bg-white opacity-0 transition-opacity;
+
+            &[data-resize-handle='top-left'] {
+                @apply -top-1.5 -left-1.5 cursor-nwse-resize;
+            }
+            &[data-resize-handle='top-right'] {
+                @apply -top-1.5 -right-1.5 cursor-nesw-resize;
+            }
+            &[data-resize-handle='bottom-left'] {
+                @apply -bottom-1.5 -left-1.5 cursor-nesw-resize;
+            }
+            &[data-resize-handle='bottom-right'] {
+                @apply -right-1.5 -bottom-1.5 cursor-nwse-resize;
+            }
+        }
+
         /* ── Strikethrough ─────────────────────────────────── */
         s,
         del {

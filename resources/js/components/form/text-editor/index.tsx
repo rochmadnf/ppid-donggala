@@ -155,7 +155,7 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
                 allowBase64: true,
                 resize: {
                     enabled: true,
-                    directions: ['top', 'bottom', 'left', 'right'],
+                    directions: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
                     minWidth: 50,
                     minHeight: 50,
                     alwaysPreserveAspectRatio: true,
