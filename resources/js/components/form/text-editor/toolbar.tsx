@@ -306,6 +306,7 @@ export function TextColorButton({ editor }: { editor: Editor }) {
         { name: 'Hitam', value: 'var(--color-black)' },
         { name: 'Putih', value: 'var(--color-white)' },
         { name: 'Merah', value: 'var(--color-red-500)' },
+        { name: 'Merah Muda', value: 'var(--color-pink-500)' },
         { name: 'Biru', value: 'var(--color-blue-500)' },
         { name: 'Hijau', value: 'var(--color-green-500)' },
         { name: 'Kuning', value: 'var(--color-yellow-500)' },
