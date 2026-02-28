@@ -160,7 +160,6 @@ export function TextAlignmentButton({ editor }: { editor: Editor }) {
 }
 
 // ─── Link dialog ────────────────────────────────────────────────────────────
-
 export function LinkButton({ editor, isActive }: { editor: Editor; isActive: boolean }) {
     const [href, setHref] = useState<string>('');
     const [openDm, setOpenDm] = useState<boolean>(false);
@@ -213,8 +212,8 @@ export function LinkButton({ editor, isActive }: { editor: Editor; isActive: boo
         </DropdownMenu>
     );
 }
-// ─── Image Button ────────────────────────────────────────────────────────────
 
+// ─── Image Button ────────────────────────────────────────────────────────────
 export function ImageButton({ editor }: { editor: Editor }) {
     const [imageUrl, setImageUrl] = useState<string>('');
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -297,8 +296,52 @@ export function ImageButton({ editor }: { editor: Editor }) {
     );
 }
 
-// ─── Full Toolbar ───────────────────────────────────────────────────────────
+export function TextColorButton({ editor }: { editor: Editor }) {
+    const [openDm, setOpenDm] = useState<boolean>(false);
 
+    const color = editor.getAttributes('textStyle').color || 'var(--color-gray-700)';
+
+    const colors: { name: string; value: string }[] = [
+        { name: 'Default', value: 'var(--color-gray-700)' },
+        { name: 'Hitam', value: 'var(--color-black)' },
+        { name: 'Putih', value: 'var(--color-white)' },
+        { name: 'Merah', value: 'var(--color-red-500)' },
+        { name: 'Biru', value: 'var(--color-blue-500)' },
+        { name: 'Hijau', value: 'var(--color-green-500)' },
+        { name: 'Kuning', value: 'var(--color-yellow-500)' },
+    ];
+
+    const onChange = (newColor: string) => {
+        editor.chain().focus().setColor(newColor).run();
+        setOpenDm(false);
+    };
+
+    return (
+        <DropdownMenu open={openDm} onOpenChange={setOpenDm}>
+            <DropdownMenuTrigger asChild>
+                <TextEditorButton title="Warna Teks" className="flex-col">
+                    <span className="text-sm" style={{ color }}>
+                        A
+                    </span>
+                    <div className="h-0.5 w-full rounded-md" style={{ backgroundColor: color }} />
+                </TextEditorButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mx-auto flex w-32 flex-wrap justify-center gap-2">
+                {colors.map(({ name, value }) => (
+                    <button
+                        title={name}
+                        key={name}
+                        className="size-5 cursor-pointer rounded-full border hover:border-2 hover:border-gray-700"
+                        style={{ backgroundColor: value, borderColor: value === color ? 'var(--color-blue-600)' : 'var(--color-gray-500)' }}
+                        onClick={() => onChange(value)}
+                    />
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
+// ─── Full Toolbar ───────────────────────────────────────────────────────────
 interface ToolbarProps {
     editor: Editor;
     canUndo: boolean;
@@ -382,13 +425,7 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
                 >
                     <StrikethroughIcon />
                 </TextEditorButton>
-                <TextEditorButton
-                    onClick={() => editor.chain().focus().toggleCode().run()}
-                    data-active={state.isCode || undefined}
-                    title="Kode Inline"
-                >
-                    <CodeIcon />
-                </TextEditorButton>
+                <TextColorButton editor={editor} />
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleHighlight().run()}
                     data-active={state.isHighlight || undefined}
@@ -440,6 +477,13 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
                     title="Kutipan"
                 >
                     <QuoteIcon />
+                </TextEditorButton>
+                <TextEditorButton
+                    onClick={() => editor.chain().focus().toggleCode().run()}
+                    data-active={state.isCode || undefined}
+                    title="Kode Inline"
+                >
+                    <CodeIcon />
                 </TextEditorButton>
                 <TextEditorButton
                     onClick={() => editor.chain().focus().toggleCodeBlock().run()}
