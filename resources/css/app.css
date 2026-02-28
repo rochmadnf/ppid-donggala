@@ -399,15 +399,20 @@
 
         /* ── Image Resize Handles ──────────────────────────── */
         [data-resize-container] {
-            @apply relative;
+            @apply relative my-4 max-w-full overflow-hidden;
 
             &[data-resize-state='true'] {
                 @apply select-none;
             }
+
+            /* Reset img styles inside resize container */
+            img {
+                @apply my-0 block max-w-full rounded-lg;
+            }
         }
 
         [data-resize-wrapper] {
-            @apply relative inline-block;
+            @apply relative inline-block max-w-full overflow-visible;
 
             &:hover [data-resize-handle],
             &:has([data-resize-handle]:active) [data-resize-handle] {
