@@ -399,7 +399,7 @@
 
         /* ── Image Resize Handles ──────────────────────────── */
         [data-resize-container] {
-            @apply relative my-4 max-w-full;
+            @apply relative my-4 max-w-full flex-wrap;
 
             &[data-resize-state='true'] {
                 @apply select-none;
@@ -408,6 +408,15 @@
             /* Reset img styles inside resize container */
             img {
                 @apply my-0 block max-w-full rounded-lg;
+            }
+        }
+
+        /* ── Image Caption ─────────────────────────────────── */
+        .image-caption {
+            @apply mt-2 w-full text-center text-sm text-gray-500 italic outline-none;
+
+            &[data-empty='true']::before {
+                @apply pointer-events-none text-gray-300 content-[attr(data-placeholder)];
             }
         }
 
