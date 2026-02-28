@@ -232,7 +232,11 @@
 
     /* ── Drag Handle (for block nodes) ───────────────────────────────── */
     .drag-handle::before {
-        @apply absolute top-0 left-[100%] h-full w-4 content-[''];
+        @apply absolute top-0 left-full h-full w-4 content-[''];
+    }
+
+    .drag-handle {
+        @apply -translate-x-[11px] transform;
     }
 
     /* .text-editor-drag-handle-icon {
@@ -314,30 +318,31 @@
 
         /* ── Task List ─────────────────────────────────────── */
         ul[data-type='taskList'] {
-            @apply my-3 ml-0 list-none pl-0;
+            list-style: none;
+            @apply ml-0 p-0;
 
-            li[data-type='taskItem'] {
-                @apply mb-1 flex items-start gap-2;
+            li {
+                @apply flex items-start;
 
                 > label {
-                    @apply mt-1 flex shrink-0 items-center;
-
-                    input[type='checkbox'] {
-                        @apply size-4 cursor-pointer rounded border-gray-300 text-blue-600 accent-blue-600;
-                    }
+                    @apply mr-2 flex-[0_0_auto] select-none;
                 }
 
                 > div {
-                    @apply flex-1 text-base leading-relaxed text-gray-700;
-
-                    p {
-                        @apply mb-0;
-                    }
+                    @apply flex-[1_1_auto];
                 }
+            }
 
-                &[data-checked='true'] > div {
-                    @apply text-gray-400 line-through;
-                }
+            li[data-checked='true'] > div {
+                @apply text-current/90 line-through;
+            }
+
+            input[type='checkbox'] {
+                @apply cursor-pointer;
+            }
+
+            ul[data-type='taskList'] {
+                margin: 0;
             }
         }
 

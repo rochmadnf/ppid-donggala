@@ -129,7 +129,7 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
                     if (node.type.name === 'heading') {
                         return `Heading ${node.attrs.level}`;
                     }
-                    return "Ketik '/' untuk perintah, atau mulai menulis...";
+                    return 'Mulai menulis...';
                 },
                 includeChildren: true,
             }),
