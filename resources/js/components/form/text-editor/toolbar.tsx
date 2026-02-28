@@ -233,8 +233,13 @@ export function ImageButton({ editor }: { editor: Editor }) {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
                 const compressed = await compressFile(file);
-                const imageurl = URL.createObjectURL(compressed);
-                onChange(imageurl);
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    if (typeof reader.result === 'string') {
+                        onChange(reader.result);
+                    }
+                };
+                reader.readAsDataURL(compressed);
             }
         };
 
