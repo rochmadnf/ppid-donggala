@@ -399,7 +399,7 @@
 
         /* ── Image Resize Handles ──────────────────────────── */
         [data-resize-container] {
-            @apply relative my-4 max-w-full overflow-hidden;
+            @apply relative my-4 max-w-full;
 
             &[data-resize-state='true'] {
                 @apply select-none;

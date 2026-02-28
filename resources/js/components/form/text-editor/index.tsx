@@ -16,7 +16,6 @@ import { cn } from '@/lib/utils';
 import Color from '@tiptap/extension-color';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Highlight from '@tiptap/extension-highlight';
-import Image from '@tiptap/extension-image';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
@@ -38,6 +37,7 @@ import {
     TrashIcon,
 } from 'lucide-react';
 import { useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
+import { CustomImage } from './custom-image';
 import { Toolbar } from './toolbar';
 
 export function TextEditorButtonGroup({
@@ -140,7 +140,7 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
                 includeChildren: true,
             }),
             TextAlign.configure({
-                types: ['heading', 'paragraph'],
+                types: ['heading', 'paragraph', 'image'],
                 defaultAlignment: 'left',
             }),
             Highlight.configure({
@@ -150,8 +150,8 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
             TaskItem.configure({
                 nested: true,
             }),
-            Image.configure({
-                inline: true,
+            CustomImage.configure({
+                inline: false,
                 allowBase64: true,
                 resize: {
                     enabled: true,
