@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { useImageCompressor } from '@/hooks/useImageCompressor';
 import { cn } from '@/lib/utils';
 import type { Editor } from '@tiptap/react';
 import { useEditorState } from '@tiptap/react';
@@ -217,6 +218,7 @@ export function LinkButton({ editor, isActive }: { editor: Editor; isActive: boo
 export function ImageButton({ editor }: { editor: Editor }) {
     const [imageUrl, setImageUrl] = useState<string>('');
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+    const { compressFile, error } = useImageCompressor();
 
     const onChange = (src: string) => {
         editor.chain().focus().setImage({ src }).run();
@@ -229,9 +231,9 @@ export function ImageButton({ editor }: { editor: Editor }) {
 
         input.onchange = async (e) => {
             const file = (e.target as HTMLInputElement).files?.[0];
-
             if (file) {
-                const imageurl = URL.createObjectURL(file);
+                const compressed = await compressFile(file);
+                const imageurl = URL.createObjectURL(compressed);
                 onChange(imageurl);
             }
         };

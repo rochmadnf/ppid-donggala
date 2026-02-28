@@ -151,7 +151,7 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
                 nested: true,
             }),
             Image.configure({
-                inline: false,
+                inline: true,
                 allowBase64: true,
                 resize: {
                     enabled: true,
