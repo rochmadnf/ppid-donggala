@@ -123,6 +123,12 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
                 undoRedo: {
                     depth: 30,
                 },
+                link: {
+                    openOnClick: false,
+                    autolink: true,
+                    defaultProtocol: 'https',
+                    protocols: ['http', 'https', 'mailto'],
+                },
             }),
             Placeholder.configure({
                 placeholder: ({ node }) => {

@@ -1,4 +1,6 @@
+import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import type { Editor } from '@tiptap/react';
 import { useEditorState } from '@tiptap/react';
@@ -16,7 +18,7 @@ import {
     Heading3Icon,
     HighlighterIcon,
     ItalicIcon,
-    LinkIcon,
+    Link2Icon,
     ListIcon,
     ListOrderedIcon,
     ListTodoIcon,
@@ -32,7 +34,7 @@ import {
     UndoIcon,
     type LucideIcon,
 } from 'lucide-react';
-import { useCallback, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { TextEditorButton, TextEditorButtonGroup, TextEditorSeparator } from './index';
 
 // ─── Block type selector (Notion-like heading/paragraph picker) ─────────────
@@ -155,26 +157,55 @@ export function TextAlignmentButton({ editor }: { editor: Editor }) {
 // ─── Link dialog ────────────────────────────────────────────────────────────
 
 export function LinkButton({ editor, isActive }: { editor: Editor; isActive: boolean }) {
-    const setLink = useCallback(() => {
-        const previousUrl = editor.getAttributes('link').href;
-        const url = window.prompt('Masukkan URL:', previousUrl);
+    const [href, setHref] = useState<string>('');
+    const [openDm, setOpenDm] = useState<boolean>(false);
+    const setLink = useCallback(
+        (url: string) => {
+            // cancelled
+            if (url === null) return;
 
-        // cancelled
-        if (url === null) return;
+            // empty - remove link
+            if (url === '') {
+                editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                return;
+            }
 
-        // empty - remove link
-        if (url === '') {
-            editor.chain().focus().extendMarkRange('link').unsetLink().run();
-            return;
-        }
-
-        editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-    }, [editor]);
+            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+            setHref('');
+        },
+        [editor],
+    );
 
     return (
-        <TextEditorButton onClick={setLink} data-active={isActive || undefined} title="Tautan">
-            <LinkIcon />
-        </TextEditorButton>
+        <DropdownMenu
+            open={openDm}
+            onOpenChange={(open) => {
+                setOpenDm(open);
+                if (open) {
+                    setHref(editor.getAttributes('link').href || '');
+                }
+            }}
+        >
+            <DropdownMenuTrigger asChild>
+                <TextEditorButton data-active={isActive || undefined} title="Sisipkan Tautan">
+                    <Link2Icon />
+                </TextEditorButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="flex items-center gap-x-2 p-2.5">
+                <Input autoFocus placeholder="https://donggala.go.id" value={href} onChange={(e) => setHref(e.target.value)} />
+                <Button
+                    size={'icon'}
+                    onClick={() => {
+                        setLink(href);
+                        setOpenDm(false);
+                    }}
+                    variant={'brand'}
+                    className="cursor-pointer"
+                >
+                    <CheckIcon />
+                </Button>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }
 

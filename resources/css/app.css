@@ -140,6 +140,10 @@
     }
 }
 
+@utility flex-center {
+    @apply flex items-center justify-center;
+}
+
 @layer components {
     /* ── Wrapper ──────────────────────────────────────────────────────── */
     .text-editor-wrapper {
