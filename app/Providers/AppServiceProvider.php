@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\{MasterData};
+use App\Repositories\Contracts\{MasterData, Profile};
 use App\Repositories;
 
 class AppServiceProvider extends ServiceProvider
@@ -14,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(MasterData\OfficeRepositoryInterface::class, Repositories\MasterData\OfficeRepository::class);
+        $this->app->bind(Profile\PpidRepositoryInterface::class, Repositories\Profile\PpidRepository::class);
     }
 
     /**

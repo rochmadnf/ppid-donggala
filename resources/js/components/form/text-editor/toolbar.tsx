@@ -349,10 +349,11 @@ interface ToolbarProps {
     editor: Editor;
     canUndo: boolean;
     canRedo: boolean;
+    isSave?: boolean;
     onSave?: () => void;
 }
 
-export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
+export function Toolbar({ editor, canUndo, canRedo, isSave, onSave }: ToolbarProps) {
     // Subscribe to editor state changes so toolbar buttons re-render on formatting changes
     const state = useEditorState({
         editor,
@@ -375,7 +376,7 @@ export function Toolbar({ editor, canUndo, canRedo, onSave }: ToolbarProps) {
     return (
         <>
             {/* Save */}
-            <TextEditorButton onClick={onSave} title="Simpan">
+            <TextEditorButton disabled={!isSave} onClick={onSave} title="Simpan">
                 <SaveIcon />
             </TextEditorButton>
 

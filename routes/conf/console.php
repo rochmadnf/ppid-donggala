@@ -33,6 +33,7 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
             ->name('ppid.')
             ->group(function () {
                 Route::get('', 'index')->name('index');
+                Route::patch('{slug}/content-update', 'update')->name('update');
             });
     });
 });

@@ -19,7 +19,6 @@ export const extenstions = [
             openOnClick: false,
             autolink: true,
             defaultProtocol: 'https',
-            protocols: ['http', 'https', 'mailto'],
         },
     }),
     Placeholder.configure({

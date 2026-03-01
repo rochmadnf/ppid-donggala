@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { type JSONContent } from '@tiptap/core';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import {
@@ -26,7 +27,7 @@ import {
     RepeatIcon,
     TrashIcon,
 } from 'lucide-react';
-import { useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
+import { useCallback, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
 import { extenstions } from './config';
 import { Toolbar } from './toolbar';
 
@@ -90,10 +91,22 @@ export function TextEditorSeparator({ className, ...props }: HTMLAttributes<HTML
 export type TextEditorProps = {
     variant?: 'default';
     content?: Record<string, unknown>;
-    onSave?: (json: Record<string, unknown>) => void;
+    onSave?: (json: JSONContent) => void;
 };
 
 export function TextEditor({ variant = 'default', content, onSave }: TextEditorProps) {
+    const [isSave, setIsSave] = useState<boolean>(false);
+    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const debouncedSetIsSave = useCallback((value: boolean) => {
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+        }
+        debounceTimeoutRef.current = setTimeout(() => {
+            setIsSave(value);
+        }, 500);
+    }, []);
+
     const defaultContent = {
         type: 'doc',
         content: [
@@ -116,7 +129,12 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
         },
         immediatelyRender: import.meta.env.VITE_APP_ENV === 'production' ? false : true,
         content: content ?? defaultContent,
+        onUpdate: ({ editor }) => {
+            debouncedSetIsSave(editor.getHTML() !== (editorHtml ?? ''));
+        },
     });
+
+    const editorHtml: string = editor?.getHTML() ?? '';
 
     const { canUndo, canRedo } = useEditorState({
         editor,
@@ -155,7 +173,7 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
         <TextEditorWrapper className="border-x-0 border-b-0">
             <TextEditorHeader>
                 <TextEditorHeaderActions>
-                    <Toolbar editor={editor} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
+                    <Toolbar editor={editor} isSave={isSave} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
                 </TextEditorHeaderActions>
             </TextEditorHeader>
             <EditorContent editor={editor} className="px-4" />

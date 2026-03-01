@@ -3,8 +3,11 @@ import { MetaTag } from '@/components/metatag';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/tabs';
 import ConsoleLayout from '@/layouts/console-layout';
 import type { PageDataProps } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import type { JSONContent } from '@tiptap/core';
 import { useState, type ReactNode } from 'react';
+import toast from 'react-hot-toast';
+import type { PpidIndexProps } from './types';
 
 const tabs: { label: string; id: string }[] = [
     { label: 'Profil Singkat', id: 'profil-singkat' },
@@ -14,8 +17,28 @@ const tabs: { label: string; id: string }[] = [
 ];
 
 export default function PpidIndexPage() {
-    const { page } = usePage<PageDataProps>().props;
-    const [activeTab, setActiveTab] = useState(tabs[0].id);
+    const { page, resources } = usePage<PageDataProps & PpidIndexProps>().props;
+    const [activeTab, setActiveTab] = useState(resources.data[0].slug);
+
+    const updateContent = (content: JSONContent, slug: string) => {
+        router.patch(
+            route('console.profile.ppid.update', { slug }),
+            {
+                values: content,
+                slug,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onError: () => {
+                    toast.error('Gagal memperbarui konten');
+                },
+                onSuccess: () => {
+                    toast.success('Konten berhasil diperbarui');
+                },
+            },
+        );
+    };
 
     return (
         <>
@@ -26,18 +49,22 @@ export default function PpidIndexPage() {
 
             <Tabs>
                 <TabsList className="rounded-b-none border-b-0">
-                    {tabs.map((tab) => (
+                    {resources.data.map((tab) => (
                         <TabsTrigger
                             className="border-b border-line-brand data-[active=true]:border-b-0 data-[active=true]:bg-white"
-                            key={tab.id}
-                            label={tab.label}
-                            active={tab.id === activeTab}
-                            onClick={() => setActiveTab(tab.id)}
+                            key={tab.slug}
+                            label={tab.name}
+                            active={tab.slug === activeTab}
+                            onClick={() => setActiveTab(tab.slug)}
                         />
                     ))}
                 </TabsList>
                 <TabsContent className="rounded-t-none border-t-0 px-0 py-8">
-                    <TextEditor />
+                    <TextEditor
+                        key={activeTab}
+                        content={resources.data.find((tab) => tab.slug === activeTab)?.values}
+                        onSave={(content) => updateContent(content, activeTab)}
+                    />
                 </TabsContent>
             </Tabs>
         </>

@@ -2,6 +2,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import type { PageDataProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
+import { Toaster } from 'react-hot-toast';
 import { ConsoleHeader } from './components/console/header';
 import { Sidebar } from './components/console/sidebar';
 import type { ConsoleLayoutProps } from './types';
@@ -25,6 +26,7 @@ export default function ConsoleLayout({ children }: PropsWithChildren<ConsoleLay
                     </div>
                 </div>
             </div>
+            <Toaster position="top-center" />
         </div>
     );
 }

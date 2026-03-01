@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -12,8 +11,9 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $s = \App\Models\User::create([
+        $s = \App\Models\User::firstOrCreate([
             'username' => 'superadmin',
+        ], [
             'email' => 'rochmadnf@donggala.go.id',
             'password' => 'P4$$w0rd',
         ]);

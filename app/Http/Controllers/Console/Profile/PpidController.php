@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Console\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Profile\PpidRequest;
 use Inertia\Response as InertiaResponse;
 
 class PpidController extends Controller
@@ -27,14 +28,31 @@ class PpidController extends Controller
         ];
     }
 
+    public function __construct(private readonly \App\Repositories\Contracts\Profile\PpidRepositoryInterface $ppidRepository)
+    {
+        //
+    }
+
     public function index(): InertiaResponse
     {
         return inertia('console/profile/ppid/index', [
             ...$this->pageDetails(
                 title: 'Profil PPID',
                 desc: 'Profil singkat PPID Pemerintah Kabupaten Donggala',
-                breadcrumbs: $this->breadcrumbs()
+                breadcrumbs: $this->breadcrumbs(),
             ),
+            "resources" => $this->ppidRepository->paginate(),
         ]);
+    }
+
+    public function store(PpidRequest $request) {}
+
+    public function update(PpidRequest $request, string $slug)
+    {
+        $validData = $request->validated();
+
+        $this->ppidRepository->update(data: ["values" => $validData['values']], columnValue: $validData['slug']);
+
+        return to_route('console.profile.ppid.index');
     }
 }
