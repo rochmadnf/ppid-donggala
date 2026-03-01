@@ -132,11 +132,13 @@ export function TextAlignmentButton({ editor }: { editor: Editor }) {
         { label: 'Rata Kiri-Kanan', icon: AlignJustifyIcon, value: 'justify', isActive: isAlignJustify, shortcut: 'Ctrl/⌘ + Shift + J' },
     ];
 
+    const activeAlignment = alignments.find((a) => a.isActive);
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <TextEditorButton className="gap-1 pr-1.5" title="Rata Teks">
-                    {alignments.map(({ isActive, icon: Icon }) => isActive && <Icon key={Icon.name} className="size-4" />)}
+                    {activeAlignment && <activeAlignment.icon className="size-4" />}
                     <ChevronDownIcon className="size-3 opacity-50" />
                 </TextEditorButton>
             </DropdownMenuTrigger>
