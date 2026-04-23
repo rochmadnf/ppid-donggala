@@ -35,5 +35,12 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
                 Route::get('', 'index')->name('index');
                 Route::patch('{slug}/content-update', 'update')->name('update');
             });
+        // @public-officers
+        Route::controller(Profile\PublicOfficerController::class)
+            ->prefix('public-officers')
+            ->name('public-officers.')
+            ->group(function () {
+                Route::get('', 'index')->name('index');
+            });
     });
 });

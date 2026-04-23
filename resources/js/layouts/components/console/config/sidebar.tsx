@@ -31,6 +31,12 @@ export const menuItems: MenuItemProps[] = [
                 url: route('console.profile.ppid.index'),
                 permissions: ['read p-ppid'],
             },
+            {
+                id: 'a19cc394-4736-4cf7-a557-65080dd2d9a2',
+                label: 'Pejabat Publik',
+                url: route('console.profile.public-officers.index'),
+                permissions: ['read p-public-officer'],
+            }
         ],
     },
     {
