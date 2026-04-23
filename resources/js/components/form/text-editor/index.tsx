@@ -30,6 +30,7 @@ import {
 import { useCallback, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
 import { extenstions } from './config';
 import { Toolbar } from './toolbar';
+import { STYLE_COLORS } from './config/colors';
 
 export function TextEditorButtonGroup({
     className,
@@ -247,51 +248,33 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
                                         <DropdownMenuSubContent>
                                             <DropdownMenuLabel className="text-sm text-gray-500">Teks</DropdownMenuLabel>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem className="text-red-500">
-                                                <ALargeSmallIcon className="size-5 text-red-500" />
-                                                Teks Merah
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                className="text-gray-700"
-                                                onClick={() => {
-                                                    editor.chain().focus().setColor('var(--color-gray-700)').run();
-                                                }}
-                                            >
-                                                <ALargeSmallIcon className="size-5 text-gray-700" />
-                                                Teks Default
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                className="text-blue-500"
-                                                onClick={() => {
-                                                    editor.chain().focus().setColor('var(--color-blue-500)').run();
-                                                }}
-                                            >
-                                                <ALargeSmallIcon className="size-5 text-blue-500" />
-                                                Teks Biru
-                                            </DropdownMenuItem>
+                                            {STYLE_COLORS.map((text) => (
+                                                <DropdownMenuItem
+                                                    style={{ color: text.value }}
+                                                    key={text.label}
+                                                    onClick={() => {
+                                                        editor.chain().focus().setColor(text.value).run();
+                                                    }}
+                                                >
+                                                    <ALargeSmallIcon className="size-5" style={{ color: text.value }} />
+                                                    Teks {text.label}
+                                                </DropdownMenuItem>
+                                            ))}
                                             <DropdownMenuSeparator />
                                             <DropdownMenuLabel className="text-sm text-gray-500">Latar Belakang</DropdownMenuLabel>
-                                            <DropdownMenuItem
-                                                className="text-blue-500"
-                                                onClick={() => {
-                                                    editor.commands.toggleHighlight({ color: 'var(--color-blue-300)' });
-                                                    editor.commands.focus();
-                                                }}
-                                            >
-                                                <CircleIcon className="size-5 fill-blue-300 stroke-blue-400" />
-                                                Latar Belakang Biru
-                                            </DropdownMenuItem>
-                                        </DropdownMenuSubContent>
-                                    </DropdownMenuPortal>
-                                </DropdownMenuSub>
-                                <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger>
-                                        <RepeatIcon />
-                                        Ubah jadi
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuPortal>
-                                        <DropdownMenuSubContent>
-                                            <DropdownMenuItem>Red</DropdownMenuItem>
+                                            {STYLE_COLORS.map((bg) => (
+                                                <DropdownMenuItem
+                                                    style={{ color: bg.value }}
+                                                    key={bg.label}
+                                                    onClick={() => {
+                                                        editor.commands.toggleHighlight({ color: bg.value });
+                                                        editor.commands.focus();
+                                                    }}
+                                                >
+                                                    <CircleIcon className="size-5 stroke-none" style={{ fill: bg.value }} />
+                                                    Latar Belakang {bg.label}
+                                                </DropdownMenuItem>
+                                            ))}
                                         </DropdownMenuSubContent>
                                     </DropdownMenuPortal>
                                 </DropdownMenuSub>
