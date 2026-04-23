@@ -16,7 +16,8 @@ return new class extends Migration
             $table->uuid('uuid')->index();
             $table->string('name');
             $table->string('alias');
-            $table->string('address');
+            $table->unsignedTinyInteger('rank')->comment('1: Kabupaten, 2: Dinas/Badan, 3: Kecamatan, 4: Desa, 5: Kelurahan');
+            $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('site_url')->nullable();
             $table->timestamps();

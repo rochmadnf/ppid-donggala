@@ -15,6 +15,7 @@ class Office extends Model
     protected $fillable = [
         'name',
         'alias',
+        'rank',
         'address',
         'phone',
         'site_url',
@@ -31,9 +32,14 @@ class Office extends Model
         ];
     }
 
-    public function scopeWithMerger($query)
+    public function scopeSortByRankAndName(Builder $query): void
     {
-        return $query->with(['mergerOf', 'mergedBy']);
+        $query->orderBy('rank')->orderBy('name');
+    }
+
+    public function scopeWithMerger(Builder $query): void
+    {
+        $query->with(['mergerOf', 'mergedBy']);
     }
 
     /**

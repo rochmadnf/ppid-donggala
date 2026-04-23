@@ -13,7 +13,8 @@ class OfficeRepository implements OfficeRepositoryInterface
 {
     public function paginate(): JsonResource
     {
-        $offices = Office::withMerger()
+        $offices = Office::sortByRankAndName()
+            ->withMerger()
             ->searchByKeyword()
             ->excludeMerged()
             ->paginate(perPage: request()->input('per_page', config('pagination.per_page')));
