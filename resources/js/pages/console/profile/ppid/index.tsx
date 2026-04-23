@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/tabs';
 import ConsoleLayout from '@/layouts/console-layout';
 import type { PageDataProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import type { JSONContent } from '@tiptap/core';
+import type { HTMLContent, JSONContent } from '@tiptap/core';
 import { useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import type { PpidIndexProps } from './types';
@@ -20,11 +20,12 @@ export default function PpidIndexPage() {
     const { page, resources } = usePage<PageDataProps & PpidIndexProps>().props;
     const [activeTab, setActiveTab] = useState(resources.data[0].slug);
 
-    const updateContent = (content: JSONContent, slug: string) => {
+    const updateContent = (content: JSONContent, htmlContent: HTMLContent, slug: string) => {
         router.patch(
             route('console.profile.ppid.update', { slug }),
             {
                 values: content,
+                html: htmlContent,
                 slug,
             },
             {
@@ -63,7 +64,7 @@ export default function PpidIndexPage() {
                     <TextEditor
                         key={activeTab}
                         content={resources.data.find((tab) => tab.slug === activeTab)?.values}
-                        onSave={(content) => updateContent(content, activeTab)}
+                        onSave={(json, html) => updateContent(json, html, activeTab)}
                     />
                 </TabsContent>
             </Tabs>

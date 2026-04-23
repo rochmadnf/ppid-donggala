@@ -26,11 +26,12 @@ class PpidRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', 'unique:ppid_profiles'],
             'type' => ['required', 'string', Rule::in(['docs', 'json'])],
             'values' => ['required', 'array'],
+            'html' => ['required', 'string'],
         ];
 
         if ($this->routeIs('console.profile.ppid.update')) {
             $rules['slug'][3] = Rule::exists('ppid_profiles', 'slug');
-            $rules = Arr::only($rules, ['values', 'slug']);
+            $rules = Arr::only($rules, ['values', 'html', 'slug']);
         }
 
         return $rules;

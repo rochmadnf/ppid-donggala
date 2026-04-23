@@ -13,6 +13,7 @@ class Ppid extends Model
         'slug',
         'type',
         'values',
+        'html'
     ];
 
     protected $casts = [

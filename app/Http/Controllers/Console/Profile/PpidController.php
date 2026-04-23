@@ -51,7 +51,7 @@ class PpidController extends Controller
     {
         $validData = $request->validated();
 
-        $this->ppidRepository->update(data: ["values" => $validData['values']], columnValue: $validData['slug']);
+        $this->ppidRepository->update(data: ["values" => $validData['values'], "html" => $validData['html']], columnValue: $validData['slug']);
 
         return to_route('console.profile.ppid.index');
     }
