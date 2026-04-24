@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories\MasterData;
+namespace App\Repositories\Eloquent\MasterData;
 
 use App\Http\Resources\MasterData\OfficeResource;
 use App\Models\MasterData\Office;

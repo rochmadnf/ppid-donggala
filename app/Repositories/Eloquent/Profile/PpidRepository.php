@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories\Profile;
+namespace App\Repositories\Eloquent\Profile;
 
 use App\Http\Resources\Profile\PpidResource;
 use App\Models\Profile\Ppid;
