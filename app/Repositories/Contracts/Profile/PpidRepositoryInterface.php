@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace App\Repositories\Contracts\Profile;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 interface PpidRepositoryInterface
 {
-    /**
-     * Get all ppid profile with pagination.
-     *
-     * @return array
-     */
     public function paginate(): JsonResource;
 
-    public function find(string $value, string $columnName = 'slug', bool $wrap = true): JsonResource;
+    public function find(int|string $value, ?string $columnName = null, string $operator = '=', bool $wrap = true): Model | JsonResource;
 
-    public function update(array $data, string $columnValue, string $columnName = 'slug'): void;
+    public function delete(int|string $value, ?string $columnName = null): bool;
+
+    public function update(array $data, string $columnValue, ?string $columnName = null): Model;
 }

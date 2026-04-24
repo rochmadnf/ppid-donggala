@@ -7,32 +7,17 @@ namespace App\Repositories\Eloquent\Profile;
 use App\Http\Resources\Profile\PpidResource;
 use App\Models\Profile\Ppid;
 use App\Repositories\Contracts\Profile\PpidRepositoryInterface;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Repositories\Eloquent\BaseRepository;
 
-class PpidRepository implements PpidRepositoryInterface
+class PpidRepository extends BaseRepository implements PpidRepositoryInterface
 {
-    public function paginate(): JsonResource
+    protected string $defaultColumnName = 'slug';
+
+    public function __construct()
     {
-        $profiles = Ppid::paginate(perPage: request()->input('per_page', config('pagination.per_page')));
-
-        return PpidResource::collection($profiles);
-    }
-
-    public function find(string $value, string $columnName = 'slug', bool $wrap = true): JsonResource
-    {
-        $profile = Ppid::where($columnName, $value)->firstOrFail();
-
-        if (!$wrap) {
-            return $profile;
-        }
-
-        return PpidResource::make($profile);
-    }
-
-    public function update(array $data, string $columnValue, string $columnName = 'slug'): void
-    {
-        $profile = $this->find($columnValue, $columnName);
-
-        $profile->update($data);
+        parent::__construct(
+            model: new Ppid(),
+            resource: PpidResource::class
+        );
     }
 }
