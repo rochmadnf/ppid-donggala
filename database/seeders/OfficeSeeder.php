@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\OfficeRankEnum;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
@@ -16,7 +17,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Pemerintah Kabupaten Donggala',
                 'alias' => 'Pemda Donggala',
-                'rank' => 1,
+                'rank' => OfficeRankEnum::PEMKAB->value,
                 'address' => 'Jl. Jati, Kompleks Perkantoran Pemda Kelurahan Gunung Bale Banawa',
                 'phone' => null,
                 'site_url' => 'https://donggala.go.id',
@@ -24,7 +25,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Dinas Komunikasi dan Informatika',
                 'alias' => 'Diskominfo',
-                'rank' => 2,
+                'rank' => OfficeRankEnum::DINAS_BADAN->value,
                 'address' => 'Jl. Jati No. 14 Kel. Gunung Bale, Kec. Banawa, Kab. Donggala',
                 'phone' => null,
                 'site_url' => 'https://kominfo.donggala.go.id',
@@ -32,7 +33,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Dinas Perhubungan',
                 'alias' => 'Dishub',
-                'rank' => 2,
+                'rank' => OfficeRankEnum::DINAS_BADAN->value,
                 'address' => 'Jl. Kabonga Besar, Kec. Banawa, Kabupaten Donggala',
                 'phone' => null,
                 'site_url' => 'https://dishubdonggala.com',
@@ -40,7 +41,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Badan Pengelolaan Keuangan dan Aset Daerah',
                 'alias' => 'BPKAD',
-                'rank' => 2,
+                'rank' => OfficeRankEnum::DINAS_BADAN->value,
                 'address' => 'Jl. Jati No. 1, Gunung Bale, Kec. Banawa, Kabupaten Donggala',
                 'phone' => null,
                 'site_url' => null,
@@ -48,7 +49,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Kecamatan Banawa',
                 'alias' => 'Banawa',
-                'rank' => 3,
+                'rank' => OfficeRankEnum::KECAMATAN->value,
                 'address' => null,
                 'phone' => null,
                 'site_url' => null,
@@ -56,7 +57,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Kecamatan Banawa Tengah',
                 'alias' => 'Banawa Tengah',
-                'rank' => 3,
+                'rank' => OfficeRankEnum::KECAMATAN->value,
                 'address' => null,
                 'phone' => null,
                 'site_url' => null,
@@ -64,7 +65,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Desa Loli Dondo',
                 'alias' => 'Loli Dondo',
-                'rank' => 4,
+                'rank' => OfficeRankEnum::DESA->value,
                 'address' => null,
                 'phone' => null,
                 'site_url' => null,
@@ -72,7 +73,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Desa Toaya',
                 'alias' => 'Toaya',
-                'rank' => 4,
+                'rank' => OfficeRankEnum::DESA->value,
                 'address' => "Jl. Pue Lasadindi No.19, Kec. Sindue, Kab. Donggala",
                 'phone' => "+6281314560100",
                 'site_url' => "https://toaya-sindue.desa.id",
@@ -80,7 +81,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Desa Towale',
                 'alias' => 'Towale',
-                'rank' => 4,
+                'rank' => OfficeRankEnum::DESA->value,
                 'address' => null,
                 'phone' => null,
                 'site_url' => "https://towale.digitaldesa.id",
@@ -88,7 +89,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Kelurahan Boneoge',
                 'alias' => 'Boneoge',
-                'rank' => 5,
+                'rank' => OfficeRankEnum::KELURAHAN->value,
                 'address' => null,
                 'phone' => null,
                 'site_url' => null,
@@ -96,7 +97,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Kelurahan Ganti',
                 'alias' => 'Ganti',
-                'rank' => 5,
+                'rank' => OfficeRankEnum::KELURAHAN->value,
                 'address' => "Jl. Trans Sulawesi Donggala",
                 'phone' => null,
                 'site_url' => null,
