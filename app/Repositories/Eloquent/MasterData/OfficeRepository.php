@@ -6,11 +6,19 @@ namespace App\Repositories\Eloquent\MasterData;
 
 use App\Http\Resources\MasterData\OfficeResource;
 use App\Models\MasterData\Office;
-use App\Repositories\Contracts\MasterData\OfficeRepositoryInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OfficeRepository implements OfficeRepositoryInterface
+class OfficeRepository extends \App\Repositories\Eloquent\BaseRepository
+implements \App\Repositories\Contracts\MasterData\OfficeRepositoryInterface
 {
+    public function __construct()
+    {
+        parent::__construct(
+            model: new Office(),
+            resource: OfficeResource::class
+        );
+    }
+
     public function paginate(): JsonResource
     {
         $offices = Office::sortByRankAndName()

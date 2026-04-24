@@ -8,10 +8,5 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 interface OfficeRepositoryInterface
 {
-    /**
-     * Get all offices with pagination.
-     *
-     * @return array
-     */
     public function paginate(): JsonResource;
 }
