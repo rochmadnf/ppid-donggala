@@ -53,8 +53,13 @@ class OfficeController extends Controller
     {
         $this->officeRepository->delete($office_id, 'uuid');
 
+        // Ambil keyword dari referer
+        parse_str(parse_url(request()->headers->get('referer', ''), PHP_URL_QUERY), $refererQuery);
+        $keyword = $refererQuery['keyword'] ?? null;
+        $searchBy = $refererQuery['search_by'] ?? null;
+
         return $this->redirectToValidPage(
-            remaining: $this->officeRepository->count(),
+            remaining: $this->officeRepository->count($keyword, $searchBy ?? 'name'),
             defaultPerPage: $this->defaultPerPage,
         );
     }

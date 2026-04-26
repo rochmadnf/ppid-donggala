@@ -17,5 +17,5 @@ interface BaseRepositoryInterface
 
     public function update(array $data, string $columnValue, ?string $columnName = null): Model;
 
-    public function count(): int;
+    public function count(?string $keyword = null, string $defaultColumn = 'name'): int;
 }

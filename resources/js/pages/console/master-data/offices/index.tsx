@@ -22,6 +22,7 @@ export default function OfficeIndexPage() {
                 metadata={resources.meta}
                 columns={columns(resources.meta)}
                 routeName="console.master-data.offices.index"
+                searchable
             />
         </>
     );

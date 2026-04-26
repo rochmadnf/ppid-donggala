@@ -44,9 +44,11 @@ abstract class BaseRepository
         return $record;
     }
 
-    public function count(): int
+    public function count(?string $keyword = null, string $defaultColumn = 'name'): int
     {
-        return $this->model->count();
+        return $this->model
+            ->when($keyword, fn($q) => $q->where($defaultColumn, 'LIKE', "%{$keyword}%"))
+            ->count();
     }
 
     public function delete(int|string $value, ?string $columnName = null): bool
