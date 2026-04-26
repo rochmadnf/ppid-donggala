@@ -16,9 +16,9 @@ abstract class BaseRepository
         //
     }
 
-    public function paginate(): JsonResource
+    public function paginate(int $perPage = 10): JsonResource
     {
-        $records = $this->model->paginate(perPage: request()->input('per_page', config('pagination.per_page')));
+        $records = $this->model->paginate(perPage: request()->input('per_page', $perPage));
 
         return $this->resource::collection($records);
     }
