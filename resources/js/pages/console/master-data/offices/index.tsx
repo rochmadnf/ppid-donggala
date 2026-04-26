@@ -1,10 +1,10 @@
+import { DataTable } from '@/components/datatable';
 import { MetaTag } from '@/components/metatag';
 import ConsoleLayout from '@/layouts/console-layout';
 import type { PageDataProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 import { columns } from './components/columns';
-import { DataTable } from './components/datatable';
 import type { OfficeDataProps, OfficeIndexProps } from './types';
 
 export default function OfficeIndexPage() {
