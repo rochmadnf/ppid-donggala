@@ -44,6 +44,11 @@ abstract class BaseRepository
         return $record;
     }
 
+    public function count(): int
+    {
+        return $this->model->count();
+    }
+
     public function delete(int|string $value, ?string $columnName = null): bool
     {
         $record = $this->find(value: $value, columnName: $columnName ?? $this->defaultColumnName, wrap: false);

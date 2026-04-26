@@ -1,11 +1,21 @@
 import { DeleteButton } from '@/components/delete-button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import type { PaginationMetaProps } from '@/types/pagination';
 import type { ColumnDef } from '@tanstack/react-table';
 import { ChevronDownIcon, CombineIcon, GlobeIcon, GlobeOffIcon, MapPinHouseIcon, MapPinOffIcon, PhoneIcon, PhoneOffIcon } from 'lucide-react';
 import type { OfficeDataProps } from '../types';
 
-export const columns: ColumnDef<OfficeDataProps>[] = [
+export const columns = (metadata: PaginationMetaProps): ColumnDef<OfficeDataProps>[] => [
+    {
+        id: 'number',
+        header: () => 'No.',
+        cell: ({ row }) => <div className="mt-1">{metadata.from + row.index}.</div>,
+        meta: {
+            className: 'text-center align-top',
+            width: '35px',
+        },
+    },
     {
         id: 'name',
         header: () => 'Nama OPD',
@@ -83,7 +93,7 @@ export const columns: ColumnDef<OfficeDataProps>[] = [
     },
     {
         id: 'actions',
-        header: () => <div className="w-full text-center">#</div>,
+        header: '',
         cell: ({ row }) => {
             const { id, name } = row.original;
             return (
@@ -94,11 +104,16 @@ export const columns: ColumnDef<OfficeDataProps>[] = [
                         variant="rect"
                         popSide="bottom"
                         pageName="Perangkat Daerah"
+                        className="group-hover/tr:text-destructive [&_svg]:size-4"
                         description="Anda yakin ingin menghapus perangkat daerah ini? Tindakan ini tidak dapat dibatalkan."
                         selectedData={name.alias}
                     />
                 </div>
             );
+        },
+        meta: {
+            className: 'align-top',
+            width: '100px',
         },
     },
 ];

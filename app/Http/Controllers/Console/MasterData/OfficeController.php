@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Console\MasterData;
 
 use App\Http\Controllers\Controller;
 use Inertia\Response as InertiaResponse;
+use App\Http\Traits\{PageTrait, HandlePaginationTrait};
 
 class OfficeController extends Controller
 {
-    use \App\Http\Traits\PageTrait;
+
+    use PageTrait, HandlePaginationTrait;
+
+    protected int $defaultPerPage = 5;
 
     public function __construct(private readonly \App\Repositories\Contracts\MasterData\OfficeRepositoryInterface $officeRepository)
     {
@@ -40,7 +44,7 @@ class OfficeController extends Controller
                     desc: 'Daftar Perangkat Daerah pada lingkup kerja Pemerintahan Kabupaten Donggala.',
                     breadcrumbs: $this->breadcrumbs(),
                 ),
-                "resources" => $this->officeRepository->paginate(perPage: 5),
+                "resources" => $this->officeRepository->paginate(perPage: $this->defaultPerPage),
             ]
         );
     }
@@ -49,6 +53,9 @@ class OfficeController extends Controller
     {
         $this->officeRepository->delete($office_id, 'uuid');
 
-        return back();
+        return $this->redirectToValidPage(
+            remaining: $this->officeRepository->count(),
+            defaultPerPage: $this->defaultPerPage,
+        );
     }
 }

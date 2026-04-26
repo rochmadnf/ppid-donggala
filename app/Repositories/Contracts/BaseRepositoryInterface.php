@@ -16,4 +16,6 @@ interface BaseRepositoryInterface
     public function delete(int|string $value, ?string $columnName = null): bool;
 
     public function update(array $data, string $columnValue, ?string $columnName = null): Model;
+
+    public function count(): int;
 }
