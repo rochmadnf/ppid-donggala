@@ -2,6 +2,7 @@
 
 namespace App\Models\MasterData;
 
+use App\Enums\OfficeRankEnum;
 use App\Models\Scopes\SearchableScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -23,6 +24,7 @@ class Office extends Model
 
     protected $casts = [
         'merged_office_ids' => 'array',
+        'rank' => OfficeRankEnum::class,
     ];
 
     public function uniqueIds(): array

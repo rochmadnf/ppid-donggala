@@ -40,8 +40,15 @@ class OfficeController extends Controller
                     desc: 'Daftar Perangkat Daerah pada lingkup kerja Pemerintahan Kabupaten Donggala.',
                     breadcrumbs: $this->breadcrumbs(),
                 ),
-                "resources" => $this->officeRepository->paginate(),
+                "resources" => $this->officeRepository->paginate(perPage: 5),
             ]
         );
+    }
+
+    public function destroy(string $office_id): \Illuminate\Http\RedirectResponse
+    {
+        $this->officeRepository->delete($office_id, 'uuid');
+
+        return back();
     }
 }

@@ -25,7 +25,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Dinas Komunikasi dan Informatika',
                 'alias' => 'Diskominfo',
-                'rank' => OfficeRankEnum::DINAS_BADAN->value,
+                'rank' => OfficeRankEnum::DINAS->value,
                 'address' => 'Jl. Jati No. 14 Kel. Gunung Bale, Kec. Banawa, Kab. Donggala',
                 'phone' => null,
                 'site_url' => 'https://kominfo.donggala.go.id',
@@ -33,7 +33,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Dinas Perhubungan',
                 'alias' => 'Dishub',
-                'rank' => OfficeRankEnum::DINAS_BADAN->value,
+                'rank' => OfficeRankEnum::DINAS->value,
                 'address' => 'Jl. Kabonga Besar, Kec. Banawa, Kabupaten Donggala',
                 'phone' => null,
                 'site_url' => 'https://dishubdonggala.com',
@@ -41,7 +41,7 @@ class OfficeSeeder extends Seeder
             [
                 'name' => 'Badan Pengelolaan Keuangan dan Aset Daerah',
                 'alias' => 'BPKAD',
-                'rank' => OfficeRankEnum::DINAS_BADAN->value,
+                'rank' => OfficeRankEnum::BADAN->value,
                 'address' => 'Jl. Jati No. 1, Gunung Bale, Kec. Banawa, Kabupaten Donggala',
                 'phone' => null,
                 'site_url' => null,

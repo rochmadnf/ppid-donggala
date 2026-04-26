@@ -17,6 +17,10 @@ class OfficeResource extends JsonResource
             ],
             'address' => $this->address,
             'phone' => $this->phone,
+            'rank' => [
+                'id' => $this->rank,
+                'label' => $this->rank->label(),
+            ],
             'merger' => [
                 'of' => $mergerOf = $this->resolveMerger('mergerOf'),
                 'by' => $mergedBy = $this->resolveMerger('mergedBy'),

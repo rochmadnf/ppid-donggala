@@ -20,7 +20,7 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
-                                <TableHead key={header.id}>
+                                <TableHead className="p-4 text-base" key={header.id}>
                                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                 </TableHead>
                             ))}
@@ -32,7 +32,7 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
                         table.getRowModel().rows.map((row) => (
                             <TableRow className="group/tr hover:bg-sidebar-menu-bg hover:text-sidebar-menu-text" key={row.id}>
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell className="py-4" key={cell.id}>
+                                    <TableCell className="p-4" key={cell.id}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </TableCell>
                                 ))}
@@ -41,7 +41,7 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                                No results.
+                                Data belum tersedia.
                             </TableCell>
                         </TableRow>
                     )}

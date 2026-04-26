@@ -22,6 +22,7 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
             ->name('offices.')
             ->group(function () {
                 Route::get('', 'index')->name('index');
+                Route::delete('{office_id}', 'destroy')->name('destroy');
             });
     });
 

@@ -12,7 +12,6 @@ import type { OfficeDataProps, OfficeIndexProps } from './types';
 export default function OfficeIndexPage() {
     const { page, resources } = usePage<PageDataProps & OfficeIndexProps>().props;
     const [openCrop, setOpenCrop] = useState(false);
-    console.log(resources.data);
 
     return (
         <>

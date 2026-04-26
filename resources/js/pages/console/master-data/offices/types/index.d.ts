@@ -11,6 +11,10 @@ export interface OfficeDataProps {
     name: OfficeName;
     address: string;
     phone: string | null;
+    rank: {
+        id: number;
+        label: string;
+    };
     merger: {
         of: OfficeMerger;
         by: OfficeMerger;
