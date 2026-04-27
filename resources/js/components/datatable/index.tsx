@@ -3,25 +3,12 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import type { PaginationMetaProps } from '@/types/pagination';
 import { router } from '@inertiajs/react';
-import { flexRender, getCoreRowModel, useReactTable, type ColumnDef, type PaginationState } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, useReactTable, type PaginationState } from '@tanstack/react-table';
 import { ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon, DatabaseZapIcon, SearchXIcon, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-
-type RequestParams = Record<string, string | number | boolean | null | undefined>;
-
-export type DataTableProps<T> = {
-    data: T[];
-    metadata: PaginationMetaProps;
-    columns: ColumnDef<T>[];
-    routeName: string;
-    keepCurrentUrl?: boolean;
-    searchable?: boolean;
-    searchPlaceholder?: string;
-    searchBy?: string;
-};
+import type { DataTableProps, RequestParams } from './types';
 
 export function DataTable<T>({
     data,
