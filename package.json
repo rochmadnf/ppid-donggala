@@ -72,7 +72,7 @@
         "compressorjs": "^1.2.1",
         "cropperjs": "^2.1.0",
         "globals": "^17.3.0",
-        "lucide-react": "^0.575.0",
+        "lucide-react": "^1.11.0",
         "radix-ui": "^1.4.3",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
