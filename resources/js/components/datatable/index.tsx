@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { flexRender, getCoreRowModel, useReactTable, type PaginationState } from '@tanstack/react-table';
-import { ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon, DatabaseZapIcon, SearchXIcon, XIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { DatabaseZapIcon, SearchXIcon, XIcon } from 'lucide-react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
+import { EmptyState } from './components/empty-state';
+import { PaginationControls } from './components/pagination-controls';
 import type { DataTableProps, RequestParams } from './types';
 
 export function DataTable<T>({
@@ -36,7 +37,7 @@ export function DataTable<T>({
         });
     }, [metadata.current_page, metadata.per_page]);
 
-    const sendRequest = (overrides: RequestParams = {}) => {
+    const buildRequestParams = (overrides: RequestParams = {}): RequestParams => {
         const params: RequestParams = {
             page: pagination.pageIndex + 1,
             per_page: pagination.pageSize,
@@ -47,15 +48,17 @@ export function DataTable<T>({
             if (searchBy) params.search_by = searchBy;
         }
 
-        router.get(
-            route(routeName),
-            { ...params, ...overrides },
-            {
-                preserveUrl: keepCurrentUrl,
-                preserveState: true,
-                preserveScroll: true,
-            },
-        );
+        return { ...params, ...overrides };
+    };
+
+    const sendRequest = (overrides: RequestParams = {}) => {
+        const requestParams = buildRequestParams(overrides);
+
+        router.get(route(routeName), requestParams, {
+            preserveUrl: keepCurrentUrl,
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
     const handleSearch = useDebouncedCallback((value: string) => {
@@ -67,7 +70,7 @@ export function DataTable<T>({
         });
     }, 500);
 
-    const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
         handleSearch(e.target.value);
     };
@@ -101,6 +104,7 @@ export function DataTable<T>({
 
     const isEmptyData = metadata.total === 0 && !search;
     const isEmptySearch = metadata.total === 0 && !!search;
+    const rows = table.getRowModel().rows;
 
     return (
         <div className="space-y-3 rounded-md border border-line-brand bg-slate-50/80 p-6">
@@ -141,8 +145,8 @@ export function DataTable<T>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map((row) => (
+                        {rows.length ? (
+                            rows.map((row) => (
                                 <TableRow className="group/tr hover:bg-sidebar-menu-bg hover:text-sidebar-menu-text" key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
@@ -159,31 +163,29 @@ export function DataTable<T>({
                             <TableRow>
                                 <TableCell colSpan={columns.length}>
                                     {isEmptySearch ? (
-                                        <div className="flex flex-col items-center justify-center gap-y-3 py-16 text-center">
-                                            <div className="rounded-full bg-amber-50 p-4">
-                                                <SearchXIcon className="size-8 text-amber-400" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="font-medium text-gray-700">Hasil tidak ditemukan</p>
-                                                <p className="text-sm text-gray-500">
+                                        <EmptyState
+                                            icon={<SearchXIcon className="size-8 text-amber-400" />}
+                                            title="Hasil tidak ditemukan"
+                                            description={
+                                                <>
                                                     Tidak ada data yang cocok dengan kata kunci <strong className="text-gray-700">"{search}"</strong>
-                                                </p>
-                                            </div>
-                                            <Button variant="outline" size="sm" onClick={onSearchReset}>
-                                                <XIcon className="mr-1.5 size-3.5" />
-                                                Reset Pencarian
-                                            </Button>
-                                        </div>
+                                                </>
+                                            }
+                                            action={
+                                                <Button variant="outline" size="sm" onClick={onSearchReset}>
+                                                    <XIcon className="mr-1.5 size-3.5" />
+                                                    Reset Pencarian
+                                                </Button>
+                                            }
+                                            iconWrapperClassName="bg-amber-50"
+                                        />
                                     ) : isEmptyData ? (
-                                        <div className="flex flex-col items-center justify-center gap-y-3 py-16 text-center">
-                                            <div className="rounded-full bg-blue-50 p-4">
-                                                <DatabaseZapIcon className="size-8 text-blue-400" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="font-medium text-gray-700">Belum ada data</p>
-                                                <p className="text-sm text-gray-500">Data yang ditambahkan akan muncul di sini.</p>
-                                            </div>
-                                        </div>
+                                        <EmptyState
+                                            icon={<DatabaseZapIcon className="size-8 text-blue-400" />}
+                                            title="Belum ada data"
+                                            description="Data yang ditambahkan akan muncul di sini."
+                                            iconWrapperClassName="bg-blue-50"
+                                        />
                                     ) : null}
                                 </TableCell>
                             </TableRow>
@@ -199,47 +201,7 @@ export function DataTable<T>({
                         Menampilkan {metadata.from} – {metadata.to} dari <strong>{metadata.total}</strong> data
                     </span>
 
-                    <div className="flex flex-row items-center justify-center gap-x-2">
-                        <Button size="icon" variant="ghost" onClick={() => table.firstPage()} disabled={!table.getCanPreviousPage()}>
-                            <ChevronFirstIcon />
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                            <ChevronLeftIcon />
-                        </Button>
-
-                        <Select value={String(pagination.pageIndex + 1)} onValueChange={(value) => table.setPageIndex(Number(value) - 1)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Halaman" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {Array.from({ length: metadata.last_page }, (_, i) => i + 1).map((page) => (
-                                    <SelectItem key={page} value={page.toString()}>
-                                        {`Hal. ${page}`}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        <Button size="icon" variant="ghost" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                            <ChevronRightIcon />
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => table.lastPage()} disabled={!table.getCanNextPage()}>
-                            <ChevronLastIcon />
-                        </Button>
-                    </div>
-
-                    <Select value={String(pagination.pageSize)} onValueChange={(value) => table.setPageSize(Number(value))}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Data perhalaman" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {[5, 10, 25, 50].map((size) => (
-                                <SelectItem key={size} value={size.toString()}>
-                                    {size} / Halaman
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <PaginationControls table={table} pagination={pagination} totalPages={metadata.last_page} />
                 </div>
             )}
         </div>
