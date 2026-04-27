@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Console\MasterData;
 
+use App\Enums\OfficeRankEnum;
 use App\Http\Controllers\Controller;
 use Inertia\Response as InertiaResponse;
 use App\Http\Traits\{PageTrait, HandlePaginationTrait};
@@ -45,6 +46,7 @@ class OfficeController extends Controller
                     breadcrumbs: $this->breadcrumbs(),
                 ),
                 "resources" => $this->officeRepository->paginate(perPage: $this->defaultPerPage),
+                "ranks" => OfficeRankEnum::options(),
             ]
         );
     }
