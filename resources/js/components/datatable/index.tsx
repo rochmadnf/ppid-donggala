@@ -20,6 +20,7 @@ export function DataTable<T>({
     searchable = false,
     searchPlaceholder = 'Cari...',
     searchBy = 'name',
+    toolbarRight,
 }: DataTableProps<T>) {
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: metadata.current_page - 1,
@@ -106,23 +107,31 @@ export function DataTable<T>({
     const isEmptySearch = metadata.total === 0 && !!search;
     const rows = table.getRowModel().rows;
 
+    const showToolbar = searchable || !!toolbarRight;
+
     return (
         <div className="space-y-3 rounded-md border border-line-brand bg-slate-50/80 p-6">
             {/* Toolbar */}
-            {searchable && (
-                <div className="flex items-center justify-between">
-                    <div className="relative">
-                        <Input placeholder={searchPlaceholder} value={search} onChange={onSearchChange} className="bg-white pr-8" />
-                        {search && (
-                            <button
-                                onClick={onSearchReset}
-                                className="absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
-                                aria-label="Reset pencarian"
-                            >
-                                <XIcon className="size-3" />
-                            </button>
-                        )}
-                    </div>
+            {showToolbar && (
+                <div className="flex items-center justify-between gap-x-3">
+                    {searchable ? (
+                        <div className="relative">
+                            <Input placeholder={searchPlaceholder} value={search} onChange={onSearchChange} className="bg-white pr-8" />
+                            {search && (
+                                <button
+                                    onClick={onSearchReset}
+                                    className="absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
+                                    aria-label="Reset pencarian"
+                                >
+                                    <XIcon className="size-3" />
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <div />
+                    )}
+
+                    {toolbarRight && <div className="flex items-center gap-x-2">{toolbarRight}</div>}
                 </div>
             )}
 

@@ -27,4 +27,8 @@ export interface OfficeIndexProps {
         data: OfficeDataProps[];
         meta: PaginationMetaProps;
     };
+    ranks: {
+        id: number;
+        label: string;
+    }[];
 }

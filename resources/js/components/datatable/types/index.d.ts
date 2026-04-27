@@ -1,8 +1,8 @@
-import type { PaginationMetaProps } from "@/types/pagination";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { PaginationMetaProps } from '@/types/pagination';
+import type { ColumnDef } from '@tanstack/react-table';
+import type { ReactNode } from 'react';
 
 export type RequestParams = Record<string, string | number | boolean | null | undefined>;
-
 
 export type DataTableProps<T> = {
     data: T[];
@@ -13,22 +13,5 @@ export type DataTableProps<T> = {
     searchable?: boolean;
     searchPlaceholder?: string;
     searchBy?: string;
+    toolbarRight?: ReactNode;
 };
-
-// Features
-// Add
-export type AddModeModal = {
-    mode: 'modal';
-    label?: string;
-    title?: string;
-    children: React.ReactNode;
-};
- 
-export type AddModeLink = {
-    mode: 'link';
-    label?: string;
-    href: string;
-};
-// --Add
- 
-export type AddConfig = AddModeModal | AddModeLink;

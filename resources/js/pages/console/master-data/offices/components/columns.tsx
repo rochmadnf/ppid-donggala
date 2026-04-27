@@ -1,12 +1,28 @@
 import { DeleteButton } from '@/components/delete-button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { PaginationMetaProps } from '@/types/pagination';
 import type { ColumnDef } from '@tanstack/react-table';
-import { ChevronDownIcon, CombineIcon, GlobeIcon, GlobeOffIcon, MapPinHouseIcon, MapPinOffIcon, PhoneIcon, PhoneOffIcon } from 'lucide-react';
+import {
+    ChevronDownIcon,
+    CombineIcon,
+    GlobeIcon,
+    GlobeOffIcon,
+    MapPinHouseIcon,
+    MapPinOffIcon,
+    PencilLineIcon,
+    PhoneIcon,
+    PhoneOffIcon,
+} from 'lucide-react';
 import type { OfficeDataProps } from '../types';
 
-export const columns = (metadata: PaginationMetaProps): ColumnDef<OfficeDataProps>[] => [
+interface ColumnsOptions {
+    metadata: PaginationMetaProps;
+    onEdit: (office: OfficeDataProps) => void;
+}
+
+export const columns = ({ metadata, onEdit }: ColumnsOptions): ColumnDef<OfficeDataProps>[] => [
     {
         id: 'number',
         header: () => 'No.',
@@ -97,7 +113,19 @@ export const columns = (metadata: PaginationMetaProps): ColumnDef<OfficeDataProp
         cell: ({ row }) => {
             const { id, name } = row.original;
             return (
-                <div className="flex w-full items-center justify-around gap-x-2" role="group" aria-label={`Aksi untuk ${row.original.name.raw}`}>
+                <div className="flex w-full items-center justify-around gap-x-1.5" role="group" aria-label={`Aksi untuk ${name.raw}`}>
+                    {/* Tombol Edit */}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 cursor-pointer group-hover/tr:bg-white group-hover/tr:text-yellow-400 hover:bg-yellow-300 hover:text-gray-900"
+                        aria-label={`Edit ${name.raw}`}
+                        onClick={() => onEdit(row.original)}
+                    >
+                        <PencilLineIcon />
+                    </Button>
+
+                    {/* Tombol Delete */}
                     <DeleteButton
                         url={route('console.master-data.offices.destroy', { office_id: id })}
                         title="Hapus Perangkat Daerah"
