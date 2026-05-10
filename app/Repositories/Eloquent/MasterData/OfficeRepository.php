@@ -23,7 +23,7 @@ implements \App\Repositories\Contracts\MasterData\OfficeRepositoryInterface
     {
         $offices = Office::sortByRankAndName()
             ->withMerger()
-            ->searchByKeyword()
+            ->searchByKeyword(['name', 'alias'])
             ->excludeMerged()
             ->paginate(perPage: request()->input('per_page', $perPage));
 

@@ -6,6 +6,7 @@ namespace App\Repositories\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 abstract class BaseRepository
 {
@@ -33,6 +34,20 @@ abstract class BaseRepository
         }
 
         return $this->resource::make($record);
+    }
+
+    public function create(array $data): Model
+    {
+        try {
+            DB::beginTransaction();
+            $record = $this->model->create($data);
+            DB::commit();
+
+            return $record;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
     }
 
     public function update(array $data, string $columnValue, ?string $columnName = null): Model

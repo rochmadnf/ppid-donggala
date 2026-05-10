@@ -22,6 +22,8 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
             ->name('offices.')
             ->group(function () {
                 Route::get('', 'index')->name('index');
+                Route::post('', 'store')->name('store');
+                Route::put('{office_id}', 'update')->name('update');
                 Route::delete('{office_id}', 'destroy')->name('destroy');
             });
     });

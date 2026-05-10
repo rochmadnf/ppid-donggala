@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Console\MasterData;
 
 use App\Enums\OfficeRankEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MasterData\OfficeRequest;
 use Inertia\Response as InertiaResponse;
 use App\Http\Traits\{PageTrait, HandlePaginationTrait};
+use Illuminate\Http\RedirectResponse;
 
 class OfficeController extends Controller
 {
@@ -51,7 +53,21 @@ class OfficeController extends Controller
         );
     }
 
-    public function destroy(string $office_id): \Illuminate\Http\RedirectResponse
+    public function store(OfficeRequest $request): RedirectResponse
+    {
+        $this->officeRepository->create($request->validated());
+
+        return back();
+    }
+
+    public function update(OfficeRequest $request, string $office_id): RedirectResponse
+    {
+        $this->officeRepository->update($request->validated(), $office_id, 'uuid');
+
+        return back();
+    }
+
+    public function destroy(string $office_id): RedirectResponse
     {
         $this->officeRepository->delete($office_id, 'uuid');
 

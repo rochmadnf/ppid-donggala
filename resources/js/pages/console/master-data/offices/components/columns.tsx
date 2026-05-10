@@ -2,6 +2,7 @@ import { DeleteButton } from '@/components/delete-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { PaginationMetaProps } from '@/types/pagination';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
@@ -115,15 +116,22 @@ export const columns = ({ metadata, onEdit }: ColumnsOptions): ColumnDef<OfficeD
             return (
                 <div className="flex w-full items-center justify-around gap-x-1.5" role="group" aria-label={`Aksi untuk ${name.raw}`}>
                     {/* Tombol Edit */}
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 cursor-pointer group-hover/tr:bg-white group-hover/tr:text-yellow-400 hover:bg-yellow-300 hover:text-gray-900"
-                        aria-label={`Edit ${name.raw}`}
-                        onClick={() => onEdit(row.original)}
-                    >
-                        <PencilLineIcon />
-                    </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-8 cursor-pointer group-hover/tr:text-orange-400 hover:bg-yellow-300 hover:text-yellow-950"
+                                aria-label={`Edit ${name.raw}`}
+                                onClick={() => onEdit(row.original)}
+                            >
+                                <PencilLineIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="left">
+                            <p>Ubah Data</p>
+                        </TooltipContent>
+                    </Tooltip>
 
                     {/* Tombol Delete */}
                     <DeleteButton
@@ -132,7 +140,7 @@ export const columns = ({ metadata, onEdit }: ColumnsOptions): ColumnDef<OfficeD
                         variant="rect"
                         popSide="bottom"
                         pageName="Perangkat Daerah"
-                        className="group-hover/tr:text-destructive [&_svg]:size-4"
+                        className="group-hover/tr:bg-transparent group-hover/tr:text-red-500 [&_svg]:size-4"
                         description="Anda yakin ingin menghapus perangkat daerah ini? Tindakan ini tidak dapat dibatalkan."
                         selectedData={name.alias}
                     />

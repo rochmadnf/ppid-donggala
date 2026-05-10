@@ -18,4 +18,6 @@ interface BaseRepositoryInterface
     public function update(array $data, string $columnValue, ?string $columnName = null): Model;
 
     public function count(?string $keyword = null, string $defaultColumn = 'name'): int;
+
+    public function create(array $data): Model;
 }

@@ -1,3 +1,4 @@
+import { InputErrorMessage } from '@/components/input-error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,8 +7,9 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { Textarea } from '@/components/ui/textarea';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import { LoaderCircleIcon, PlusCircleIcon, SquarePenIcon } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { LoaderCircleIcon, PlusCircleIcon, SquarePenIcon, XIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import type { OfficeDataProps, OfficeIndexProps } from '../types';
 
 interface OfficeFormData {
@@ -37,53 +39,68 @@ const EMPTY_FORM: OfficeFormData = {
 export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFormSheetProps) {
     const { ranks } = usePage<PageDataProps & OfficeIndexProps>().props;
 
-    // Snapshot data edit — hanya diperbarui saat sheet terbuka
-    const committedOfficeRef = useRef<OfficeDataProps | null>(null);
-    if (open) {
-        committedOfficeRef.current = selectedOffice;
-    }
+    const [displayOffice, setDisplayOffice] = useState<OfficeDataProps | null>(null);
+    const isEditMode = displayOffice !== null;
 
-    const committed = committedOfficeRef.current;
-    const isEditMode = committed !== null; // ← pakai committed, bukan selectedOffice langsung
+    const form = useForm<OfficeFormData>(EMPTY_FORM);
 
-    const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm<OfficeFormData>(EMPTY_FORM);
+    const resetForm = () => {
+        form.setDefaults(EMPTY_FORM);
+        form.setData(EMPTY_FORM);
+        form.resetAndClearErrors();
+    };
 
     useEffect(() => {
-        if (open) {
-            if (isEditMode && committed) {
-                setData({
-                    name: committed.name.raw,
-                    alias: committed.name.alias,
-                    address: committed.address ?? '',
-                    phone: committed.phone ?? '',
-                    site_url: committed.site_url ?? '',
-                    rank_id: String(committed.rank.id),
-                });
-            } else {
-                reset();
-                clearErrors();
-            }
+        if (!open) {
+            resetForm();
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open, committed]);
+
+        setDisplayOffice(selectedOffice);
+
+        if (selectedOffice) {
+            const editData = {
+                name: selectedOffice.name.raw,
+                alias: selectedOffice.name.alias,
+                address: selectedOffice.address ?? '',
+                phone: selectedOffice.phone ?? '',
+                site_url: selectedOffice.site_url ?? '',
+                rank_id: String(selectedOffice.rank.id),
+            };
+
+            form.setDefaults(editData);
+            form.setData(editData);
+            form.clearErrors();
+        } else {
+            resetForm();
+        }
+    }, [open, selectedOffice]);
 
     const handleSubmit = () => {
-        if (isEditMode && committed) {
-            put(route('console.master-data.offices.update', { office_id: committed.id }), {
+        if (isEditMode && displayOffice) {
+            form.put(route('console.master-data.offices.update', { office_id: displayOffice.id }), {
                 preserveScroll: true,
-                onSuccess: () => onOpenChange(false),
+                preserveState: true,
+                onSuccess: () => {
+                    toast.success('Perangkat daerah berhasil diperbarui.');
+                    onOpenChange(false);
+                },
             });
         } else {
-            post(route('console.master-data.offices.store'), {
+            form.post(route('console.master-data.offices.store'), {
                 preserveScroll: true,
-                onSuccess: () => onOpenChange(false),
+                preserveState: true,
+                onSuccess: () => {
+                    toast.success('Perangkat daerah berhasil ditambahkan.');
+                    onOpenChange(false);
+                },
             });
         }
     };
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent className="flex flex-col gap-0 overflow-y-auto sm:max-w-lg">
+            <SheetContent className="flex flex-col gap-0 overflow-y-auto sm:max-w-md">
                 <SheetHeader className="border-b border-line-brand px-6 pt-6 pb-4">
                     <SheetTitle className="flex items-center gap-2">
                         {isEditMode ? (
@@ -99,7 +116,9 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                         )}
                     </SheetTitle>
                     <SheetDescription>
-                        {isEditMode ? `Perbarui data untuk "${committed?.name.raw}".` : 'Isi form di bawah untuk menambahkan perangkat daerah baru.'}
+                        {isEditMode
+                            ? `Perbarui data untuk "${displayOffice?.name.raw}".`
+                            : 'Isi form di bawah untuk menambahkan perangkat daerah baru.'}
                     </SheetDescription>
                 </SheetHeader>
 
@@ -111,12 +130,12 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                         </Label>
                         <Input
                             id="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
+                            value={form.data.name}
+                            onChange={(e) => form.setData('name', e.target.value)}
                             placeholder="Dinas Komunikasi dan Informatika"
-                            aria-invalid={!!errors.name}
+                            aria-invalid={!!form.errors.name}
                         />
-                        {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                        <InputErrorMessage message={form.errors.name} />
                     </div>
 
                     {/* Alias */}
@@ -126,12 +145,12 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                         </Label>
                         <Input
                             id="alias"
-                            value={data.alias}
-                            onChange={(e) => setData('alias', e.target.value)}
+                            value={form.data.alias}
+                            onChange={(e) => form.setData('alias', e.target.value)}
                             placeholder="Diskominfo"
-                            aria-invalid={!!errors.alias}
+                            aria-invalid={!!form.errors.alias}
                         />
-                        {errors.alias && <p className="text-xs text-destructive">{errors.alias}</p>}
+                        <InputErrorMessage message={form.errors.alias} />
                     </div>
 
                     {/* Rank */}
@@ -139,8 +158,8 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                         <Label htmlFor="rank_id">
                             Tingkat <span className="text-destructive">*</span>
                         </Label>
-                        <Select value={data.rank_id} onValueChange={(val) => setData('rank_id', val)}>
-                            <SelectTrigger className="w-full" id="rank_id" aria-invalid={!!errors.rank_id}>
+                        <Select value={form.data.rank_id} onValueChange={(val) => form.setData('rank_id', val)}>
+                            <SelectTrigger className="w-full" id="rank_id" aria-invalid={!!form.errors.rank_id}>
                                 <SelectValue placeholder="Pilih tingkat..." />
                             </SelectTrigger>
                             <SelectContent>
@@ -151,7 +170,7 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                                 ))}
                             </SelectContent>
                         </Select>
-                        {errors.rank_id && <p className="text-xs text-destructive">{errors.rank_id}</p>}
+                        <InputErrorMessage message={form.errors.rank_id} />
                     </div>
 
                     {/* Alamat */}
@@ -159,13 +178,13 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                         <Label htmlFor="address">Alamat</Label>
                         <Textarea
                             id="address"
-                            value={data.address}
-                            onChange={(e) => setData('address', e.target.value)}
+                            value={form.data.address}
+                            onChange={(e) => form.setData('address', e.target.value)}
                             placeholder="Jl. Contoh No. 1, Kecamatan, Kota"
                             rows={3}
-                            aria-invalid={!!errors.address}
+                            aria-invalid={!!form.errors.address}
                         />
-                        {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}
+                        <InputErrorMessage message={form.errors.address} />
                     </div>
 
                     {/* No. HP/Telepon */}
@@ -174,12 +193,12 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                         <Input
                             id="phone"
                             type="tel"
-                            value={data.phone}
-                            onChange={(e) => setData('phone', e.target.value)}
+                            value={form.data.phone}
+                            onChange={(e) => form.setData('phone', e.target.value)}
                             placeholder="0811234567"
-                            aria-invalid={!!errors.phone}
+                            aria-invalid={!!form.errors.phone}
                         />
-                        {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
+                        <InputErrorMessage message={form.errors.phone} />
                     </div>
 
                     {/* Situs Web */}
@@ -188,27 +207,26 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                         <Input
                             id="site_url"
                             type="url"
-                            value={data.site_url}
-                            onChange={(e) => setData('site_url', e.target.value)}
+                            value={form.data.site_url}
+                            onChange={(e) => form.setData('site_url', e.target.value)}
                             placeholder="https://diskominfo.donggalakab.go.id"
-                            aria-invalid={!!errors.site_url}
+                            aria-invalid={!!form.errors.site_url}
                         />
-                        {errors.site_url && <p className="text-xs text-destructive">{errors.site_url}</p>}
+                        <InputErrorMessage message={form.errors.site_url} />
                     </div>
                 </div>
 
-                <SheetFooter className="grid grid-cols-3 place-content-between place-items-center gap-2 border-t border-line-brand px-6 py-4">
-                    <Button onClick={handleSubmit} variant={'brand'} className="col-span-2 w-full cursor-pointer" disabled={processing}>
-                        {processing ? <LoaderCircleIcon className="animate-spin" /> : null}
+                <SheetFooter className="flex flex-row items-center gap-x-2 border-t border-line-brand px-6 py-4">
+                    <Button
+                        onClick={handleSubmit}
+                        className="h-10 flex-1 cursor-pointer bg-blue-500 hover:bg-blue-700 in-disabled:text-red-500"
+                        disabled={form.processing || !form.isDirty || !open}
+                    >
+                        {form.processing ? <LoaderCircleIcon className="animate-spin" /> : null}
                         {isEditMode ? 'Simpan Perubahan' : 'Tambah'}
                     </Button>
-                    <Button
-                        variant="destructive"
-                        className="col-span-1 w-full cursor-pointer"
-                        onClick={() => onOpenChange(false)}
-                        disabled={processing}
-                    >
-                        Batal
+                    <Button variant="destructive" className="size-10 cursor-pointer" onClick={() => onOpenChange(false)} disabled={form.processing}>
+                        <XIcon />
                     </Button>
                 </SheetFooter>
             </SheetContent>

@@ -50,7 +50,7 @@ export default function OfficeIndexPage() {
                 routeName="console.master-data.offices.index"
                 searchable
                 toolbarRight={
-                    <Button size="sm" variant="brand" className="cursor-pointer" onClick={handleAdd}>
+                    <Button variant="brand" className="cursor-pointer" onClick={handleAdd}>
                         <PlusIcon />
                         OPD
                     </Button>
