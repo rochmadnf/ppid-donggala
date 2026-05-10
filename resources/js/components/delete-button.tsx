@@ -7,11 +7,14 @@ import { Trash2Icon, TriangleAlertIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
+type SIDE_OPTIONS = 'top' | 'bottom' | 'left' | 'right';
+
 export interface DeleteButtonProps {
     url: string;
     pageName?: string;
     onlyProps?: string[] | undefined;
-    popSide?: 'top' | 'bottom' | 'left' | 'right' | undefined;
+    ttSide?: SIDE_OPTIONS; // Tooltip side
+    popSide?: SIDE_OPTIONS; // Popover side
     popSideOffset?: number | undefined;
     title: string;
     description: string;
@@ -23,6 +26,7 @@ export interface DeleteButtonProps {
 export function DeleteButton({
     url,
     onlyProps = ['resources'],
+    ttSide = 'top',
     popSide = 'top',
     popSideOffset = 12,
     title,
@@ -79,7 +83,7 @@ export function DeleteButton({
                         </button>
                     </PopoverTrigger>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent side={ttSide}>
                     <p>Hapus Data</p>
                 </TooltipContent>
             </Tooltip>
