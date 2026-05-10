@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import type { PageDataProps, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronsUpDownIcon, Globe2Icon, LogOutIcon, PlusIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { menuItems, type MenuItemProps } from './config/sidebar';
 
 export function Sidebar() {
@@ -44,6 +44,10 @@ export function SidebarHeader() {
 
 export function SidebarMenu() {
     const { page } = usePage<PageDataProps>().props;
+    const activeParentId = useMemo(() => {
+        return menuItems.find((menu) => menu.children.some((child) => child.id === page.id))?.id ?? null;
+    }, [page.id]);
+    const [openMenuId, setOpenMenuId] = useState<string | null>(activeParentId);
 
     return (
         <ul
@@ -57,7 +61,16 @@ export function SidebarMenu() {
                     const { id, url, ...menuItemProps } = menu;
                     const menuIds = [...menu.children.map((child) => child.id), id];
 
-                    return <CollapsibleMenuItem key={id} {...menuItemProps} menuIds={menuIds} isOpen={menuIds.includes(page.id)} pageId={page.id} />;
+                    return (
+                        <CollapsibleMenuItem
+                            key={id}
+                            {...menuItemProps}
+                            menuIds={menuIds}
+                            isOpen={openMenuId === id}
+                            pageId={page.id}
+                            onOpenChange={(open) => setOpenMenuId(open ? id : null)}
+                        />
+                    );
                 } else {
                     const { id, children, ...menuItemProps } = menu;
                     return <SidebarMenuItem key={id} {...menuItemProps} isActive={page.id === id} />;
@@ -100,17 +113,21 @@ export function CollapsibleMenuItem({
     isOpen = false,
     pageId,
     menuIds,
-}: { isOpen?: boolean; pageId: string; menuIds: string[] } & Pick<MenuItemProps, 'children' | 'icon' | 'label'>) {
-    const [isCollapsed, setIsCollapsed] = useState<boolean>(isOpen);
-    useEffect(() => setIsCollapsed(isOpen), [isOpen]);
+    onOpenChange,
+}: {
+    isOpen?: boolean;
+    pageId: string;
+    menuIds: string[];
+    onOpenChange: (open: boolean) => void;
+} & Pick<MenuItemProps, 'children' | 'icon' | 'label'>) {
     return (
-        <Collapsible asChild className="group/menu-trigger relative" title={label} open={isCollapsed} onOpenChange={(open) => setIsCollapsed(open)}>
+        <Collapsible asChild className="group/menu-trigger relative" title={label} open={isOpen} onOpenChange={onOpenChange}>
             <li>
                 <CollapsibleTrigger asChild>
                     <button
                         className={cn(
                             'inline-flex w-full cursor-pointer flex-row items-center gap-x-2 rounded-md px-2 py-1.5 tracking-wide transition duration-200 [&_svg]:pointer-events-none [&_svg]:size-4.5',
-                            isCollapsed || menuIds.includes(pageId)
+                            isOpen || menuIds.includes(pageId)
                                 ? 'bg-sidebar-menu-bg text-sidebar-menu-text'
                                 : 'bg-transparent text-sidebar-menu-inactive-text hover:bg-sidebar-menu-bg hover:text-sidebar-menu-text',
                         )}
@@ -124,7 +141,7 @@ export function CollapsibleMenuItem({
                     <ul
                         className={cn(
                             'ml-3.5 flex flex-col gap-y-2.5 border-l-[1.5px] p-2 pr-0',
-                            isCollapsed ? 'border-blue-700/30' : 'border-line-brand',
+                            isOpen ? 'border-blue-700/30' : 'border-line-brand',
                         )}
                     >
                         {collapsibleChildren.map((child) => (
