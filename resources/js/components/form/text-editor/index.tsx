@@ -15,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { cn } from '@/lib/utils';
 import { type HTMLContent, type JSONContent } from '@tiptap/core';
 import DragHandle from '@tiptap/extension-drag-handle-react';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import {
     ALargeSmallIcon,
@@ -24,13 +25,25 @@ import {
     MoveVerticalIcon,
     PaintbrushIcon,
     RemoveFormattingIcon,
-    RepeatIcon,
     TrashIcon,
 } from 'lucide-react';
-import { useCallback, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren } from 'react';
 import { extenstions } from './config';
-import { Toolbar } from './toolbar';
 import { STYLE_COLORS } from './config/colors';
+import { Toolbar } from './toolbar';
+
+const DEFAULT_CONTENT = {
+    type: 'doc',
+    content: [
+        {
+            type: 'paragraph',
+            attrs: {
+                id: '540f9bb0-028b-4f78-a063-aa77c7ae5e0a',
+                textAlign: 'left',
+            },
+        },
+    ],
+};
 
 export function TextEditorButtonGroup({
     className,
@@ -77,7 +90,7 @@ export function TextEditorHeaderActions({ children, className, ...props }: HTMLA
     );
 }
 
-export function TextEditorHeader({ children, className, ...props }: HTMLAttributes<HTMLHeadElement>) {
+export function TextEditorHeader({ children, className, ...props }: HTMLAttributes<HTMLElementTagNameMap['header']>) {
     return (
         <header className={cn('text-editor-header', className)} {...props}>
             {children}
@@ -96,30 +109,19 @@ export type TextEditorProps = {
 };
 
 export function TextEditor({ variant = 'default', content, onSave }: TextEditorProps) {
-    const [isSave, setIsSave] = useState<boolean>(false);
-    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [isDirty, setIsDirty] = useState<boolean>(false);
 
-    const debouncedSetIsSave = useCallback((value: boolean) => {
+    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const initialHtmlRef = useRef('');
+
+    const debouncedSetIsDirty = useCallback((value: boolean) => {
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current);
         }
         debounceTimeoutRef.current = setTimeout(() => {
-            setIsSave(value);
+            setIsDirty(value);
         }, 500);
     }, []);
-
-    const defaultContent = {
-        type: 'doc',
-        content: [
-            {
-                type: 'paragraph',
-                attrs: {
-                    id: '540f9bb0-028b-4f78-a063-aa77c7ae5e0a',
-                    textAlign: 'left',
-                },
-            },
-        ],
-    };
 
     const editor = useEditor({
         extensions: extenstions,
@@ -128,54 +130,77 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
                 class: 'text-editor-content pl-10 pt-4',
             },
         },
-        immediatelyRender: import.meta.env.VITE_APP_ENV === 'production' ? false : true,
-        content: content ?? defaultContent,
+        immediatelyRender: false,
+        content: content ?? DEFAULT_CONTENT,
         onUpdate: ({ editor }) => {
-            debouncedSetIsSave(editor.getHTML() !== (editorHtml ?? ''));
+            debouncedSetIsDirty(editor.getHTML() !== initialHtmlRef.current);
         },
     });
-
-    const editorHtml: string = editor?.getHTML() ?? '';
 
     const { canUndo, canRedo } = useEditorState({
         editor,
-        selector: (ctx) => {
-            return {
-                canUndo: ctx.editor.can().chain().focus().undo().run(),
-                canRedo: ctx.editor.can().chain().focus().redo().run(),
-            };
-        },
-    });
+        selector: (ctx) => ({
+            canUndo: ctx.editor?.can().chain().focus().undo().run() ?? false,
+            canRedo: ctx.editor?.can().chain().focus().redo().run() ?? false,
+        }),
+    }) ?? { canUndo: false, canRedo: false };
 
     // state management
-    const [activeNode, setActiveNode] = useState<{ node: any; pos: number } | null>(null);
+    const [activeNode, setActiveNode] = useState<{
+        node: ProseMirrorNode;
+        pos: number;
+    } | null>(null);
+
+    const contentString = useMemo(() => JSON.stringify(content), [content]);
+
+    useEffect(() => {
+        if (editor) {
+            initialHtmlRef.current = editor.getHTML();
+        }
+    }, [editor]);
+
+    useEffect(() => {
+        return () => {
+            if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (editor && content) {
+            editor.commands.setContent(content, { emitUpdate: false });
+            initialHtmlRef.current = editor.getHTML();
+            setIsDirty(false);
+        }
+    }, [editor, contentString]);
 
     if (!editor) {
         return null;
     }
 
+    const goToLastPositionOnCurrentNode = () => {
+        const pos = Math.max(0, editor.state.selection.from - 1);
+        editor.commands.focus(pos);
+    };
+
     const handleSave = () => {
         const json = editor.getJSON();
         const html = editor.getHTML();
+
         if (onSave) {
             onSave(json, html);
-        } else {
-            console.log(json);
         }
-    };
 
-    const goToLastPositionOnCurrentNode = () => {
-        const { $from } = editor.state.selection;
-        const endPos = $from.end($from.depth);
-
-        editor.commands.focus(endPos);
+        initialHtmlRef.current = html;
+        setIsDirty(false);
     };
 
     return (
         <TextEditorWrapper className="border-x-0 border-b-0">
             <TextEditorHeader>
                 <TextEditorHeaderActions>
-                    <Toolbar editor={editor} isSave={isSave} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
+                    <Toolbar editor={editor} isDirty={isDirty} canUndo={canUndo} canRedo={canRedo} onSave={handleSave} />
                 </TextEditorHeaderActions>
             </TextEditorHeader>
             <EditorContent editor={editor} className="px-4" />
