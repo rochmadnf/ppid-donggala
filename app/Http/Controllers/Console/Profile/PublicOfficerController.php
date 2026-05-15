@@ -76,13 +76,13 @@ class PublicOfficerController extends Controller
         $photoPath = $request->file('photo')->store('images/public-officers', ['disk' => 'public']);
 
         // Hapus foto lama jika ada
-        if ($publicOfficer->photo) {
-            Storage::disk('public')->delete($publicOfficer->photo);
+        if (!is_null($publicOfficer->photo)) {
+            $test = Storage::disk('public')->delete($publicOfficer->photo);
         }
 
         // Update path foto di database
         $publicOfficer->update([
-            'photo' => $photoPath . '?t=' . now()->timestamp,
+            'photo' => $photoPath,
         ]);
 
         return back()->with('success', 'Foto berhasil diperbarui!');

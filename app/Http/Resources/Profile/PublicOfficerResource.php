@@ -41,7 +41,7 @@ class PublicOfficerResource extends JsonResource
                 'id' => $this->position->uuid,
                 'name' => $this->position->name,
             ],
-            'photo' => is_null($this->photo) ? $this->defautlPhoto($this->gender, $this->religion->value) : storage_asset($this->photo),
+            'photo' => is_null($this->photo) ? $this->defautlPhoto($this->gender, $this->religion->value) : storage_asset($this->photo) . '?t=' . $this->updated_at->timestamp,
             'is_active' => $this->is_active,
         ];
 
