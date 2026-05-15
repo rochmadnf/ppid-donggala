@@ -6,17 +6,7 @@
  * All controls are disabled when the cropper is not ready.
  */
 
-import {
-    AlignCenterIcon,
-    FlipHorizontalIcon,
-    FlipVerticalIcon,
-    RatioIcon,
-    RotateCcwIcon,
-    RotateCwIcon,
-    UndoIcon,
-    ZoomInIcon,
-    ZoomOutIcon,
-} from 'lucide-react';
+import { AlignCenterIcon, FlipHorizontalIcon, FlipVerticalIcon, RotateCcwIcon, RotateCwIcon, UndoIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -75,7 +65,7 @@ export function CropperControls({
     return (
         <div data-slot="cropper-controls" className={cn('flex flex-col gap-2.5', className)}>
             {/* ---- Preset selector row (compact pills) ---- */}
-            {presets.length > 1 && (
+            {/* {presets.length > 1 && (
                 <div className="flex items-center justify-center gap-1">
                     {presets.map((p) => (
                         <button
@@ -96,7 +86,6 @@ export function CropperControls({
                         </button>
                     ))}
 
-                    {/* Free crop pill */}
                     <button
                         type="button"
                         disabled={disabled}
@@ -115,7 +104,7 @@ export function CropperControls({
                         Free
                     </button>
                 </div>
-            )}
+            )} */}
 
             {/* ---- Tool bar (icon buttons in a dark pill) ---- */}
             <div className="flex items-center justify-center">

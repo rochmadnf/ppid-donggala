@@ -1,15 +1,3 @@
-/**
- * ImageCropperDialog — Pintura-style image crop editor
- *
- * Full-panel dark editor dialog with:
- *   - Dark workspace background
- *   - Centered canvas with floating controls
- *   - Bottom toolbar + preset pills
- *   - Compact header and action bar
- *
- * Flow: Upload → Select preset → Crop → Preview → Confirm
- */
-
 import { CheckIcon, ImageIcon, Loader2Icon, XIcon } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -17,7 +5,6 @@ import { Button } from '@/components/ui/button';
 
 import { CropperCanvas } from './cropper-canvas';
 import { CropperControls } from './cropper-controls';
-import { CropperPreview } from './cropper-preview';
 import { ImageDropzone } from './image-dropzone';
 import type { CropPreset } from './presets';
 import { useCropper } from './use-cropper';
@@ -39,6 +26,10 @@ export interface ImageCropperDialogProps {
     onConfirm: (blob: Blob, preset: CropPreset) => void;
     /** Maximum upload size in MB (default: 5) */
     maxSizeMB?: number;
+    /** Output MIME type (default: image/png) */
+    outputType?: string;
+    /** Output quality between 0 and 1 (default: 0.92) */
+    outputQuality?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -52,6 +43,8 @@ export function ImageCropperDialog({
     presets: customPresets,
     onConfirm,
     maxSizeMB = 5,
+    outputType = 'image/png',
+    outputQuality = 0.92,
 }: ImageCropperDialogProps) {
     // ---- Local image source state -----------------------------------------
     const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -107,21 +100,20 @@ export function ImageCropperDialog({
 
         setIsExporting(true);
         try {
-            const blob = await getCroppedBlob('image/png', 0.92);
+            const blob = await getCroppedBlob(outputType, outputQuality);
             if (blob) {
                 onConfirm(blob, preset);
                 setImageSrc((prev) => {
                     if (prev) URL.revokeObjectURL(prev);
                     return null;
                 });
-                onOpenChange(false);
             }
         } catch (err) {
             console.error('[ImageCropperDialog] Export failed:', err);
         } finally {
             setIsExporting(false);
         }
-    }, [preset, getCroppedBlob, onConfirm, onOpenChange]);
+    }, [preset, getCroppedBlob, onConfirm, onOpenChange, outputType, outputQuality]);
 
     // ---- Handle dialog close (cleanup) ------------------------------------
     const handleClose = useCallback(() => {
@@ -172,7 +164,7 @@ export function ImageCropperDialog({
                                 disabled={isExporting}
                                 className="rounded-lg px-3 py-1.5 text-xs font-medium text-neutral-400 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
                             >
-                                Change image
+                                Ganti gambar
                             </button>
                         )}
 
@@ -188,12 +180,12 @@ export function ImageCropperDialog({
                                 {isExporting ? (
                                     <>
                                         <Loader2Icon className="size-3.5 animate-spin" />
-                                        Exporting…
+                                        Mengekspor...
                                     </>
                                 ) : (
                                     <>
                                         <CheckIcon className="size-3.5" />
-                                        Done
+                                        Terapkan
                                     </>
                                 )}
                             </Button>
@@ -226,20 +218,6 @@ export function ImageCropperDialog({
                                 {/* Canvas area */}
                                 <div className="flex min-w-0 flex-1 items-center justify-center p-3 sm:p-4">
                                     <CropperCanvas src={imageSrc} imageRef={imageRef} shape={preset?.shape} className="border-0 bg-transparent" />
-                                </div>
-
-                                {/* Preview sidebar (desktop) */}
-                                <div className="hidden w-37 items-center justify-center border-l border-white/6 px-4 sm:flex">
-                                    {isReady && (
-                                        <CropperPreview
-                                            cropper={cropper}
-                                            isReady={isReady}
-                                            shape={preset?.shape}
-                                            width={previewSize.width}
-                                            height={previewSize.height}
-                                            changeVersion={changeVersion}
-                                        />
-                                    )}
                                 </div>
                             </div>
 

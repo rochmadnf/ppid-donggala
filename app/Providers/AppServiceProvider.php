@@ -13,8 +13,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(MasterData\OfficeRepositoryInterface::class, Eloquent\MasterData\OfficeRepository::class);
-        $this->app->bind(Profile\PpidRepositoryInterface::class, Eloquent\Profile\PpidRepository::class);
+        $repositories = [
+            MasterData\OfficeRepositoryInterface::class => Eloquent\MasterData\OfficeRepository::class,
+            Profile\PpidRepositoryInterface::class => Eloquent\Profile\PpidRepository::class,
+            Profile\PublicOfficerRepositoryInterface::class => Eloquent\Profile\PublicOfficerRepository::class,
+        ];
+
+        foreach ($repositories as $interface => $implementation) {
+            $this->app->bind($interface, $implementation);
+        }
     }
 
     /**

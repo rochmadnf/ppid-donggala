@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             OfficeSeeder::class,
             PpidProfileSeeder::class,
             PositionSeeder::class,
+            PublicOfficerSeeder::class,
         ]);
     }
 }

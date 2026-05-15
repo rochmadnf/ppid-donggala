@@ -4,10 +4,14 @@ namespace App\Models\Profile;
 
 use App\Enums\{EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
 use App\Models\MasterData\{Office, Position};
+use App\Models\Scopes\SearchableScope;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class PublicOfficer extends Model
 {
+    use HasUuids, SearchableScope;
+
     protected $fillable = [
         'fullname',
         'birth_place',

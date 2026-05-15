@@ -2,6 +2,7 @@ import '@css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'My App';
@@ -14,7 +15,11 @@ createInertiaApp({
         if (appEnv === 'production') {
             hydrateRoot(el, <App {...props} />);
         } else {
-            createRoot(el).render(<App {...props} />);
+            createRoot(el).render(
+                <StrictMode>
+                    <App {...props} />
+                </StrictMode>,
+            );
         }
     },
     progress: {

@@ -2,6 +2,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { PageDataProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
+import { Fragment } from 'react';
 import { menuItems } from './config/sidebar';
 
 export function ConsoleHeader() {
@@ -43,12 +44,12 @@ export function ConsoleHeader() {
                         return lastItem ? (
                             <BreadcrumbPage key={bc.id}>{bc.label}</BreadcrumbPage>
                         ) : (
-                            <>
-                                <BreadcrumbItem key={bc.id}>
+                            <Fragment key={bc.id}>
+                                <BreadcrumbItem>
                                     <BreadcrumbLink href={bc.url}>{bc.label}</BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
-                            </>
+                            </Fragment>
                         );
                     })}
                 </BreadcrumbList>

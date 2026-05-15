@@ -17,23 +17,22 @@ abstract class BaseRepository
         //
     }
 
-    public function paginate(int $perPage = 10): JsonResource
+    public function paginate(array $relations = [], int $perPage = 10): JsonResource
     {
-        $records = $this->model->paginate(perPage: request()->input('per_page', $perPage));
+        $records = $this->model->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))->paginate(perPage: request()->input('per_page', $perPage));
 
         return $this->resource::collection($records);
     }
 
-    public function find(int|string $value, ?string $columnName = null, string $operator = '=', bool $wrap = true): Model | JsonResource
+    public function find(int|string $value, ?string $columnName = null, array $relations = [], array $resourceParams = [], string $operator = '=', bool $wrap = true): Model | JsonResource
     {
 
-        $record = $this->model->where(column: $columnName ?? $this->defaultColumnName, operator: $operator, value: $value)->firstOrFail();
+        $record = $this->model
+            ->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))
+            ->where(column: $columnName ?? $this->defaultColumnName, operator: $operator, value: $value)
+            ->firstOrFail();
 
-        if (!$wrap) {
-            return $record;
-        }
-
-        return $this->resource::make($record);
+        return $wrap ? new $this->resource($record, ...$resourceParams) : $record;
     }
 
     public function create(array $data): Model

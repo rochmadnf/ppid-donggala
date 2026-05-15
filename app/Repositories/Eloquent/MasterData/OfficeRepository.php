@@ -19,7 +19,7 @@ implements \App\Repositories\Contracts\MasterData\OfficeRepositoryInterface
         );
     }
 
-    public function paginate(int $perPage = 10): JsonResource
+    public function paginate(array $relations = [], int $perPage = 10): JsonResource
     {
         $offices = Office::sortByRankAndName()
             ->withMerger()
