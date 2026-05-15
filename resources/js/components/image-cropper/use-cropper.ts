@@ -118,6 +118,7 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
     const [changeVersion, setChangeVersion] = useState(0);
     const [within, setWithin] = useState<WithinMode>(initialWithin);
     const refreshImageBoundsRef = useRef<(() => void) | null>(null);
+    const isResettingRef = useRef(false);
 
     /**
      * Keep a ref in sync with `within` so that event listeners (which close
@@ -374,6 +375,12 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
             // ----------------------------------------------------------------
             const onImageTransform = (event: Event) => {
                 if (withinRef.current !== 'image') return;
+                if (isResettingRef.current) {
+                    requestAnimationFrame(() => {
+                        refreshImageBounds();
+                    });
+                    return;
+                }
 
                 const canvas = cropper.getCropperCanvas();
                 const image = cropper.getCropperImage();
@@ -587,6 +594,7 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
     const reset = useCallback(() => {
         const image = getImage();
         const selection = getSelection();
+        isResettingRef.current = true;
         image?.$resetTransform();
         image?.$center('contain');
         selection?.$reset();
@@ -597,8 +605,12 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
             applyShapeMask(selection, activePreset.shape);
         }
 
-        notifyChange();
-    }, [getImage, getSelection, activePreset, applyShapeMask, notifyChange]);
+        reflow();
+
+        requestAnimationFrame(() => {
+            isResettingRef.current = false;
+        });
+    }, [getImage, getSelection, activePreset, applyShapeMask, reflow]);
 
     // ---- Output helpers ---------------------------------------------------
 
