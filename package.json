@@ -71,6 +71,7 @@
         "clsx": "^2.1.1",
         "compressorjs": "^1.2.1",
         "cropperjs": "^2.1.0",
+        "dayjs": "^1.11.20",
         "globals": "^17.3.0",
         "lucide-react": "^1.11.0",
         "radix-ui": "^1.4.3",

@@ -4,6 +4,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConsoleLayout from '@/layouts/console-layout';
+import { formatDate } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
@@ -49,7 +50,7 @@ export default function PublicOfficerShow() {
             <div className="flex flex-col gap-y-4">
                 {/* Personal Info */}
                 <ShowCard title={false}>
-                    <div className="relative flex w-full gap-x-14">
+                    <div className="relative flex w-full items-center gap-x-8">
                         <div
                             className={cn(
                                 'absolute -top-2 right-0 size-3 animate-ping rounded-full',
@@ -58,7 +59,7 @@ export default function PublicOfficerShow() {
                         ></div>
                         <div className={cn('absolute -top-2 right-0 size-3 rounded-full', officer.is_active ? 'bg-green-500' : 'bg-red-500')}></div>
 
-                        <div className="group/pop relative w-full max-w-75 transition duration-300">
+                        <div className="group/pop relative h-fit w-full max-w-85 rounded-md shadow-md shadow-gray-500/20 transition duration-300">
                             <AspectRatio ratio={4 / 5} className="rounded-md">
                                 <img src={officer.photo} alt={officer.name} className="rounded-md object-cover" />
                             </AspectRatio>
@@ -111,7 +112,7 @@ export default function PublicOfficerShow() {
                                 },
                                 {
                                     th: 'Tempat, Tanggal Lahir',
-                                    td: `${officer.birth_place}, ${officer.birth_date}`,
+                                    td: `${officer.birth_place}, ${formatDate(officer.birth_date, 'LL')}`,
                                 },
                                 {
                                     th: 'Jenis Kelamin',
@@ -124,6 +125,13 @@ export default function PublicOfficerShow() {
                                 {
                                     th: 'Status',
                                     td: officer.marital_status,
+                                },
+                                {
+                                    th: 'Periode',
+                                    td:
+                                        formatDate(officer.period_start, 'L') +
+                                        ' - ' +
+                                        (officer.period_end === 'Sekarang' ? 'Sekarang' : formatDate(officer.period_end, 'L')),
                                 },
                             ].map(({ th, td }, idx) => (
                                 <div key={th + td + idx} className="flex flex-row justify-between border-b border-line-brand px-2 py-3">
