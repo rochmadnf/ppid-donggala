@@ -257,6 +257,12 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
                 applyShapeMask(selection, activePreset.shape);
             }
 
+            // Ensure the image is centered and fully visible on init
+            const image = cropper.getCropperImage();
+            image?.$resetTransform();
+            image?.$center('contain');
+            selection?.$center();
+
             // ----------------------------------------------------------------
             // Boundary: constrain selection move / resize
             // ----------------------------------------------------------------
