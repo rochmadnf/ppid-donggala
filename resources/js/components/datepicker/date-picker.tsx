@@ -91,12 +91,6 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
         );
 
         // ── Mask hook ─────────────────────────────────────────────────────────────
-        // useDateMask mengelola:
-        // - Fixed-position slots: hapus digit tidak menggeser digit lain
-        // - Auto-advance cursor ke slot berikutnya setelah input digit
-        // - Backspace/Delete menghapus slot di posisi cursor saja
-        // - Block huruf dan karakter non-digit
-        // - Snap cursor ke digit slot saat click di area separator
         const {
             handleKeyDown: handleMaskedKeyDown,
             handleClick: handleMaskedClick,
@@ -108,31 +102,47 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
         } = useDateMask(internalInputRef, {
             format,
             onMaskedChange: (maskedDisplay, complete) => {
-                // maskedDisplay: "19-__-2022" dengan '_' untuk slot kosong
-                // complete: true jika semua slot terisi
-                if (!maskedDisplay || maskedDisplay.replace(/\D/g, '') === '') {
+                // maskedDisplay berisi '_' untuk slot kosong, misal "19-__-2022"
+                // complete = true hanya jika semua digit sudah terisi
+
+                // Input kosong sepenuhnya
+                if (!maskedDisplay || maskedDisplay.replace(/[_\-\/.\s]/g, '') === '') {
                     setValidationError('');
                     commitDate(null);
                     return;
                 }
 
+                // Masih ada slot kosong — tidak commit, tidak tampilkan error dulu
                 if (!complete) {
-                    // Masih ada slot yang kosong — tidak commit, tidak error dulu
                     setValidationError('');
                     return;
                 }
 
-                // Semua slot terisi — validasi
+                // Semua slot terisi — jalankan validasi
                 const result = validateDateInput(maskedDisplay, format, minDate, maxDate);
                 if (result.valid) {
                     setValidationError('');
                     const parsed = dayjs(maskedDisplay, format, true);
                     commitDate(parsed.isValid() ? parsed : null);
                 } else {
+                    // FIX [9-UX]: error tetap ditampilkan langsung untuk tanggal
+                    // impossible (misal 31-02) karena sudah "complete" namun tidak valid.
+                    // Ini memberikan feedback segera tanpa menunggu blur.
                     const reason = (result as { valid: false; reason: string }).reason;
-                    setValidationError(reason !== 'incomplete' ? getValidationMessage(result, format) : '');
+                    if (reason !== 'incomplete') {
+                        setValidationError(getValidationMessage(result, format));
+                    }
+                    commitDate(null);
                 }
             },
+        });
+
+        // ── Ref untuk displayValue — hindari stale closure di handleInputBlur ────
+        // FIX [7]: displayValue dibaca dari ref agar handleInputBlur selalu
+        // mendapat nilai terbaru meski dipanggil setelah setState async.
+        const displayValueRef = React.useRef(displayValue);
+        React.useLayoutEffect(() => {
+            displayValueRef.current = displayValue;
         });
 
         // ── Sync controlled value ke mask ─────────────────────────────────────────
@@ -142,31 +152,38 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             setSelectedDate(parsed);
             if (parsed) {
                 setCalendarMonth(parsed);
-                setValidationError('');
                 setExternalValue(formatDate(parsed, format));
             } else {
                 setExternalValue('');
             }
+            // FIX [5]: selalu reset validationError — bukan hanya saat parsed truthy.
+            // Sebelumnya jika value di-clear dari parent (undefined/""),
+            // error lama tetap tampil karena setValidationError ada di dalam `if (parsed)`.
+            setValidationError('');
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [value, format]);
 
         // ── Input blur: validasi akhir ────────────────────────────────────────────
         const handleInputBlur = React.useCallback(() => {
-            if (!displayValue || displayValue.replace(/[_\-\/\s]/g, '') === '') {
+            // FIX [7]: baca dari ref, bukan closure — selalu fresh
+            const current = displayValueRef.current;
+
+            if (!current || current.replace(/[_\-\/.\s]/g, '') === '') {
                 setValidationError('');
                 return;
             }
-            // Jika masih ada '_' berarti incomplete
-            if (displayValue.includes('_')) {
+            // Masih ada slot kosong setelah blur → incomplete
+            if (current.includes('_')) {
                 setValidationError(getValidationMessage({ valid: false, reason: 'incomplete' }, format));
                 return;
             }
-            const result = validateDateInput(displayValue, format, minDate, maxDate);
+            const result = validateDateInput(current, format, minDate, maxDate);
             if (!result.valid) setValidationError(getValidationMessage(result, format));
             else setValidationError('');
-        }, [displayValue, format, minDate, maxDate]);
+        }, [format, minDate, maxDate]);
+        // deps: displayValue TIDAK ada di sini (sudah lewat ref)
 
-        // ── Keyboard: tambahkan Enter untuk toggle calendar ───────────────────────
+        // ── Keyboard handler ──────────────────────────────────────────────────────
         const handleInputKeyDown = React.useCallback(
             (e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === 'Enter') {
@@ -175,7 +192,6 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                     return;
                 }
                 if (e.key === 'Escape') return; // biarkan popover handle
-                // Semua key lain diproses mask
                 handleMaskedKeyDown(e);
             },
             [selectedDate, handleMaskedKeyDown],
@@ -189,7 +205,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                 if (isDateDisabled(djs, minDate, maxDate)) return;
 
                 const formatted = formatDate(djs, format);
-                setExternalValue(formatted); // sync ke mask slots
+                setExternalValue(formatted);
                 setValidationError('');
                 setIsOpen(false);
                 commitDate(djs);
@@ -231,8 +247,8 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
         const computedDescribedBy = [ariaDescribedBy, isInvalid ? errorId : undefined].filter(Boolean).join(' ') || undefined;
 
         // Nilai yang ditampilkan di input:
-        // - isMaskable: gunakan displayValue dari hook (misal "19-08-2022" atau "19-__-2022")
-        // - tidak maskable: format teks bebas, tidak ada displayValue dari hook
+        // - maskable: pakai displayValue dari hook (dengan '_' untuk slot kosong)
+        // - non-maskable (MMMM dll): pakai format teks dari selectedDate
         const inputValue = isMaskable ? displayValue : selectedDate ? formatDate(selectedDate, format) : '';
 
         // ── Render ────────────────────────────────────────────────────────────────
@@ -270,8 +286,9 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                             required={required}
                             value={inputValue}
                             placeholder={computedPlaceholder}
-                            // onChange dikosongkan karena semua input dihandle lewat onKeyDown
-                            // React butuh onChange agar tidak warning "controlled without onChange"
+                            // onChange dikosongkan: semua input masuk lewat onKeyDown.
+                            // React membutuhkan handler ini agar tidak warning
+                            // "controlled input without onChange handler".
                             onChange={() => {}}
                             onBlur={handleInputBlur}
                             onKeyDown={handleInputKeyDown}
@@ -306,10 +323,10 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                         )}
 
                         {/*
-                            PENTING: Tooltip wrap di LUAR PopoverTrigger.
-                            PopoverTrigger asChild meng-clone child ke DOM element.
-                            Jika child adalah <Tooltip> (bukan DOM), asChild gagal
-                            meneruskan event click sehingga popover tidak terbuka.
+                            PENTING: Tooltip harus wrap di LUAR PopoverTrigger.
+                            PopoverTrigger asChild meng-clone child langsung ke DOM.
+                            Jika child adalah <Tooltip> (bukan DOM element), asChild
+                            gagal meneruskan click event → popover tidak terbuka.
                         */}
                         <Popover open={isOpen} onOpenChange={handleOpenChange}>
                             <Tooltip>
@@ -361,6 +378,12 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                             </PopoverContent>
                         </Popover>
                     </div>
+
+                    {isInvalid && (
+                        <p id={errorId} role="alert" aria-live="polite" className="text-xs leading-tight text-destructive">
+                            {validationError}
+                        </p>
+                    )}
                 </div>
             </TooltipProvider>
         );
