@@ -10,9 +10,13 @@ dayjs.extend(localizedFormat);
 dayjs.locale('id');
 
 export function formatDate(date: string | Date, format: string) {
-    return dayjs.utc(date).tz('Asia/Makassar').format(format);
+    if (!date) return '';
+    const parsed = dayjs.utc(date).tz('Asia/Makassar');
+    return parsed.isValid() ? parsed.format(format) : '';
 }
 
 export function witaToUtc(date: string | Date) {
-    return dayjs.tz(`${date} 00:00`, 'DD-MM-YYYY HH:mm', 'Asia/Makassar').utc().format('YYYY-MM-DDTHH:mm:ss[.000000Z]');
+    if (!date) return '';
+    const parsed = dayjs.tz(`${date} 00:00`, 'DD-MM-YYYY HH:mm', 'Asia/Makassar');
+    return parsed.isValid() ? parsed.utc().format('YYYY-MM-DDTHH:mm:ss[.000000Z]') : '';
 }
