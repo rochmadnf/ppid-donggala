@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Console\Profile;
 
+use App\Enums\EducationLevelEnum;
+use App\Enums\MaritalStatusEnum;
+use App\Enums\ReligionEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\PublicOfficerRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Response as InertiaResponse;
 
@@ -64,11 +68,24 @@ class PublicOfficerController extends Controller
                     ],
                 ]),
             ),
-            'resources' => $publicOfficer,
+            'resources' => [
+                'data' => $publicOfficer->resolve(),
+                'educations' => EducationLevelEnum::options(),
+                'religions' => ReligionEnum::options(),
+                'maritalStatuses' => MaritalStatusEnum::options(),
+            ],
         ]);
     }
 
-    public function updatePhoto(PublicOfficerRequest $request, string $poid): \Illuminate\Http\RedirectResponse
+    public function update(PublicOfficerRequest $request, string $poid): RedirectResponse
+    {
+        $publicOfficer = $this->poRepo->find(value: $poid, columnName: 'uuid', wrap: false);
+        $publicOfficer->update($request->whenFulfill());
+
+        return back()->with('success', 'Data berhasil diperbarui!');
+    }
+
+    public function updatePhoto(PublicOfficerRequest $request, string $poid): RedirectResponse
     {
         $publicOfficer = $this->poRepo->find(value: $poid, columnName: 'uuid', wrap: false);
 

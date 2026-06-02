@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Profile;
 
-use Illuminate\Contracts\Validation\ValidationRule;
+use App\Enums\{EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
-use SanderMuller\FluentValidation\FluentRule;
-use SanderMuller\FluentValidation\HasFluentRules;
+use SanderMuller\FluentValidation\{FluentRule, HasFluentRules};
 
 class PublicOfficerRequest extends FormRequest
 {
@@ -33,13 +33,76 @@ class PublicOfficerRequest extends FormRequest
         ];
     }
 
+    protected function baseRules(): array
+    {
+        return [
+            'name' => FluentRule::string()->bail()->required()->min(3)->max(100),
+            'last_education' => FluentRule::enum(EducationLevelEnum::class)->bail()->required(),
+            'birth_date' => FluentRule::date()->bail()->required()->beforeToday()->format('Y-m-d\TH:i:s.u\Z'),
+            'birth_place' => FluentRule::string()->bail()->required()->min(3)->max(100),
+            'religion' => FluentRule::enum(ReligionEnum::class)->bail()->required(),
+            'marital_status' => FluentRule::enum(MaritalStatusEnum::class)->bail()->required(),
+            'gender' => FluentRule::boolean()->bail()->required(),
+            'is_active' => FluentRule::boolean()->bail()->required(),
+            'period_start' => FluentRule::date()->bail()->required()->beforeToday()->format('Y-m-d\TH:i:s.u\Z'),
+            'period_end' => FluentRule::date()->bail()->requiredIf(fn() => !$this->is_active)->nullable()->when(value: fn() => !is_null($this->period_start), callback: function ($rule) {
+                return $rule->after($this->period_start);
+            })->format('Y-m-d\TH:i:s.u\Z'),
+
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Nama',
+            'last_education' => 'Pendidikan Terakhir',
+            'birth_date' => 'Tanggal Lahir',
+            'birth_place' => 'Tempat Lahir',
+            'religion' => 'Agama',
+            'marital_status' => 'Status Perkawinan',
+            'is_active' => 'Status Keaktifan',
+            'period_start' => 'Periode Awal',
+            'period_end' => 'Periode Akhir',
+            'office.id' => 'Perangkat Daerah',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'date_format' => "Format tanggal harus 'Hari-Bulan-Tahun'",
+            'period_end.after' => "Tanggal Periode Akhir harus setelah tanggal Periode Awal",
+        ];
+    }
+
     public function rules(): array
     {
         $rules = match ($this->route()->getName()) {
             "{$this->baseRouteName}.photo.update" => $this->photoUpdateRules(),
-            default => [],
+            default => $this->baseRules(),
         };
 
         return $rules;
+    }
+
+    protected function setToWita(string $date, string $format = 'Y-m-d'): string
+    {
+        return Carbon::parse($date)->setTimezone(config('app.timezone'))->format($format);
+    }
+
+    public function whenFulfill(): array
+    {
+        $data = $this->validated();
+        if (!$this->hasFile('photo')) {
+            $data = array_merge($data, [
+                'fullname' => $data['name'],
+                'birth_date' => $this->setToWita($data['birth_date']),
+                'period_start' => $this->setToWita($data['period_start']),
+                'period_end' => !is_null($data['period_end']) ? $this->setToWita($data['period_end']) : null,
+            ]);
+        }
+
+        return $data;
     }
 }

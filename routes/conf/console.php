@@ -48,6 +48,8 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
                 Route::prefix('d')->group(function () {
                     Route::get('{poid}', 'show')->name('show');
                     Route::post('{poid}/photo', 'updatePhoto')->name('photo.update');
+
+                    Route::put('{poid}', 'update')->name('update');
                 });
             });
     });

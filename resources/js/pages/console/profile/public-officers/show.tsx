@@ -8,14 +8,16 @@ import { formatDate } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import { ImagesIcon } from 'lucide-react';
+import { ImagesIcon, PencilLineIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
-import type { PublicInformationShowProps } from './types';
+import { PublicOfficerForm } from './components/form';
+import type { PublicOfficerShowProps } from './types';
 
 export default function PublicOfficerShow() {
-    const { page, resources } = usePage<PageDataProps & PublicInformationShowProps>().props;
+    const { page, resources } = usePage<PageDataProps & PublicOfficerShowProps>().props;
     const [openCrop, setOpenCrop] = useState<boolean>(false);
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
     const photoForm = useForm<{ photo: File | null }>({
         photo: null,
@@ -45,8 +47,6 @@ export default function PublicOfficerShow() {
                 <link rel="canonical" href={route('console.profile.public-officers.index')} />
             </MetaTag>
 
-            {/* <pre>{JSON.stringify(resources.data, null, 2)}</pre> */}
-
             <div className="flex flex-col gap-y-4">
                 {/* Personal Info */}
                 <ShowCard title={false}>
@@ -58,6 +58,16 @@ export default function PublicOfficerShow() {
                             )}
                         ></div>
                         <div className={cn('absolute -top-2 right-0 size-3 rounded-full', officer.is_active ? 'bg-green-500' : 'bg-red-500')}></div>
+
+                        {/* edit button */}
+                        <Button
+                            size={'icon'}
+                            onClick={() => setIsDialogOpen(true)}
+                            variant={'edit'}
+                            className="absolute right-0 bottom-2 cursor-pointer rounded-full"
+                        >
+                            <PencilLineIcon />
+                        </Button>
 
                         <div className="group/pop relative h-fit w-full max-w-85 rounded-md shadow-md shadow-gray-500/20 transition duration-300">
                             <AspectRatio ratio={4 / 5} className="rounded-md">
@@ -108,7 +118,7 @@ export default function PublicOfficerShow() {
                                 },
                                 {
                                     th: 'Pendidikan Terakhir',
-                                    td: officer.last_education,
+                                    td: resources.educations.find((edu) => edu.id === officer.last_education)?.label || officer.last_education,
                                 },
                                 {
                                     th: 'Tempat, Tanggal Lahir',
@@ -116,22 +126,24 @@ export default function PublicOfficerShow() {
                                 },
                                 {
                                     th: 'Jenis Kelamin',
-                                    td: officer.gender,
+                                    td: officer.gender.toString() === '0' ? 'Perempuan' : 'Laki-Laki',
                                 },
                                 {
                                     th: 'Agama',
-                                    td: officer.religion,
+                                    td: resources.religions.find((religion) => religion.id === officer.religion)?.label || officer.religion,
                                 },
                                 {
-                                    th: 'Status',
-                                    td: officer.marital_status,
+                                    th: 'Status Perkawinan',
+                                    td:
+                                        resources.maritalStatuses.find((status) => status.id === officer.marital_status)?.label ||
+                                        officer.marital_status,
                                 },
                                 {
                                     th: 'Periode',
                                     td:
                                         formatDate(officer.period_start, 'L') +
                                         ' - ' +
-                                        (officer.period_end === 'Sekarang' ? 'Sekarang' : formatDate(officer.period_end, 'L')),
+                                        (officer.period_end === null ? 'Sekarang' : formatDate(officer.period_end, 'L')),
                                 },
                             ].map(({ th, td }, idx) => (
                                 <div key={th + td + idx} className="flex flex-row justify-between border-b border-line-brand px-2 py-3">
@@ -149,6 +161,8 @@ export default function PublicOfficerShow() {
 
                 <ShowCard title="Riwayat Organisasi" /> */}
             </div>
+
+            <PublicOfficerForm open={isDialogOpen} onOpenChange={setIsDialogOpen} selectedRecord={officer} />
         </>
     );
 }

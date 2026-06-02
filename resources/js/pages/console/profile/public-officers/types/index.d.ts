@@ -1,6 +1,17 @@
 import type { PaginationMetaProps } from '@/types/pagination';
 
-export interface PublicInformationDataIndexProps {
+export interface EnumOptionType {
+    id: string;
+    label: string;
+}
+
+export interface PublicOfficerForm {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    selectedRecord: PublicOfficerDataShowProps | null;
+}
+
+export interface PublicOfficerDataIndexProps {
     id: string;
     name: string;
     office: {
@@ -16,7 +27,7 @@ export interface PublicInformationDataIndexProps {
     photo: string;
 }
 
-export interface PublicInformationDataShowProps extends PublicInformationDataIndexProps {
+export interface PublicOfficerDataShowProps extends PublicOfficerDataIndexProps {
     birth_place: string;
     birth_date: string;
     last_education: string;
@@ -24,18 +35,20 @@ export interface PublicInformationDataShowProps extends PublicInformationDataInd
     marital_status: string;
     religion: string;
     period_start: string;
-    period_end: string;
+    period_end: string | null;
 }
 
-export interface PublicInformationShowProps {
+export interface PublicOfficerShowProps {
     resources: {
-        data: PublicInformationDataShowProps;
-        meta: PaginationMetaProps;
+        data: PublicOfficerDataShowProps;
+        educations: EnumOptionType[];
+        religions: EnumOptionType[];
+        maritalStatuses: EnumOptionType[];
     };
 }
-export interface PublicInformationIndexProps {
+export interface PublicOfficerIndexProps {
     resources: {
-        data: PublicInformationDataIndexProps[];
+        data: PublicOfficerDataIndexProps[];
         meta: PaginationMetaProps;
     };
 }

@@ -49,12 +49,12 @@ class PublicOfficerResource extends JsonResource
             return array_merge($base, [
                 'birth_place' => $this->birth_place,
                 'birth_date' => $this->birth_date,
-                'last_education' => $this->last_education->label(),
-                'gender' => $this->gender === 1 ? 'Laki-laki' : 'Perempuan',
-                'religion' => $this->religion->label(),
-                'marital_status' => $this->marital_status->label(),
+                'last_education' => $this->last_education,
+                'gender' => $this->gender,
+                'religion' => $this->religion,
+                'marital_status' => $this->marital_status,
                 'period_start' => $this->period_start,
-                'period_end' => is_null($this->period_end) ? "Sekarang" : $this->period_end,
+                'period_end' => $this->period_end,
             ]);
         }
 
