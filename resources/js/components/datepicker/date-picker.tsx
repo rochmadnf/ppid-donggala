@@ -40,6 +40,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             returnType = 'string',
             minDate,
             maxDate,
+            tabIndex = 0,
             id,
             name,
             'aria-label': ariaLabel,
@@ -272,6 +273,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                             type="text"
                             inputMode={isMaskable ? 'numeric' : 'text'}
                             role="combobox"
+                            tabIndex={tabIndex}
                             aria-expanded={isOpen}
                             aria-haspopup="dialog"
                             aria-invalid={isInvalid}

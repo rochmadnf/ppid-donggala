@@ -64,6 +64,8 @@ export interface DatePickerProps {
     /** Name attribute for the <input> element — needed for native form submissions */
     name?: string;
 
+    tabIndex?: number;
+
     /**
      * Side of the calendar popover relative to the trigger button.
      * @default "bottom" (Radix default)
