@@ -39,6 +39,7 @@ export default function Login() {
 
             <form onSubmit={hitLoginButton} className="space-y-6">
                 <FormInput
+                    inputSize="lg"
                     label="Nama Pengguna"
                     name="username"
                     autoFocus
@@ -50,6 +51,7 @@ export default function Login() {
                 />
 
                 <FormInput
+                    inputSize="lg"
                     label="Katasandi"
                     type="password"
                     tabIndex={2}
