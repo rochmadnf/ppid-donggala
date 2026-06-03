@@ -203,18 +203,20 @@ export function FormCombobox<T extends { id: string | number }>({
     );
 }
 
-export const fetchComboboxOptions = async (query: string): Promise<OfficeDataProps[]> => {
-    try {
-        if (query.length < 2) return [];
+export const ComboboxFetcher = <T,>(routeName: string, params?: Record<string, unknown>, minLength = 2) => {
+    return async (query: string): Promise<T[]> => {
+        try {
+            if (query.length < minLength) return [];
 
-        const response = await axios.get(route('console.master-data.offices.index'), {
-            params: { to: 'cb', keyword: query, per_page: 15 },
-        });
+            const response = await axios.get(route(routeName), {
+                params: { keyword: query, per_page: 15, ...params },
+            });
 
-        return response.data;
-    } catch {
-        return [];
-    }
+            return response.data;
+        } catch {
+            return [];
+        }
+    };
 };
 
 export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }: PublicOfficerForm) {
@@ -358,7 +360,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         key={selectedRecord?.id ?? 'new'}
                         label="Pilih Perangkat Daerah"
                         getLabel={(u) => u.name.raw}
-                        onSearch={async (q) => fetchComboboxOptions(q)}
+                        onSearch={ComboboxFetcher<OfficeDataProps>('console.master-data.offices.index', { to: 'cb' })}
                         onChange={(opt) => form.setData('office', { id: opt?.id ?? '', name: opt?.name.raw ?? '', alias: opt?.name.alias ?? '' })}
                         defaultValue={
                             selectedRecord
