@@ -1,17 +1,13 @@
-import {
-    useEffect,
-    useRef,
-    type HTMLAttributes,
-} from "react";
-import { Search } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
-import { useComboBoxContext } from "../combobox";
-import { useKeyboardNavigation } from "../hooks/use-keyboard-navigation";
-import { ComboBoxItem } from "./combobox-item";
-import { ComboBoxEmpty } from "./combobox-empty";
-import { ComboBoxCreate } from "./combobox-create";
-import { ComboBoxLoading } from "./combobox-loading";
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
+import { Search } from 'lucide-react';
+import { useEffect, useRef, type HTMLAttributes } from 'react';
+import { useComboBoxContext } from '../combobox';
+import { useKeyboardNavigation } from '../hooks/use-keyboard-navigation';
+import { ComboBoxCreate } from './combobox-create';
+import { ComboBoxEmpty } from './combobox-empty';
+import { ComboBoxItem } from './combobox-item';
+import { ComboBoxLoading } from './combobox-loading';
 
 interface ComboBoxContentProps extends HTMLAttributes<HTMLDivElement> {
     id?: string;
@@ -59,7 +55,7 @@ export function ComboBoxContent({ id, className }: ComboBoxContentProps) {
         onClose: () => setOpen(false),
         hasCreateAction,
         onCreateTrigger: () => {
-            if (createMode === "modal") {
+            if (createMode === 'modal') {
                 setShowCreateModal(true);
             } else {
                 handleCreate(query.trim());
@@ -68,11 +64,7 @@ export function ComboBoxContent({ id, className }: ComboBoxContentProps) {
     });
 
     return (
-        <div
-            className={cn("flex flex-col", className)}
-            onKeyDown={handleKeyDown}
-            data-combobox-content
-        >
+        <div className={cn('flex flex-col', className)} onKeyDown={handleKeyDown} data-combobox-content>
             {/* Search input — sticky at top */}
             {searchable && (
                 <div className="flex items-center border-b px-3">
@@ -83,10 +75,7 @@ export function ComboBoxContent({ id, className }: ComboBoxContentProps) {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="Cari…"
-                        className={cn(
-                            "flex h-10 w-full bg-transparent py-3 text-sm outline-none",
-                            "placeholder:text-muted-foreground"
-                        )}
+                        className={cn('flex h-10 w-full bg-transparent py-3 text-sm outline-none', 'placeholder:text-muted-foreground')}
                         aria-label="Search options"
                         autoComplete="off"
                         spellCheck={false}
@@ -95,13 +84,8 @@ export function ComboBoxContent({ id, className }: ComboBoxContentProps) {
             )}
 
             {/* Option list */}
-            <ScrollArea className="max-h-64">
-                <div
-                    role="listbox"
-                    id={id}
-                    aria-multiselectable={useComboBoxContext().multiple}
-                    className="p-1"
-                >
+            <ScrollArea className="h-full">
+                <div role="listbox" id={id} aria-multiselectable={useComboBoxContext().multiple} className="max-h-64 p-1">
                     {isLoading ? (
                         <ComboBoxLoading />
                     ) : !hasResults && !hasCreateAction ? (
