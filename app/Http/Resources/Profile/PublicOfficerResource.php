@@ -36,6 +36,7 @@ class PublicOfficerResource extends JsonResource
                 'id' => $this->office->uuid,
                 'name' => $this->office->name,
                 'alias' => $this->office->alias,
+                'rank' => $this->office->rank,
             ],
             'position' => [
                 'id' => $this->position->uuid,

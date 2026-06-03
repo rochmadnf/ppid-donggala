@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatDate, witaToUtc } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import type { OfficeDataProps } from '@/pages/console/master-data/offices/types';
+import type { PositionDataProps } from '@/pages/console/master-data/positions/types';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
@@ -28,6 +29,7 @@ const EMPTY_FORM: PublicOfficerDataShowProps = {
         id: '',
         name: '',
         alias: '',
+        rank: null,
     },
     is_active: true,
     photo: '',
@@ -136,6 +138,7 @@ export interface FormComboboxProps<T extends { id: string | number }> {
     onSearch: (query: string) => Promise<T[]>;
     onChange?: (value: T | null) => void;
     defaultValue?: T | null;
+    error?: string;
 }
 
 export function FormCombobox<T extends { id: string | number }>({
@@ -144,6 +147,7 @@ export function FormCombobox<T extends { id: string | number }>({
     getLabel,
     onSearch,
     onChange,
+    error = '',
     defaultValue = null,
 }: FormComboboxProps<T>) {
     const [rawOptions, setRawOptions] = useState<T[]>([]);
@@ -151,6 +155,7 @@ export function FormCombobox<T extends { id: string | number }>({
     const [value, setValue] = useState<T | null>(defaultValue);
 
     useEffect(() => {
+        console.log('defaultValue changed:', defaultValue);
         setValue(defaultValue ?? null);
         if (defaultValue) {
             setRawOptions((prev) => {
@@ -189,21 +194,23 @@ export function FormCombobox<T extends { id: string | number }>({
     };
 
     return (
-        <div className="space-y-2">
+        <div className="w-full space-y-2">
             {label && <Label>{label}</Label>}
             <ComboBox
                 options={options}
                 value={value ? String(value.id) : undefined}
                 placeholder={placeholder}
                 loading={loading}
+                debounceDelay={800}
                 onSearch={handleSearch}
                 onChange={handleChange}
             />
+            <InputErrorMessage className="mt-2" message={error} />
         </div>
     );
 }
 
-export const ComboboxFetcher = <T,>(routeName: string, params?: Record<string, unknown>, minLength = 2) => {
+export const ComboboxFetcher = <T,>(routeName: string, params?: Record<string, unknown>, minLength = 1) => {
     return async (query: string): Promise<T[]> => {
         try {
             if (query.length < minLength) return [];
@@ -356,24 +363,63 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         />
                     </RowWrapper>
 
-                    <FormCombobox<OfficeDataProps>
-                        key={selectedRecord?.id ?? 'new'}
-                        label="Pilih Perangkat Daerah"
-                        getLabel={(u) => u.name.raw}
-                        onSearch={ComboboxFetcher<OfficeDataProps>('console.master-data.offices.index', { to: 'cb' })}
-                        onChange={(opt) => form.setData('office', { id: opt?.id ?? '', name: opt?.name.raw ?? '', alias: opt?.name.alias ?? '' })}
-                        defaultValue={
-                            selectedRecord
-                                ? ({
-                                      id: selectedRecord.office.id,
-                                      name: {
-                                          raw: selectedRecord.office.name,
-                                          alias: selectedRecord.office.alias,
-                                      },
-                                  } as OfficeDataProps)
-                                : null
-                        }
-                    />
+                    <RowWrapper className="items-start">
+                        <FormCombobox<OfficeDataProps>
+                            key={`office-${selectedRecord?.id ?? 'new'}`}
+                            label="Pilih Perangkat Daerah"
+                            getLabel={(u) => u.name.raw}
+                            error={form.errors['office.id']}
+                            onSearch={ComboboxFetcher<OfficeDataProps>('console.master-data.offices.index', { to: 'cb' })}
+                            onChange={(opt) => {
+                                form.setData({
+                                    ...form.data,
+                                    office: {
+                                        id: opt?.id ?? '',
+                                        name: opt?.name.raw ?? '',
+                                        alias: opt?.name.alias ?? '',
+                                        rank: opt?.rank?.id ?? null,
+                                    },
+                                    position: { id: '', name: '' }, // ← reset position sekaligus
+                                });
+                            }}
+                            defaultValue={
+                                form.data.office?.id
+                                    ? ({
+                                          id: form.data.office.id,
+                                          name: {
+                                              raw: form.data.office.name,
+                                              alias: form.data.office.alias,
+                                          },
+                                          rank: {
+                                              id: form.data.office.rank,
+                                          },
+                                      } as OfficeDataProps)
+                                    : null
+                            }
+                        />
+
+                        <FormCombobox<PositionDataProps>
+                            key={`position-${selectedRecord?.id ?? 'new'}-${form.data.office?.id}`}
+                            label="Pilih Jabatan"
+                            getLabel={(u) => u.name}
+                            error={form.errors['position.id']}
+                            onSearch={ComboboxFetcher<PositionDataProps>('console.master-data.positions.index', { for: form.data.office?.rank })}
+                            onChange={(opt) =>
+                                form.setData('position', {
+                                    id: opt?.id ?? '',
+                                    name: opt?.name ?? '',
+                                })
+                            }
+                            defaultValue={
+                                form.data.position?.id
+                                    ? ({
+                                          id: form.data.position.id,
+                                          name: form.data.position.name,
+                                      } as PositionDataProps)
+                                    : null
+                            }
+                        />
+                    </RowWrapper>
 
                     <FormSelect
                         wrapperClassName="w-full"

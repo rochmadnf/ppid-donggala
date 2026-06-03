@@ -26,6 +26,14 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
                 Route::put('{office_id}', 'update')->name('update');
                 Route::delete('{office_id}', 'destroy')->name('destroy');
             });
+
+        //@positions
+        Route::controller(MasterData\PositionController::class)
+            ->prefix('positions')
+            ->name('positions.')
+            ->group(function () {
+                Route::get('', 'index')->name('index');
+            });
     });
 
     // @profile

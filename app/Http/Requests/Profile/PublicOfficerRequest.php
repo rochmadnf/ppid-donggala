@@ -20,6 +20,20 @@ class PublicOfficerRequest extends FormRequest
         return auth()->user()->getRoleNames()->first() === config('permission.superior_role_name');
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'office' => [
+                ...$this->input('office', []),
+                'id' => DB::table('offices')->where('uuid', $this->office['id'])->value('id'),
+            ],
+            'position' => [
+                ...$this->input('position', []),
+                'id' => DB::table('positions')->where('uuid', $this->position['id'])->value('id'),
+            ],
+        ]);
+    }
+
     protected function photoUpdateRules(): array
     {
         return [
@@ -34,6 +48,11 @@ class PublicOfficerRequest extends FormRequest
         ];
     }
 
+    protected function updateRoute(): string
+    {
+        return $this->route()->getName() === "{$this->baseRouteName}.update";
+    }
+
     protected function baseRules(): array
     {
         return [
@@ -45,12 +64,18 @@ class PublicOfficerRequest extends FormRequest
             'marital_status' => FluentRule::enum(MaritalStatusEnum::class)->bail()->required(),
             'gender' => FluentRule::boolean()->bail()->required(),
             'is_active' => FluentRule::boolean()->bail()->required(),
-            'office.id' => FluentRule::uuid()->bail()->required()->exists(table: 'offices', column: 'uuid'),
+            'office.id' => FluentRule::integer()->bail()->required()->exists(table: 'offices', column: 'id'),
+            'position.id' => FluentRule::integer()->bail()->required()
+                ->exists(table: 'positions', column: 'id', callback: fn($eq) => $eq->where('only_for', $this->office['rank']))
+                ->unique(
+                    table: 'public_officers',
+                    column: 'position_id',
+                    callback: fn($uq) => ($this->updateRoute()) ? $uq->where('office_id', $this->office['id'])->where('is_active', true)->ignore(id: $this->id, idColumn: 'uuid') : null
+                ),
             'period_start' => FluentRule::date()->bail()->required()->beforeToday()->format('Y-m-d\TH:i:s.u\Z'),
             'period_end' => FluentRule::date()->bail()->requiredIf(fn() => !$this->is_active)->nullable()->when(value: fn() => !is_null($this->period_start), callback: function ($rule) {
                 return $rule->after($this->period_start);
             })->format('Y-m-d\TH:i:s.u\Z'),
-
         ];
     }
 
@@ -67,6 +92,7 @@ class PublicOfficerRequest extends FormRequest
             'period_start' => 'Periode Awal',
             'period_end' => 'Periode Akhir',
             'office.id' => 'Perangkat Daerah',
+            'position.id' => 'Jabatan',
         ];
     }
 
@@ -96,11 +122,13 @@ class PublicOfficerRequest extends FormRequest
     public function whenFulfill(): array
     {
         $data = $this->validated();
+
         if (!$this->hasFile('photo')) {
             $data = array_merge($data, [
                 'fullname' => $data['name'],
                 'birth_date' => $this->setToWita($data['birth_date']),
-                'office_id' => DB::table('offices')->where('uuid', $data['office']['id'])->value('id'),
+                'office_id' => $this->office['id'],
+                'position_id' => $this->position['id'],
                 'period_start' => $this->setToWita($data['period_start']),
                 'period_end' => !is_null($data['period_end']) ? $this->setToWita($data['period_end']) : null,
             ]);

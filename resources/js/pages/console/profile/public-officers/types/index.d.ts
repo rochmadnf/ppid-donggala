@@ -18,6 +18,7 @@ export interface PublicOfficerDataIndexProps {
         id: string;
         name: string;
         alias: string;
+        rank: number | null;
     };
     position: {
         id: string;
