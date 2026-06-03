@@ -28,6 +28,7 @@ export interface ComboBoxProps {
     multiple?: boolean;
     disabled?: boolean;
     className?: string;
+    debounceDelay?: number;
     onChange?: (value: Option | Option[] | null) => void;
     onSearch?: (query: string) => Promise<void>;
     onCreate?: (value: string) => Promise<Option>;

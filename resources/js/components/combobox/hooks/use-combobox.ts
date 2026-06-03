@@ -1,7 +1,3 @@
-// ============================================================
-// hooks/use-combobox.ts — Core state & logic for ComboBox
-// ============================================================
-
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import type { ComboBoxProps, Option } from '../types';
 import { useDebouncedCallback } from './use-debounce';
@@ -22,6 +18,7 @@ export function useComboBox({
     onCreate,
     onDelete,
     filterFn = DEFAULT_FILTER,
+    debounceDelay = 350,
 }: ComboBoxProps) {
     // ── Popover open state ──────────────────────────────────────
     const [open, setOpenState] = useState(false);
@@ -81,10 +78,8 @@ export function useComboBox({
     // ── Debounced remote search ──────────────────────────────────
     const debouncedSearch = useDebouncedCallback(async (q: string) => {
         if (!onSearch) return;
-        startSearch(async () => {
-            await onSearch(q);
-        });
-    }, 350);
+        startSearch(async () => await onSearch(q));
+    }, debounceDelay);
 
     // ── Open/close helpers ───────────────────────────────────────
     const setOpen = useCallback((next: boolean) => {

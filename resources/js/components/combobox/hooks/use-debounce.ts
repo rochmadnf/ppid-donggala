@@ -1,8 +1,4 @@
-// ============================================================
-// hooks/use-debounce.ts
-// ============================================================
-
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Debounces a value — only updates after `delay` ms of inactivity.
@@ -11,14 +7,14 @@ import { useEffect, useRef, useState } from "react";
  * const debouncedQuery = useDebounce(query, 300);
  */
 export function useDebounce<T>(value: T, delay = 300): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+    const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedValue(value), delay);
+        return () => clearTimeout(timer);
+    }, [value, delay]);
 
-  return debouncedValue;
+    return debouncedValue;
 }
 
 /**
@@ -28,22 +24,24 @@ export function useDebounce<T>(value: T, delay = 300): T {
  * @example
  * const debouncedSearch = useDebouncedCallback(onSearch, 300);
  */
-export function useDebouncedCallback<T extends (...args: Parameters<T>) => ReturnType<T>>(
-  fn: T,
-  delay = 300
-): (...args: Parameters<T>) => void {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const fnRef = useRef(fn);
+export function useDebouncedCallback<T extends (...args: Parameters<T>) => ReturnType<T>>(fn: T, delay = 300): (...args: Parameters<T>) => void {
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const fnRef = useRef(fn);
+    const delayRef = useRef(delay); // ← tambah ref untuk delay
 
-  // Keep fnRef current without resetting timer
-  useEffect(() => {
-    fnRef.current = fn;
-  });
+    useEffect(() => {
+        fnRef.current = fn;
+    });
 
-  return (...args: Parameters<T>) => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      fnRef.current(...args);
-    }, delay);
-  };
+    // Sync delay setiap render
+    useEffect(() => {
+        delayRef.current = delay;
+    }, [delay]);
+
+    return useCallback((...args: Parameters<T>) => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => {
+            fnRef.current(...args);
+        }, delayRef.current);
+    }, []);
 }
