@@ -18,7 +18,7 @@ trait SearchableScope
     public function scopeSearchByKeyword(Builder $query, string|array $defaultColumns = 'name'): void
     {
         $query->when(
-            request()->has('keyword') && strlen(request()->input('keyword')) > 0,
+            request()->has('keyword') && !is_null(request()->input('keyword')),
             fn(Builder $q)  => $q->when(is_array($defaultColumns), function (Builder $_q) use ($defaultColumns) {
                 $_q->where(function (Builder $q) use ($defaultColumns) {
                     foreach ($defaultColumns as $column) {
