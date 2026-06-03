@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MasterData\OfficeRequest;
 use Inertia\Response as InertiaResponse;
 use App\Http\Traits\{PageTrait, HandlePaginationTrait};
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 
 class OfficeController extends Controller
@@ -37,8 +38,14 @@ class OfficeController extends Controller
         ];
     }
 
-    public function index(): InertiaResponse
+    public function index(): InertiaResponse | JsonResponse
     {
+        $resources = $this->officeRepository->paginate(perPage: $this->defaultPerPage);
+
+        if (request()->has('to') && request()->input('to') === 'cb') {
+            return response()->json($resources->resolve());
+        }
+
         return inertia(
             'console/master-data/offices/index',
             [

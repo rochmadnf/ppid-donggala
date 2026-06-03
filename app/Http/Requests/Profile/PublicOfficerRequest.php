@@ -5,6 +5,7 @@ namespace App\Http\Requests\Profile;
 use App\Enums\{EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use SanderMuller\FluentValidation\{FluentRule, HasFluentRules};
 
 class PublicOfficerRequest extends FormRequest
@@ -44,6 +45,7 @@ class PublicOfficerRequest extends FormRequest
             'marital_status' => FluentRule::enum(MaritalStatusEnum::class)->bail()->required(),
             'gender' => FluentRule::boolean()->bail()->required(),
             'is_active' => FluentRule::boolean()->bail()->required(),
+            'office.id' => FluentRule::uuid()->bail()->required()->exists(table: 'offices', column: 'uuid'),
             'period_start' => FluentRule::date()->bail()->required()->beforeToday()->format('Y-m-d\TH:i:s.u\Z'),
             'period_end' => FluentRule::date()->bail()->requiredIf(fn() => !$this->is_active)->nullable()->when(value: fn() => !is_null($this->period_start), callback: function ($rule) {
                 return $rule->after($this->period_start);
@@ -98,6 +100,7 @@ class PublicOfficerRequest extends FormRequest
             $data = array_merge($data, [
                 'fullname' => $data['name'],
                 'birth_date' => $this->setToWita($data['birth_date']),
+                'office_id' => DB::table('offices')->where('uuid', $data['office']['id'])->value('id'),
                 'period_start' => $this->setToWita($data['period_start']),
                 'period_end' => !is_null($data['period_end']) ? $this->setToWita($data['period_end']) : null,
             ]);

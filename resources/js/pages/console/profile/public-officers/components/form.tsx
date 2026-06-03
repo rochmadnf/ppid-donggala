@@ -1,3 +1,4 @@
+import { ComboBox, type Option } from '@/components/combobox';
 import { DatePicker } from '@/components/datepicker/date-picker';
 import { FormInput } from '@/components/form/input';
 import { InputErrorMessage } from '@/components/input-error-message';
@@ -7,10 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatDate, witaToUtc } from '@/lib/date';
 import { cn } from '@/lib/utils';
+import type { OfficeDataProps } from '@/pages/console/master-data/offices/types';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import { LoaderCircleIcon, XIcon } from 'lucide-react';
-import type { SubmitEventHandler } from 'react';
+import { useEffect, useState, type SubmitEventHandler } from 'react';
 import toast from 'react-hot-toast';
 import type { EnumOptionType, PublicOfficerDataShowProps, PublicOfficerForm, PublicOfficerShowProps } from '../types';
 
@@ -63,7 +66,6 @@ function FormSelect({
     required?: boolean;
     tabIndex?: number;
 }) {
-    console.log('error:', name, error);
     return (
         <div className={cn('space-y-2', wrapperClassName)}>
             <Label htmlFor={name}>
@@ -127,6 +129,94 @@ function FormDatePicker({
     );
 }
 
+export interface FormComboboxProps<T extends { id: string | number }> {
+    label?: string;
+    placeholder?: string;
+    getLabel: (item: T) => string;
+    onSearch: (query: string) => Promise<T[]>;
+    onChange?: (value: T | null) => void;
+    defaultValue?: T | null;
+}
+
+export function FormCombobox<T extends { id: string | number }>({
+    label,
+    placeholder = 'Cari...',
+    getLabel,
+    onSearch,
+    onChange,
+    defaultValue = null,
+}: FormComboboxProps<T>) {
+    const [rawOptions, setRawOptions] = useState<T[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [value, setValue] = useState<T | null>(defaultValue);
+
+    useEffect(() => {
+        setValue(defaultValue ?? null);
+        if (defaultValue) {
+            setRawOptions((prev) => {
+                const exists = prev.some((o) => String(o.id) === String(defaultValue.id));
+                return exists ? prev : [defaultValue, ...prev];
+            });
+        }
+    }, [defaultValue?.id]);
+
+    const handleSearch = async (query: string) => {
+        setLoading(true);
+        try {
+            const results = await onSearch(query);
+            setRawOptions(results);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const options: Option[] = rawOptions.map((item) => ({
+        id: String(item.id),
+        label: getLabel(item),
+        meta: item as Record<string, unknown>,
+    }));
+
+    const handleChange = (opt: Option | Option[] | null) => {
+        if (Array.isArray(opt) || opt === null) {
+            setValue(null);
+            onChange?.(null);
+            return;
+        }
+
+        const original = rawOptions.find((item) => String(item.id) === String(opt.id)) ?? null;
+        setValue(original);
+        onChange?.(original);
+    };
+
+    return (
+        <div className="space-y-2">
+            {label && <Label>{label}</Label>}
+            <ComboBox
+                options={options}
+                value={value ? String(value.id) : undefined}
+                placeholder={placeholder}
+                loading={loading}
+                onSearch={handleSearch}
+                onChange={handleChange}
+            />
+        </div>
+    );
+}
+
+export const fetchComboboxOptions = async (query: string): Promise<OfficeDataProps[]> => {
+    try {
+        if (query.length < 2) return [];
+
+        const response = await axios.get(route('console.master-data.offices.index'), {
+            params: { to: 'cb', keyword: query, per_page: 15 },
+        });
+
+        return response.data;
+    } catch {
+        return [];
+    }
+};
+
 export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }: PublicOfficerForm) {
     const { resources } = usePage<PageDataProps & PublicOfficerShowProps>().props;
 
@@ -134,13 +224,11 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
 
     const handleSubmit: SubmitEventHandler = (e) => {
         e.preventDefault();
-
         if (selectedRecord !== null) {
             form.transform((data) => ({
                 ...data,
                 period_end: data.is_active ? null : data.period_end,
             }));
-
             form.put(route('console.profile.public-officers.update', selectedRecord.id), {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -265,6 +353,25 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                             tabIndex={7}
                         />
                     </RowWrapper>
+
+                    <FormCombobox<OfficeDataProps>
+                        key={selectedRecord?.id ?? 'new'}
+                        label="Pilih Perangkat Daerah"
+                        getLabel={(u) => u.name.raw}
+                        onSearch={async (q) => fetchComboboxOptions(q)}
+                        onChange={(opt) => form.setData('office', { id: opt?.id ?? '', name: opt?.name.raw ?? '', alias: opt?.name.alias ?? '' })}
+                        defaultValue={
+                            selectedRecord
+                                ? ({
+                                      id: selectedRecord.office.id,
+                                      name: {
+                                          raw: selectedRecord.office.name,
+                                          alias: selectedRecord.office.alias,
+                                      },
+                                  } as OfficeDataProps)
+                                : null
+                        }
+                    />
 
                     <FormSelect
                         wrapperClassName="w-full"
