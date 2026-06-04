@@ -76,11 +76,11 @@ class PublicOfficerRequest extends FormRequest
             'office.id' => FluentRule::integer()->bail()->required()->exists(table: 'offices', column: 'id'),
             'position.id' => FluentRule::integer()->bail()->required()
                 ->exists(table: 'positions', column: 'id', callback: fn($eq) => $eq->where('only_for', $this->office['rank']))
-                ->unique(
+                ->when(value: $this->is_active, callback: fn($rule) => $rule->unique(
                     table: 'public_officers',
                     column: 'position_id',
-                    callback: fn($uq) => ($this->updateRoute()) ? $uq->where('office_id', $this->office['id'])->where('is_active', true)->ignore(id: $this->id, idColumn: 'uuid') : null
-                ),
+                    callback: fn($uq) => ($this->updateRoute()) ? $uq->when($this->is_active, fn($_uq) => $_uq->where('office_id', $this->office['id'])->where('is_active', true))->ignore(id: $this->id, idColumn: 'uuid') : null
+                )),
             'period_start' => FluentRule::date()->bail()->required()->beforeToday()->format('Y-m-d\TH:i:s.u\Z'),
             'period_end' => FluentRule::date()->bail()->requiredIf(fn() => !$this->is_active)->nullable()->when(value: fn() => !is_null($this->period_start), callback: function ($rule) {
                 return $rule->after($this->period_start);
