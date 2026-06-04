@@ -17,6 +17,7 @@ export interface CreateFormProps {
 }
 
 export interface ComboBoxProps {
+    name: string;
     value?: string | string[];
     options: Option[];
     placeholder?: string;

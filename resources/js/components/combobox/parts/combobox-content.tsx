@@ -11,9 +11,10 @@ import { ComboBoxLoading } from './combobox-loading';
 
 interface ComboBoxContentProps extends HTMLAttributes<HTMLDivElement> {
     id?: string;
+    inputName?: string;
 }
 
-export function ComboBoxContent({ id, className }: ComboBoxContentProps) {
+export function ComboBoxContent({ id, className, inputName }: ComboBoxContentProps) {
     const {
         query,
         setQuery,
@@ -70,6 +71,7 @@ export function ComboBoxContent({ id, className }: ComboBoxContentProps) {
                 <div className="flex items-center border-b px-3">
                     <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
                     <input
+                        name={inputName}
                         id="combobox-search"
                         ref={searchRef}
                         value={query}

@@ -17,6 +17,7 @@ export function useComboBoxContext(): ComboBoxContextValue {
 
 // ── Root Component ────────────────────────────────────────────
 export function ComboBox({
+    name,
     value,
     options,
     placeholder = 'Select…',
@@ -40,6 +41,7 @@ export function ComboBox({
     const id = useId();
 
     const state = useComboBox({
+        name,
         value,
         options,
         searchable,
@@ -85,7 +87,7 @@ export function ComboBox({
                     sideOffset={6}
                     onOpenAutoFocus={(e) => e.preventDefault()}
                 >
-                    <ComboBoxContent id={`combobox-listbox-${id}`} />
+                    <ComboBoxContent inputName={name} id={`combobox-listbox-${id}`} />
                 </PopoverContent>
             </Popover>
 

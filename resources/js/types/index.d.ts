@@ -37,3 +37,8 @@ export interface PageDataProps {
     };
     [key: string]: unknown;
 }
+
+export interface EnumOptionType {
+    id: string;
+    label: string;
+}

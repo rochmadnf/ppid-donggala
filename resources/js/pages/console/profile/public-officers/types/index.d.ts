@@ -1,9 +1,5 @@
+import type { EnumOptionType } from '@/types';
 import type { PaginationMetaProps } from '@/types/pagination';
-
-export interface EnumOptionType {
-    id: string;
-    label: string;
-}
 
 export interface PublicOfficerForm {
     open: boolean;

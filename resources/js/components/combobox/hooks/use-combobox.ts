@@ -5,6 +5,7 @@ import { useDebouncedCallback } from './use-debounce';
 const DEFAULT_FILTER = (option: Option, query: string): boolean => option.label.toLowerCase().includes(query.toLowerCase());
 
 export function useComboBox({
+    name,
     value,
     options: externalOptions,
     multiple = false,
