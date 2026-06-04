@@ -19,11 +19,11 @@ implements \App\Repositories\Contracts\MasterData\OfficeRepositoryInterface
         );
     }
 
-    public function paginate(array $relations = [], int $perPage = 10): JsonResource
+    public function paginate(array $relations = [], array $searchFields = ['name', 'alias'], int $perPage = 10): JsonResource
     {
         $offices = Office::sortByRankAndName()
             ->withMerger()
-            ->searchByKeyword(['name', 'alias'])
+            ->searchByKeyword($searchFields)
             ->excludeMerged()
             ->paginate(perPage: request()->input('per_page', $perPage));
 

@@ -17,9 +17,9 @@ abstract class BaseRepository
         //
     }
 
-    public function paginate(array $relations = [], int $perPage = 10): JsonResource
+    public function paginate(array $relations = [], array $searchFields = ['name'], int $perPage = 10): JsonResource
     {
-        $records = $this->model->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))->paginate(perPage: request()->input('per_page', $perPage));
+        $records = $this->model->when(method_exists($this->model, 'scopeSearchByKeyword'), fn($qSearch) => $qSearch->searchByKeyword($searchFields))->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))->paginate(perPage: request()->input('per_page', $perPage));
 
         return $this->resource::collection($records);
     }
