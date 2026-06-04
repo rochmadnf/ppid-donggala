@@ -34,8 +34,6 @@ class PublicOfficerSeeder extends Seeder
             $record = \App\Models\Profile\PublicOfficer::firstOrCreate([
                 'fullname' => $officer['fullname']
             ], Arr::except($officer, ['fullname']));
-
-            dd($record);
         });
     }
 }
