@@ -1,22 +1,19 @@
-import { ComboBox, type Option } from '@/components/combobox';
-import { DatePicker } from '@/components/datepicker/date-picker';
+import { ComboboxFetcher, FormCombobox } from '@/components/form/combobox';
+import { FormDatePicker } from '@/components/form/date-picker';
 import { FormInput } from '@/components/form/input';
-import { InputErrorMessage } from '@/components/input-error-message';
+import { FormSelect } from '@/components/form/select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatDate, witaToUtc } from '@/lib/date';
+import { witaToUtc } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import type { OfficeDataProps } from '@/pages/console/master-data/offices/types';
 import type { PositionDataProps } from '@/pages/console/master-data/positions/types';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import axios from 'axios';
 import { LoaderCircleIcon, XIcon } from 'lucide-react';
-import { useEffect, useState, type SubmitEventHandler } from 'react';
+import { type SubmitEventHandler } from 'react';
 import toast from 'react-hot-toast';
-import type { EnumOptionType, PublicOfficerDataShowProps, PublicOfficerForm, PublicOfficerFormPageProps } from '../types';
+import type { PublicOfficerDataShowProps, PublicOfficerForm, PublicOfficerFormPageProps } from '../types';
 
 const EMPTY_FORM: PublicOfficerDataShowProps = {
     id: '',
@@ -46,184 +43,6 @@ const EMPTY_FORM: PublicOfficerDataShowProps = {
 function RowWrapper({ children, className }: { children: React.ReactNode; className?: string }) {
     return <div className={cn(`flex flex-row items-center justify-between gap-x-2`, className)}>{children}</div>;
 }
-
-function FormSelect({
-    name,
-    label,
-    options,
-    value,
-    onChange,
-    wrapperClassName,
-    error,
-    required = false,
-    tabIndex,
-}: {
-    name: string;
-    label: string;
-    options: EnumOptionType[];
-    value: string;
-    onChange: (value: string) => void;
-    wrapperClassName?: string;
-    error?: string;
-    required?: boolean;
-    tabIndex?: number;
-}) {
-    return (
-        <div className={cn('space-y-2', wrapperClassName)}>
-            <Label htmlFor={name}>
-                {label} {required && <span className="align-middle text-destructive">*</span>}
-            </Label>
-            <Select required={required} value={value} onValueChange={onChange}>
-                <SelectTrigger id={name} name={name} className="h-9.5 w-full" tabIndex={tabIndex}>
-                    <SelectValue placeholder={`Pilih ${label}`} />
-                </SelectTrigger>
-                <SelectContent>
-                    {options.map((option) => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                            {option.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-            <InputErrorMessage className="mt-2" message={error} />
-        </div>
-    );
-}
-
-function FormDatePicker({
-    name,
-    label,
-    value,
-    onChange,
-    wrapperClassName,
-    defaultDateFormat = 'DD-MM-YYYY',
-    error,
-    required = false,
-    tabIndex,
-}: {
-    name: string;
-    label: string;
-    value: string;
-    onChange: (value: string | Date | undefined) => void;
-    wrapperClassName?: string;
-    defaultDateFormat?: string;
-    error?: string;
-    required?: boolean;
-    tabIndex?: number;
-}) {
-    return (
-        <div className={cn('space-y-2', wrapperClassName)}>
-            <Label htmlFor={name}>
-                {label} {required && <span className="align-middle text-destructive">*</span>}
-            </Label>
-            <DatePicker
-                tabIndex={tabIndex}
-                id={name}
-                name={name}
-                className="h-9.5"
-                value={formatDate(value, defaultDateFormat)}
-                calendarSide="right"
-                onChange={onChange}
-                maxDate={new Date()}
-            />
-            <InputErrorMessage className="mt-2" message={error} />
-        </div>
-    );
-}
-
-export interface FormComboboxProps<T extends { id: string | number }> {
-    label?: string;
-    placeholder?: string;
-    getLabel: (item: T) => string;
-    onSearch: (query: string) => Promise<T[]>;
-    onChange?: (value: T | null) => void;
-    defaultValue?: T | null;
-    error?: string;
-}
-
-export function FormCombobox<T extends { id: string | number }>({
-    label,
-    placeholder = 'Cari...',
-    getLabel,
-    onSearch,
-    onChange,
-    error = '',
-    defaultValue = null,
-}: FormComboboxProps<T>) {
-    const [rawOptions, setRawOptions] = useState<T[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [value, setValue] = useState<T | null>(defaultValue);
-
-    useEffect(() => {
-        setValue(defaultValue ?? null);
-        if (defaultValue) {
-            setRawOptions((prev) => {
-                const exists = prev.some((o) => String(o.id) === String(defaultValue.id));
-                return exists ? prev : [defaultValue, ...prev];
-            });
-        }
-    }, [defaultValue?.id]);
-
-    const handleSearch = async (query: string) => {
-        setLoading(true);
-        try {
-            const results = await onSearch(query);
-            setRawOptions(results);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const options: Option[] = rawOptions.map((item) => ({
-        id: String(item.id),
-        label: getLabel(item),
-        meta: item as Record<string, unknown>,
-    }));
-
-    const handleChange = (opt: Option | Option[] | null) => {
-        if (Array.isArray(opt) || opt === null) {
-            setValue(null);
-            onChange?.(null);
-            return;
-        }
-
-        const original = rawOptions.find((item) => String(item.id) === String(opt.id)) ?? null;
-        setValue(original);
-        onChange?.(original);
-    };
-
-    return (
-        <div className="w-full space-y-2">
-            {label && <Label>{label}</Label>}
-            <ComboBox
-                options={options}
-                value={value ? String(value.id) : undefined}
-                placeholder={placeholder}
-                loading={loading}
-                debounceDelay={800}
-                onSearch={handleSearch}
-                onChange={handleChange}
-            />
-            <InputErrorMessage className="mt-2" message={error} />
-        </div>
-    );
-}
-
-export const ComboboxFetcher = <T,>(routeName: string, params?: Record<string, unknown>, minLength = 1) => {
-    return async (query: string): Promise<T[]> => {
-        try {
-            if (query.length < minLength) return [];
-
-            const response = await axios.get(route(routeName), {
-                params: { keyword: query, per_page: 15, ...params },
-            });
-
-            return response.data;
-        } catch {
-            return [];
-        }
-    };
-};
 
 export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }: PublicOfficerForm) {
     const { options } = usePage<PageDataProps & PublicOfficerFormPageProps>().props;
@@ -378,9 +197,11 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                     </RowWrapper>
 
                     <FormCombobox<OfficeDataProps>
+                        name="office_id"
                         key={`office-${selectedRecord?.id ?? 'new'}`}
                         label="Pilih Kantor"
                         placeholder="Cari Kantor..."
+                        required
                         getLabel={(u) => u.name.raw}
                         error={form.errors['office.id']}
                         onSearch={ComboboxFetcher<OfficeDataProps>('console.master-data.offices.index', { to: 'cb' })}
@@ -413,8 +234,10 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                     />
 
                     <FormCombobox<PositionDataProps>
+                        name="position_id"
                         key={`position-${selectedRecord?.id ?? 'new'}-${form.data.office?.id}`}
                         label="Pilih Jabatan"
+                        required
                         placeholder="Cari Jabatan..."
                         getLabel={(u) => u.name}
                         error={form.errors['position.id']}
@@ -452,7 +275,6 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                                 document.getElementById(isActive ? 'period_start' : 'period_end')?.focus();
                             }, 50);
                         }}
-                        tabIndex={8}
                         required
                         error={form.errors.is_active}
                     />
@@ -465,7 +287,6 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                             onChange={(v) => form.setData('period_start', witaToUtc(v as string))}
                             error={form.errors.period_start}
                             required
-                            tabIndex={9}
                         />
 
                         {form.data.is_active ? null : (
@@ -477,7 +298,6 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                                 onChange={(v) => form.setData('period_end', witaToUtc(v as string))}
                                 error={form.errors.period_end}
                                 required
-                                tabIndex={10}
                             />
                         )}
                     </RowWrapper>
@@ -487,7 +307,6 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                             type="submit"
                             className="h-10 flex-1 cursor-pointer bg-blue-500 hover:bg-blue-700 in-disabled:text-red-500"
                             disabled={form.processing || !form.isDirty || !open}
-                            tabIndex={11}
                         >
                             {form.processing ? <LoaderCircleIcon className="animate-spin" /> : null}
                             {selectedRecord !== null ? 'Simpan Perubahan' : 'Tambah'}
@@ -498,7 +317,6 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                             className="size-10 cursor-pointer"
                             onClick={afterModalClosed}
                             disabled={form.processing}
-                            tabIndex={12}
                         >
                             <XIcon />
                         </Button>
