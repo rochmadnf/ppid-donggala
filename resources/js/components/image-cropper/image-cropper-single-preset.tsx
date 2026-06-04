@@ -23,7 +23,7 @@ export interface ImageCropperDialogProps {
     /** Additional presets merged with the built-in ones */
     presets?: CropPreset[];
     /** Called when the user confirms the crop */
-    onConfirm: (blob: Blob, preset: CropPreset) => void;
+    onConfirm: (blob: Blob, preset: CropPreset) => void | Promise<void>;
     /** Maximum upload size in MB (default: 5) */
     maxSizeMB?: number;
     /** Output MIME type (default: image/png) */
@@ -102,7 +102,7 @@ export function ImageCropperDialog({
         try {
             const blob = await getCroppedBlob(outputType, outputQuality);
             if (blob) {
-                onConfirm(blob, preset);
+                await onConfirm(blob, preset); // ← tunggu selesai
                 setImageSrc((prev) => {
                     if (prev) URL.revokeObjectURL(prev);
                     return null;
@@ -113,7 +113,7 @@ export function ImageCropperDialog({
         } finally {
             setIsExporting(false);
         }
-    }, [preset, getCroppedBlob, onConfirm, onOpenChange, outputType, outputQuality]);
+    }, [preset, getCroppedBlob, onConfirm, outputType, outputQuality]);
 
     // ---- Handle dialog close (cleanup) ------------------------------------
     const handleClose = useCallback(() => {

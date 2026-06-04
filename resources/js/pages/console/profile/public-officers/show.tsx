@@ -26,18 +26,24 @@ export default function PublicOfficerShow() {
 
     const officer = resources.data;
 
-    const submitNewPhoto = (file: File) => {
-        photoForm.transform((data) => ({ photo: file }));
+    const submitNewPhoto = (file: File): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            photoForm.transform(() => ({ photo: file }));
 
-        photoForm.post(route('console.profile.public-officers.photo.update', { poid: officer.id }), {
-            forceFormData: true,
-            preserveScroll: true,
-            onError: () => toast.error('Gagal mengunggah foto. Silakan coba lagi.'),
-            onSuccess: () => {
-                toast.success('Foto berhasil diperbarui!');
-                photoForm.reset();
-                setOpenCrop(false);
-            },
+            photoForm.post(route('console.profile.public-officers.photo.update', { poid: officer.id }), {
+                forceFormData: true,
+                preserveScroll: true,
+                onError: () => {
+                    toast.error('Gagal mengunggah foto. Silakan coba lagi.');
+                    reject();
+                },
+                onSuccess: () => {
+                    toast.success('Foto berhasil diperbarui!');
+                    photoForm.reset();
+                    setOpenCrop(false);
+                    resolve();
+                },
+            });
         });
     };
 
@@ -102,12 +108,11 @@ export default function PublicOfficerShow() {
                                     outputHeight: 1000,
                                 },
                             ]}
-                            onConfirm={(blob) => {
+                            onConfirm={async (blob) => {
                                 const file = new File([blob], `${officer.id}.webp`, {
                                     type: blob.type || 'image/webp',
                                 });
-
-                                submitNewPhoto(file);
+                                await submitNewPhoto(file);
                             }}
                         />
 
