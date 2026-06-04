@@ -16,7 +16,7 @@ import axios from 'axios';
 import { LoaderCircleIcon, XIcon } from 'lucide-react';
 import { useEffect, useState, type SubmitEventHandler } from 'react';
 import toast from 'react-hot-toast';
-import type { EnumOptionType, PublicOfficerDataShowProps, PublicOfficerForm, PublicOfficerShowProps } from '../types';
+import type { EnumOptionType, PublicOfficerDataShowProps, PublicOfficerForm, PublicOfficerFormPageProps } from '../types';
 
 const EMPTY_FORM: PublicOfficerDataShowProps = {
     id: '',
@@ -155,7 +155,6 @@ export function FormCombobox<T extends { id: string | number }>({
     const [value, setValue] = useState<T | null>(defaultValue);
 
     useEffect(() => {
-        console.log('defaultValue changed:', defaultValue);
         setValue(defaultValue ?? null);
         if (defaultValue) {
             setRawOptions((prev) => {
@@ -227,7 +226,7 @@ export const ComboboxFetcher = <T,>(routeName: string, params?: Record<string, u
 };
 
 export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }: PublicOfficerForm) {
-    const { resources } = usePage<PageDataProps & PublicOfficerShowProps>().props;
+    const { options } = usePage<PageDataProps & PublicOfficerFormPageProps>().props;
 
     const form = useForm<PublicOfficerDataShowProps>(selectedRecord !== null ? selectedRecord : EMPTY_FORM);
 
@@ -250,7 +249,16 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                 },
             });
         } else {
-            // for create method
+            form.post(route('console.profile.public-officers.store'), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Pejabat publik berhasil ditambahkan.');
+                    onOpenChange(false);
+                },
+                onError: () => {
+                    toast.error('Terdapat data yang tidak valid!');
+                },
+            });
         }
     };
 
@@ -284,18 +292,19 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         <FormInput
                             error={form.errors.name}
                             wrapperClassName="w-full"
-                            label="Nama"
+                            label="Nama Lengkap"
+                            placeholder="Nama Lengkap..."
                             name="name"
                             value={form.data.name}
                             onChange={(e) => form.setData('name', e.target.value)}
                             required
                             tabIndex={1}
-                            />
+                        />
 
                         <FormSelect
                             name="last_education"
                             label="Pendidikan Terakhir"
-                            options={resources.educations}
+                            options={options.educations}
                             value={form.data.last_education?.toString()}
                             onChange={(v) => form.setData('last_education', v)}
                             error={form.errors.last_education}
@@ -309,6 +318,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         <FormInput
                             error={form.errors.birth_place}
                             label="Tempat Lahir"
+                            placeholder="Tempat Lahir..."
                             name="birth_place"
                             wrapperClassName="w-full"
                             tabIndex={3}
@@ -347,7 +357,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                             wrapperClassName="w-full"
                             name="religion"
                             required
-                            options={resources.religions}
+                            options={options.religions}
                             error={form.errors.religion}
                             label="Agama"
                             value={form.data.religion?.toString() || ''}
@@ -358,7 +368,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                             wrapperClassName="w-full"
                             name="marital_status"
                             required
-                            options={resources.maritalStatuses}
+                            options={options.maritalStatuses}
                             error={form.errors.marital_status}
                             label="Status Perkawinan"
                             value={form.data.marital_status?.toString() || ''}
@@ -367,61 +377,63 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         />
                     </RowWrapper>
 
-                        <FormCombobox<OfficeDataProps>
-                            key={`office-${selectedRecord?.id ?? 'new'}`}
-                            label="Pilih Perangkat Daerah"
-                            getLabel={(u) => u.name.raw}
-                            error={form.errors['office.id']}
-                            onSearch={ComboboxFetcher<OfficeDataProps>('console.master-data.offices.index', { to: 'cb' })}
-                            onChange={(opt) => {
-                                form.setData({
-                                    ...form.data,
-                                    office: {
-                                        id: opt?.id ?? '',
-                                        name: opt?.name.raw ?? '',
-                                        alias: opt?.name.alias ?? '',
-                                        rank: opt?.rank?.id ?? null,
-                                    },
-                                    position: { id: '', name: '' }, // ← reset position sekaligus
-                                });
-                            }}
-                            defaultValue={
-                                form.data.office?.id
-                                    ? ({
-                                          id: form.data.office.id,
-                                          name: {
-                                              raw: form.data.office.name,
-                                              alias: form.data.office.alias,
-                                          },
-                                          rank: {
-                                              id: form.data.office.rank,
-                                          },
-                                      } as OfficeDataProps)
-                                    : null
-                            }
-                        />
-
-                        <FormCombobox<PositionDataProps>
-                            key={`position-${selectedRecord?.id ?? 'new'}-${form.data.office?.id}`}
-                            label="Pilih Jabatan"
-                            getLabel={(u) => u.name}
-                            error={form.errors['position.id']}
-                            onSearch={ComboboxFetcher<PositionDataProps>('console.master-data.positions.index', { for: form.data.office?.rank })}
-                            onChange={(opt) =>
-                                form.setData('position', {
+                    <FormCombobox<OfficeDataProps>
+                        key={`office-${selectedRecord?.id ?? 'new'}`}
+                        label="Pilih Kantor"
+                        placeholder="Cari Kantor..."
+                        getLabel={(u) => u.name.raw}
+                        error={form.errors['office.id']}
+                        onSearch={ComboboxFetcher<OfficeDataProps>('console.master-data.offices.index', { to: 'cb' })}
+                        onChange={(opt) => {
+                            form.setData({
+                                ...form.data,
+                                office: {
                                     id: opt?.id ?? '',
-                                    name: opt?.name ?? '',
-                                })
-                            }
-                            defaultValue={
-                                form.data.position?.id
-                                    ? ({
-                                          id: form.data.position.id,
-                                          name: form.data.position.name,
-                                      } as PositionDataProps)
-                                    : null
-                            }
-                        />
+                                    name: opt?.name.raw ?? '',
+                                    alias: opt?.name.alias ?? '',
+                                    rank: opt?.rank?.id ?? null,
+                                },
+                                position: { id: '', name: '' }, // ← reset position sekaligus
+                            });
+                        }}
+                        defaultValue={
+                            form.data.office?.id
+                                ? ({
+                                      id: form.data.office.id,
+                                      name: {
+                                          raw: form.data.office.name,
+                                          alias: form.data.office.alias,
+                                      },
+                                      rank: {
+                                          id: form.data.office.rank,
+                                      },
+                                  } as OfficeDataProps)
+                                : null
+                        }
+                    />
+
+                    <FormCombobox<PositionDataProps>
+                        key={`position-${selectedRecord?.id ?? 'new'}-${form.data.office?.id}`}
+                        label="Pilih Jabatan"
+                        placeholder="Cari Jabatan..."
+                        getLabel={(u) => u.name}
+                        error={form.errors['position.id']}
+                        onSearch={ComboboxFetcher<PositionDataProps>('console.master-data.positions.index', { for: form.data.office?.rank })}
+                        onChange={(opt) =>
+                            form.setData('position', {
+                                id: opt?.id ?? '',
+                                name: opt?.name ?? '',
+                            })
+                        }
+                        defaultValue={
+                            form.data.position?.id
+                                ? ({
+                                      id: form.data.position.id,
+                                      name: form.data.position.name,
+                                  } as PositionDataProps)
+                                : null
+                        }
+                    />
 
                     <FormSelect
                         wrapperClassName="w-full"

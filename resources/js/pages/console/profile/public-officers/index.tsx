@@ -3,14 +3,17 @@ import { MetaTag } from '@/components/metatag';
 import { Button } from '@/components/ui/button';
 import ConsoleLayout from '@/layouts/console-layout';
 import type { PageDataProps } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { columns } from './components/column';
-import type { PublicInformationDataIndexProps, PublicInformationIndexProps } from './types';
+import { PublicOfficerForm } from './components/form';
+import type { PublicOfficerDataIndexProps, PublicOfficerIndexProps } from './types';
 
 export default function PublicOfficerIndex() {
-    const { page, resources } = usePage<PageDataProps & PublicInformationIndexProps>().props;
+    const { page, resources } = usePage<PageDataProps & PublicOfficerIndexProps>().props;
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+
     return (
         <>
             <MetaTag robots="00" withAppName {...page}>
@@ -18,20 +21,20 @@ export default function PublicOfficerIndex() {
                 <link rel="canonical" href={route('console.profile.public-officers.index')} />
             </MetaTag>
 
-            <DataTable<PublicInformationDataIndexProps>
+            <DataTable<PublicOfficerDataIndexProps>
                 data={resources.data}
                 metadata={resources.meta}
                 columns={columns({ metadata: resources.meta })}
                 routeName="console.profile.public-officers.index"
                 searchable
                 toolbarRight={
-                    <Button asChild variant="brand" className="cursor-pointer">
-                        <Link href="#">
-                            <PlusIcon />
-                        </Link>
+                    <Button variant="brand" className="cursor-pointer" onClick={() => setOpenDialog(true)}>
+                        <PlusIcon />
                     </Button>
                 }
             />
+
+            <PublicOfficerForm open={openDialog} onOpenChange={setOpenDialog} selectedRecord={null} />
         </>
     );
 }

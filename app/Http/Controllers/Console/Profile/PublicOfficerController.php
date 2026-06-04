@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\PublicOfficerRequest;
 use App\Http\Traits\{HandlePaginationTrait, PageTrait};
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Response as InertiaResponse;
 
 
@@ -49,7 +48,19 @@ class PublicOfficerController extends Controller
                 breadcrumbs: $this->breadcrumbs(),
             ),
             "resources" => $this->poRepo->paginate(relations: $this->relations, searchFields: ['fullname'], perPage: $this->defaultPerPage),
+            "options" => [
+                "educations" => EducationLevelEnum::options(),
+                "religions" => ReligionEnum::options(),
+                "maritalStatuses" => MaritalStatusEnum::options(),
+            ],
         ]);
+    }
+
+    public function store(PublicOfficerRequest $request): RedirectResponse
+    {
+        $this->poRepo->create($request->whenFulfill());
+
+        return back()->with('success', 'Pejabat publik berhasil ditambahkan!');
     }
 
 
@@ -71,9 +82,11 @@ class PublicOfficerController extends Controller
             ),
             'resources' => [
                 'data' => $publicOfficer->resolve(),
-                'educations' => EducationLevelEnum::options(),
-                'religions' => ReligionEnum::options(),
-                'maritalStatuses' => MaritalStatusEnum::options(),
+            ],
+            "options" => [
+                "educations" => EducationLevelEnum::options(),
+                "religions" => ReligionEnum::options(),
+                "maritalStatuses" => MaritalStatusEnum::options(),
             ],
         ]);
     }

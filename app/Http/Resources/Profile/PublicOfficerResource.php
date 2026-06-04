@@ -15,14 +15,12 @@ class PublicOfficerResource extends JsonResource
 
     private function defautlPhoto(int $gender, int $religion): string
     {
-        $fileName = 'po-male';
 
-
-        if ($gender === 0 && $religion === ReligionEnum::ISLAM->value) {
-            $fileName = 'po-female-hijab';
-        } else {
-            $fileName = 'po-female';
-        }
+        $fileName = match (true) {
+            $gender === 1 => 'po-male',
+            $gender === 0 && $religion === ReligionEnum::ISLAM->value => 'po-female-hijab',
+            default => 'po-female',
+        };
 
         return storage_asset("images/default/$fileName.webp");
     }

@@ -52,6 +52,7 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
             ->name('public-officers.')
             ->group(function () {
                 Route::get('', 'index')->name('index');
+                Route::post('', 'store')->name('store');
                 Route::delete('{poid}', 'destroy')->name('destroy');
 
                 Route::prefix('d')->group(function () {

@@ -39,12 +39,17 @@ export interface PublicOfficerDataShowProps extends PublicOfficerDataIndexProps 
     period_end: string | null;
 }
 
-export interface PublicOfficerShowProps {
-    resources: {
-        data: PublicOfficerDataShowProps;
+export interface PublicOfficerFormPageProps {
+    options: {
         educations: EnumOptionType[];
         religions: EnumOptionType[];
         maritalStatuses: EnumOptionType[];
+    };
+}
+
+export interface PublicOfficerShowProps extends PublicOfficerFormPageProps {
+    resources: {
+        data: PublicOfficerDataShowProps;
     };
 }
 export interface PublicOfficerIndexProps {

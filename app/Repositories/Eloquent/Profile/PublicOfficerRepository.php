@@ -8,6 +8,7 @@ use App\Http\Resources\Profile\PublicOfficerResource;
 use App\Models\Profile\PublicOfficer;
 use App\Repositories\Contracts\Profile\PublicOfficerRepositoryInterface;
 use App\Repositories\Eloquent\BaseRepository;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class PublicOfficerRepository extends BaseRepository implements PublicOfficerRepositoryInterface
 {
@@ -19,6 +20,16 @@ class PublicOfficerRepository extends BaseRepository implements PublicOfficerRep
             model: new PublicOfficer(),
             resource: PublicOfficerResource::class
         );
+    }
+
+    public function paginate(array $relations = [], array $searchFields = ['name'], int $perPage = 10): JsonResource
+    {
+        $records = PublicOfficer::searchByKeyword($searchFields)
+            ->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))
+            ->where('is_active', request()->input('is_active') === 'no' ? false : true)
+            ->paginate(perPage: request()->input('per_page', $perPage));
+
+        return $this->resource::collection($records);
     }
 
     public function delete(int|string $value, ?string $columnName = null): bool

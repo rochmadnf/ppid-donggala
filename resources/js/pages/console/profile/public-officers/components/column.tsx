@@ -6,13 +6,13 @@ import type { PaginationMetaProps } from '@/types/pagination';
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { BookUserIcon } from 'lucide-react';
-import type { PublicInformationDataIndexProps } from '../types';
+import type { PublicOfficerDataIndexProps } from '../types';
 
 interface ColumnsOptions {
     metadata: PaginationMetaProps;
 }
 
-export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicInformationDataIndexProps>[] => [
+export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicOfficerDataIndexProps>[] => [
     {
         id: 'number',
         header: () => 'No.',
@@ -38,7 +38,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicInformati
                     </div>
                     <div className="space-y-0.5">
                         <h5 className="text-base font-semibold">{xName}</h5>
-                        <p className="text-slate-600/80 text-xs">{position.name}</p>
+                        <p className="text-xs text-slate-600/80">{position.name}</p>
                     </div>
                 </div>
             );

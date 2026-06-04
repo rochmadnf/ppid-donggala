@@ -15,7 +15,7 @@ import { PublicOfficerForm } from './components/form';
 import type { PublicOfficerShowProps } from './types';
 
 export default function PublicOfficerShow() {
-    const { page, resources } = usePage<PageDataProps & PublicOfficerShowProps>().props;
+    const { page, resources, options } = usePage<PageDataProps & PublicOfficerShowProps>().props;
     const [openCrop, setOpenCrop] = useState<boolean>(false);
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
@@ -118,7 +118,7 @@ export default function PublicOfficerShow() {
                                 },
                                 {
                                     th: 'Pendidikan Terakhir',
-                                    td: resources.educations.find((edu) => edu.id === officer.last_education)?.label || officer.last_education,
+                                    td: options.educations.find((edu) => edu.id === officer.last_education)?.label || officer.last_education,
                                 },
                                 {
                                     th: 'Tempat, Tanggal Lahir',
@@ -130,12 +130,12 @@ export default function PublicOfficerShow() {
                                 },
                                 {
                                     th: 'Agama',
-                                    td: resources.religions.find((religion) => religion.id === officer.religion)?.label || officer.religion,
+                                    td: options.religions.find((religion) => religion.id === officer.religion)?.label || officer.religion,
                                 },
                                 {
                                     th: 'Status Perkawinan',
                                     td:
-                                        resources.maritalStatuses.find((status) => status.id === officer.marital_status)?.label ||
+                                        options.maritalStatuses.find((status) => status.id === officer.marital_status)?.label ||
                                         officer.marital_status,
                                 },
                                 {
