@@ -15,6 +15,17 @@ class PublicOfficerRequest extends FormRequest
 
     protected string $baseRouteName = 'console.profile.public-officers';
 
+
+    protected function updateRoute(): string
+    {
+        return $this->route()->getName() === "{$this->baseRouteName}.update";
+    }
+
+    protected function updatePhotoRoute(): string
+    {
+        return $this->route()->getName() === "{$this->baseRouteName}.photo.update";
+    }
+
     public function authorize(): bool
     {
         return auth()->user()->getRoleNames()->first() === config('permission.superior_role_name');
@@ -22,16 +33,18 @@ class PublicOfficerRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'office' => [
-                ...$this->input('office', []),
-                'id' => DB::table('offices')->where('uuid', $this->office['id'])->value('id'),
-            ],
-            'position' => [
-                ...$this->input('position', []),
-                'id' => DB::table('positions')->where('uuid', $this->position['id'])->value('id'),
-            ],
-        ]);
+        if (!$this->updatePhotoRoute()) {
+            $this->merge([
+                'office' => [
+                    ...$this->input('office', []),
+                    'id' => DB::table('offices')->where('uuid', $this->office['id'])->value('id'),
+                ],
+                'position' => [
+                    ...$this->input('position', []),
+                    'id' => DB::table('positions')->where('uuid', $this->position['id'])->value('id'),
+                ],
+            ]);
+        }
     }
 
     protected function photoUpdateRules(): array
@@ -48,10 +61,6 @@ class PublicOfficerRequest extends FormRequest
         ];
     }
 
-    protected function updateRoute(): string
-    {
-        return $this->route()->getName() === "{$this->baseRouteName}.update";
-    }
 
     protected function baseRules(): array
     {

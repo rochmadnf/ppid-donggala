@@ -7,6 +7,7 @@ use App\Enums\MaritalStatusEnum;
 use App\Enums\ReligionEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\PublicOfficerRequest;
+use App\Http\Traits\{HandlePaginationTrait, PageTrait};
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Response as InertiaResponse;
@@ -14,7 +15,7 @@ use Inertia\Response as InertiaResponse;
 
 class PublicOfficerController extends Controller
 {
-    use \App\Http\Traits\PageTrait;
+    use PageTrait, HandlePaginationTrait;
 
     protected string $pageId = 'a19cc394-4736-4cf7-a557-65080dd2d9a2';
     protected array $relations = ['office', 'position'];
@@ -92,10 +93,7 @@ class PublicOfficerController extends Controller
         // Simpan ke storage/app/public/public-officers/photos/
         $photoPath = $request->file('photo')->store('images/public-officers', ['disk' => 'public']);
 
-        // Hapus foto lama jika ada
-        if (!is_null($publicOfficer->photo)) {
-            $test = Storage::disk('public')->delete($publicOfficer->photo);
-        }
+        delete_file_exists($publicOfficer->photo);
 
         // Update path foto di database
         $publicOfficer->update([
@@ -103,5 +101,20 @@ class PublicOfficerController extends Controller
         ]);
 
         return back()->with('success', 'Foto berhasil diperbarui!');
+    }
+
+    public function destroy(string $poid): RedirectResponse
+    {
+        $this->poRepo->delete($poid, 'uuid');
+
+        // Ambil keyword dari referer
+        parse_str(parse_url(request()->headers->get('referer', ''), PHP_URL_QUERY), $refererQuery);
+        $keyword = $refererQuery['keyword'] ?? null;
+        $searchBy = $refererQuery['search_by'] ?? null;
+
+        return $this->redirectToValidPage(
+            remaining: $this->poRepo->count($keyword, $searchBy ?? 'name'),
+            defaultPerPage: $this->defaultPerPage,
+        );
     }
 }

@@ -20,4 +20,14 @@ class PublicOfficerRepository extends BaseRepository implements PublicOfficerRep
             resource: PublicOfficerResource::class
         );
     }
+
+    public function delete(int|string $value, ?string $columnName = null): bool
+    {
+        $record = $this->find(value: $value, columnName: $columnName ?? $this->defaultColumnName, wrap: false);
+
+        // delete foto profile jika ada
+        delete_file_exists($record->photo);
+
+        return $record->delete();
+    }
 }

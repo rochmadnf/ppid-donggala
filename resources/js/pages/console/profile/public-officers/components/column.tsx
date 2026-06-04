@@ -36,9 +36,9 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicInformati
                             <img src={photo} alt={xName} className="rounded-md object-cover" />
                         </AspectRatio>
                     </div>
-                    <div className="-space-y-0.5">
+                    <div className="space-y-0.5">
                         <h5 className="text-base font-semibold">{xName}</h5>
-                        <p className="text-slate-600/80">{position.name}</p>
+                        <p className="text-slate-600/80 text-xs">{position.name}</p>
                     </div>
                 </div>
             );
@@ -50,7 +50,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicInformati
         accessorFn: (row) => row.office.name,
         cell: ({ row }) => {
             const { office } = row.original;
-            return <span className="font-medium uppercase">{office.alias}</span>;
+            return <span className="font-medium">{office.alias}</span>;
         },
     },
     {
@@ -103,7 +103,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicInformati
 
                     {/* Tombol Delete */}
                     <DeleteButton
-                        url={'#'}
+                        url={route('console.profile.public-officers.destroy', { poid: id })}
                         title="Hapus Pejabat Publik"
                         variant="rect"
                         popSide="bottom"

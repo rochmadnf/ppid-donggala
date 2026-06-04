@@ -6,6 +6,7 @@ use App\Enums\EducationLevelEnum;
 use App\Enums\MaritalStatusEnum;
 use App\Enums\ReligionEnum;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 class PublicOfficerSeeder extends Seeder
 {
@@ -30,7 +31,11 @@ class PublicOfficerSeeder extends Seeder
             'photo' => null,
 
         ]])->each(function ($officer) {
-            \App\Models\Profile\PublicOfficer::firstOrCreate($officer);
+            $record = \App\Models\Profile\PublicOfficer::firstOrCreate([
+                'fullname' => $officer['fullname']
+            ], Arr::except($officer, ['fullname']));
+
+            dd($record);
         });
     }
 }
