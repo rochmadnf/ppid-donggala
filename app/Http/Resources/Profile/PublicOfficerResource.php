@@ -54,6 +54,7 @@ class PublicOfficerResource extends JsonResource
                 'marital_status' => $this->marital_status,
                 'period_start' => $this->period_start,
                 'period_end' => $this->period_end,
+                'cv' => $this->curriculumVitaeOfficers->count() > 0 ? CurriculumVitaeOfficerResource::collection($this->curriculumVitaeOfficers)->resolve() : [],
             ]);
         }
 

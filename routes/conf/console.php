@@ -56,10 +56,21 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
                 Route::delete('{poid}', 'destroy')->name('destroy');
 
                 Route::prefix('d')->group(function () {
-                    Route::get('{poid}', 'show')->name('show');
-                    Route::post('{poid}/photo', 'updatePhoto')->name('photo.update');
 
-                    Route::put('{poid}', 'update')->name('update');
+                    Route::prefix('{poid}')->group(function () {
+                        Route::get('', 'show')->name('show');
+                        Route::put('', 'update')->name('update');
+                        Route::post('/photo', 'updatePhoto')->name('photo.update');
+
+                        // @curriculum-vitae
+                        Route::post('/cv', 'storeCv')->name('cv.store');
+                    });
+
+                    // @curriculum-vitae
+                    Route::prefix('cv')->group(function () {
+                        Route::put('{cvid}', 'updateCv')->name('cv.update');
+                        Route::delete('{cvid}', 'destroyCv')->name('cv.destroy');
+                    });
                 });
             });
     });

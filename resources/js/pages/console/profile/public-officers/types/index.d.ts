@@ -24,6 +24,18 @@ export interface PublicOfficerDataIndexProps {
     photo: string;
 }
 
+export interface curriculumVitaeProps {
+    id: number;
+    title: string;
+    institution: string;
+    period: {
+        s: number;
+        e: number | null;
+        display: string;
+    };
+    category: number;
+}
+
 export interface PublicOfficerDataShowProps extends PublicOfficerDataIndexProps {
     birth_place: string;
     birth_date: string;
@@ -33,6 +45,7 @@ export interface PublicOfficerDataShowProps extends PublicOfficerDataIndexProps 
     religion: string;
     period_start: string;
     period_end: string | null;
+    cv: curriculumVitaeProps[];
 }
 
 export interface PublicOfficerFormPageProps {

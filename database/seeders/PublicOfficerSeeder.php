@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\EducationLevelEnum;
-use App\Enums\MaritalStatusEnum;
-use App\Enums\ReligionEnum;
+use App\Enums\{CurriculumVitaeTypeEnum, EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
@@ -34,6 +32,37 @@ class PublicOfficerSeeder extends Seeder
             $record = \App\Models\Profile\PublicOfficer::firstOrCreate([
                 'fullname' => $officer['fullname']
             ], Arr::except($officer, ['fullname']));
+
+            // curriculum vitae
+            collect([
+                [
+                    'title' => 'S1',
+                    'institution' => 'Universitas Muhammadiyah Palu',
+                    'period_start' => 2001,
+                    'period_end' => 2014,
+                    'category' => CurriculumVitaeTypeEnum::EDUCATION,
+                ],
+                [
+                    'title' => 'SMA',
+                    'institution' => 'SMEA Negeri Palu',
+                    'period_start' => 1985,
+                    'period_end' => 1988,
+                    'category' => CurriculumVitaeTypeEnum::EDUCATION,
+                ],
+                [
+                    'title' => 'Ketua',
+                    'institution' => 'Lansia Kabupaten Donggala',
+                    'period_start' => 2015,
+                    'period_end' => 2019,
+                    'category' => CurriculumVitaeTypeEnum::ORGANIZATION,
+                ]
+            ])->each(fn($item) => $record->curriculumVitaeOfficers()->firstOrCreate(
+                [
+                    'title' => $item['title'],
+                    'institution' => $item['institution'],
+                ],
+                Arr::except($item, ['title', 'institution']),
+            ));
         });
     }
 }

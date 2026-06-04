@@ -55,4 +55,9 @@ class PublicOfficer extends Model
     {
         return $this->belongsTo(Office::class);
     }
+
+    public function curriculumVitaeOfficers()
+    {
+        return $this->hasMany(CurriculumVitaeOfficer::class);
+    }
 }

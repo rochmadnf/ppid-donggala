@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Console\Profile;
 
-use App\Enums\EducationLevelEnum;
-use App\Enums\MaritalStatusEnum;
-use App\Enums\ReligionEnum;
+use App\Enums\{CurriculumVitaeTypeEnum, EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Profile\PublicOfficerRequest;
+use App\Http\Requests\Profile\{CurriculumVitaeRequest, PublicOfficerRequest};
 use App\Http\Traits\{HandlePaginationTrait, PageTrait};
+use App\Models\Profile\CurriculumVitaeOfficer;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response as InertiaResponse;
 
@@ -66,7 +65,7 @@ class PublicOfficerController extends Controller
 
     public function show(string $poid): InertiaResponse
     {
-        $publicOfficer = $this->poRepo->find(value: $poid, columnName: 'uuid', relations: $this->relations, resourceParams: ['isDetail' => true]);
+        $publicOfficer = $this->poRepo->find(value: $poid, columnName: 'uuid', relations: [...$this->relations, 'curriculumVitaeOfficers'], resourceParams: ['isDetail' => true]);
 
         return inertia('console/profile/public-officers/show', [
             ...$this->pageDetails(
@@ -87,6 +86,7 @@ class PublicOfficerController extends Controller
                 "educations" => EducationLevelEnum::options(),
                 "religions" => ReligionEnum::options(),
                 "maritalStatuses" => MaritalStatusEnum::options(),
+                "cvCategories" => CurriculumVitaeTypeEnum::options(),
             ],
         ]);
     }
@@ -129,5 +129,31 @@ class PublicOfficerController extends Controller
             remaining: $this->poRepo->count($keyword, $searchBy ?? 'name'),
             defaultPerPage: $this->defaultPerPage,
         );
+    }
+
+    public function storeCv(CurriculumVitaeRequest $request, string $poid): RedirectResponse
+    {
+        $publicOfficer = $this->poRepo->find(value: $poid, columnName: 'uuid', wrap: false);
+
+        $publicOfficer->curriculumVitaeOfficers()->create($request->whenFulfill());
+
+        return back()->with('success', 'Curriculum vitae berhasil ditambahkan!');
+    }
+
+    public function updateCv(CurriculumVitaeRequest $request, int $cvid): RedirectResponse
+    {
+        $cv = CurriculumVitaeOfficer::findOrFail($cvid);
+
+        $cv->update($request->whenFulfill());
+
+        return back()->with('success', 'CV berhasil diperbarui!');
+    }
+
+    public function destroyCv(int $cvid): RedirectResponse
+    {
+        $cv = CurriculumVitaeOfficer::findOrFail($cvid);
+        $cv->delete();
+
+        return back()->with('success', 'CV berhasil dihapus!');
     }
 }

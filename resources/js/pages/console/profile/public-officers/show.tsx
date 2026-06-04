@@ -11,6 +11,7 @@ import { useForm, usePage } from '@inertiajs/react';
 import { ImagesIcon, PencilLineIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
+import { CurriculumVitaeCard } from './components/curriculum-vitae';
 import { PublicOfficerForm } from './components/form';
 import type { PublicOfficerShowProps } from './types';
 
@@ -49,7 +50,7 @@ export default function PublicOfficerShow() {
 
             <div className="flex flex-col gap-y-4">
                 {/* Personal Info */}
-                <ShowCard title={false}>
+                <ShowCard>
                     <div className="relative flex w-full items-center gap-x-8">
                         <div
                             className={cn(
@@ -155,11 +156,7 @@ export default function PublicOfficerShow() {
                     </div>
                 </ShowCard>
 
-                {/* <ShowCard title="Riwayat Pendidikan" />
-
-                <ShowCard title="Riwayat Jabatan" />
-
-                <ShowCard title="Riwayat Organisasi" /> */}
+                <CurriculumVitaeCard data={officer.cv} officerId={officer.id} />
             </div>
 
             <PublicOfficerForm open={isDialogOpen} onOpenChange={setIsDialogOpen} selectedRecord={officer} />
@@ -167,10 +164,10 @@ export default function PublicOfficerShow() {
     );
 }
 
-function ShowCard({ title, children }: { title: string | false; children: ReactNode }) {
+export function ShowCard({ title, children }: { title?: string | false; children: ReactNode }) {
     return (
         <Card>
-            {title !== false ? (
+            {title ? (
                 <CardHeader>
                     <CardTitle>{title}</CardTitle>
                 </CardHeader>
@@ -180,4 +177,5 @@ function ShowCard({ title, children }: { title: string | false; children: ReactN
         </Card>
     );
 }
+
 PublicOfficerShow.layout = (page: ReactNode) => <ConsoleLayout>{page}</ConsoleLayout>;
