@@ -265,7 +265,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="md:max-w-xl"
+                className="md:max-w-200"
                 onInteractOutside={(e) => e.preventDefault()}
                 showCloseButton={false}
                 onEscapeKeyDown={afterModalClosed}
@@ -280,26 +280,30 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <FormInput
-                        error={form.errors.name}
-                        label="Nama"
-                        name="name"
-                        value={form.data.name}
-                        onChange={(e) => form.setData('name', e.target.value)}
-                        required
-                        tabIndex={1}
-                    />
+                    <RowWrapper className="items-start">
+                        <FormInput
+                            error={form.errors.name}
+                            wrapperClassName="w-full"
+                            label="Nama"
+                            name="name"
+                            value={form.data.name}
+                            onChange={(e) => form.setData('name', e.target.value)}
+                            required
+                            tabIndex={1}
+                            />
 
-                    <FormSelect
-                        name="last_education"
-                        label="Pendidikan Terakhir"
-                        options={resources.educations}
-                        value={form.data.last_education?.toString()}
-                        onChange={(v) => form.setData('last_education', v)}
-                        error={form.errors.last_education}
-                        required
-                        tabIndex={2}
-                    />
+                        <FormSelect
+                            name="last_education"
+                            label="Pendidikan Terakhir"
+                            options={resources.educations}
+                            value={form.data.last_education?.toString()}
+                            onChange={(v) => form.setData('last_education', v)}
+                            error={form.errors.last_education}
+                            required
+                            wrapperClassName="w-full"
+                            tabIndex={2}
+                        />
+                    </RowWrapper>
 
                     <RowWrapper className="items-start justify-start">
                         <FormInput
@@ -363,7 +367,6 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         />
                     </RowWrapper>
 
-                    <RowWrapper className="items-start">
                         <FormCombobox<OfficeDataProps>
                             key={`office-${selectedRecord?.id ?? 'new'}`}
                             label="Pilih Perangkat Daerah"
@@ -419,7 +422,6 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                                     : null
                             }
                         />
-                    </RowWrapper>
 
                     <FormSelect
                         wrapperClassName="w-full"

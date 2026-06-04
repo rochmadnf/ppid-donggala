@@ -48,7 +48,7 @@ class PublicOfficerController extends Controller
                 desc: 'Informasi Pejabat Publik Pemerintah Kabupaten Donggala',
                 breadcrumbs: $this->breadcrumbs(),
             ),
-            "resources" => $this->poRepo->paginate(relations: $this->relations, perPage: $this->defaultPerPage),
+            "resources" => $this->poRepo->paginate(relations: $this->relations, searchFields: ['fullname'], perPage: $this->defaultPerPage),
         ]);
     }
 
@@ -60,7 +60,7 @@ class PublicOfficerController extends Controller
         return inertia('console/profile/public-officers/show', [
             ...$this->pageDetails(
                 title: $publicOfficer->fullname,
-                desc: "{$publicOfficer->position->name}",
+                desc: "{$publicOfficer->position->name} - {$publicOfficer->office->name}",
                 breadcrumbs: $this->breadcrumbs(extraItems: [
                     [
                         'id'    => $publicOfficer->id,
