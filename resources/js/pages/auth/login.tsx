@@ -31,8 +31,8 @@ export default function Login() {
     };
 
     return (
-        <AuthLayout title="Masuk" description="Silakan masukkan kredensial untuk melanjutkan.">
-            <MetaTag withAppName title="Masuk" robots="00" description="Halaman untuk masuk ke aplikasi PPID Kabupaten Donggala.">
+        <AuthLayout title="Selamat Datang!" description="Silakan masukkan kredensial untuk melanjutkan.">
+            <MetaTag withAppName title="Selamat Datang!" robots="00" description="Halaman untuk masuk ke aplikasi PPID Kabupaten Donggala.">
                 <meta property="og:url" content={route('login')} />
                 <link rel="canonical" href={route('login')} />
             </MetaTag>
@@ -41,6 +41,7 @@ export default function Login() {
                 <FormInput
                     inputSize="lg"
                     label="Nama Pengguna"
+                    placeholder="admin_ppid"
                     name="username"
                     autoFocus
                     autoComplete="username"
@@ -55,6 +56,7 @@ export default function Login() {
                     label="Katasandi"
                     type="password"
                     tabIndex={2}
+                    placeholder="••••••••"
                     name="password"
                     autoComplete="current-password"
                     value={form.data.password}
