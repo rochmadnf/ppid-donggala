@@ -37,6 +37,7 @@ const EMPTY_FORM: PublicOfficerDataShowProps = {
     marital_status: '',
     religion: '',
     period_start: '',
+    cv: null,
     period_end: null,
 };
 
@@ -61,6 +62,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                 onSuccess: () => {
                     toast.success('Data pejabat publik berhasil diperbarui.');
                     onOpenChange(false);
+                    afterModalClosed(form.data);
                     if (form.data.is_active) form.setData('period_end', null);
                 },
                 onError: () => {
@@ -73,6 +75,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                 onSuccess: () => {
                     toast.success('Pejabat publik berhasil ditambahkan.');
                     onOpenChange(false);
+                    afterModalClosed();
                 },
                 onError: () => {
                     toast.error('Terdapat data yang tidak valid!');
@@ -81,10 +84,10 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
         }
     };
 
-    const afterModalClosed = () => {
+    const afterModalClosed = (newData?: PublicOfficerDataShowProps) => {
         form.reset();
-        form.setDefaults(selectedRecord !== null ? selectedRecord : EMPTY_FORM);
-        form.setData(selectedRecord !== null ? selectedRecord : EMPTY_FORM);
+        form.setDefaults(newData || (selectedRecord !== null ? selectedRecord : EMPTY_FORM));
+        form.setData(newData || (selectedRecord !== null ? selectedRecord : EMPTY_FORM));
         form.clearErrors();
         onOpenChange(false);
     };
@@ -95,7 +98,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                 className="md:max-w-200"
                 onInteractOutside={(e) => e.preventDefault()}
                 showCloseButton={false}
-                onEscapeKeyDown={afterModalClosed}
+                onEscapeKeyDown={() => afterModalClosed()}
             >
                 <DialogHeader>
                     <DialogTitle>{selectedRecord === null ? 'Tambah Pejabat Publik' : 'Ubah Data'}</DialogTitle>
@@ -315,7 +318,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                             type="button"
                             variant="destructive"
                             className="size-10 cursor-pointer"
-                            onClick={afterModalClosed}
+                            onClick={() => afterModalClosed()}
                             disabled={form.processing}
                         >
                             <XIcon />

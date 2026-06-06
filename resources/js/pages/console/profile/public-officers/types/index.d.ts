@@ -22,6 +22,8 @@ export interface PublicOfficerDataIndexProps {
     };
     is_active: boolean;
     photo: string;
+    period_start: string;
+    period_end: string | null;
 }
 
 export interface curriculumVitaeProps {
@@ -43,9 +45,7 @@ export interface PublicOfficerDataShowProps extends PublicOfficerDataIndexProps 
     gender: string;
     marital_status: string;
     religion: string;
-    period_start: string;
-    period_end: string | null;
-    cv: curriculumVitaeProps[];
+    cv: null | curriculumVitaeProps[];
 }
 
 export interface PublicOfficerFormPageProps {

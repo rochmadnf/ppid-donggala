@@ -86,7 +86,6 @@ function NavItem({
 }) {
     const { page } = usePage<PageDataProps>().props;
 
-    console.log(page);
     return (
         <NavigationMenuItem className={wrapperClassName}>
             {children !== null && children.items.length > 0 ? (

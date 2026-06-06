@@ -42,14 +42,18 @@ class PublicOfficerController extends Controller
     {
 
         $page = match (request()->route()->getName()) {
-            'console.profile.public-officers.index' => ['component' => 'console/profile/public-officers/index', 'breadcrumbs' => $this->breadcrumbs()],
+            'console.profile.public-officers.index' => [
+                'component' => 'console/profile/public-officers/index',
+                'breadcrumbs' => $this->breadcrumbs(),
+                'resources' => $this->poRepo->paginate(relations: $this->relations, searchFields: ['fullname'], perPage: $this->defaultPerPage),
+            ],
             'profile.public-officers.index' => ['component' => 'landing/profile/public-officers/index', 'breadcrumbs' => $this->breadcrumbs(from: 'landing', extraItems: [
                 [
                     'id'    => $this->pageId,
                     'label' => 'Pejabat Publik',
                     'url'   => route('profile.public-officers.index'),
                 ],
-            ])],
+            ]), 'resources' => $this->poRepo->all()],
             default => abort(404)
         };
 
@@ -59,7 +63,7 @@ class PublicOfficerController extends Controller
                 desc: 'Informasi Pejabat Publik Pemerintah Kabupaten Donggala',
                 breadcrumbs: $page['breadcrumbs'],
             ),
-            "resources" => $this->poRepo->paginate(relations: $this->relations, searchFields: ['fullname'], perPage: $this->defaultPerPage),
+            "resources" => $page['resources'],
             "options" => [
                 "educations" => EducationLevelEnum::options(),
                 "religions" => ReligionEnum::options(),

@@ -42,6 +42,8 @@ class PublicOfficerResource extends JsonResource
             ],
             'photo' => is_null($this->photo) ? $this->defautlPhoto($this->gender, $this->religion->value) : storage_asset($this->photo) . '?t=' . $this->updated_at->timestamp,
             'is_active' => $this->is_active,
+            'period_start' => $this->period_start,
+            'period_end' => $this->period_end,
         ];
 
         if ($this->isDetail) {
@@ -52,8 +54,6 @@ class PublicOfficerResource extends JsonResource
                 'gender' => $this->gender,
                 'religion' => $this->religion,
                 'marital_status' => $this->marital_status,
-                'period_start' => $this->period_start,
-                'period_end' => $this->period_end,
                 'cv' => $this->curriculumVitaeOfficers->count() > 0 ? CurriculumVitaeOfficerResource::collection($this->curriculumVitaeOfficers)->resolve() : [],
             ]);
         }

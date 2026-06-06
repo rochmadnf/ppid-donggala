@@ -101,17 +101,17 @@ export function LandingBanner({
                         const lastItem = idx === arr.length - 1;
 
                         return lastItem ? (
-                            <BreadcrumbPage className={v.breadcrumb.last} key={bc.id}>
+                            <BreadcrumbPage className={v.breadcrumb.last} key={`${bc.label}-${bc.id}`}>
                                 {bc.label}
                             </BreadcrumbPage>
                         ) : (
-                            <Fragment key={bc.id}>
+                            <Fragment key={`${bc.label}-${bc.id}`}>
                                 {bc.url === '#' ? (
                                     <BreadcrumbPage className={cn(v.breadcrumb.item.default)}>{bc.label}</BreadcrumbPage>
                                 ) : (
                                     <BreadcrumbItem>
-                                        <BreadcrumbLink href={bc.url} className={cn(v.breadcrumb.item.default, v.breadcrumb.item.hover)}>
-                                            {bc.label}
+                                        <BreadcrumbLink asChild className={cn(v.breadcrumb.item.default, v.breadcrumb.item.hover)}>
+                                            <Link href={bc.url}>{bc.label}</Link>
                                         </BreadcrumbLink>
                                     </BreadcrumbItem>
                                 )}

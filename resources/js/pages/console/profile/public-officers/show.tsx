@@ -161,7 +161,7 @@ export default function PublicOfficerShow() {
                     </div>
                 </ShowCard>
 
-                <CurriculumVitaeCard data={officer.cv} officerId={officer.id} />
+                <CurriculumVitaeCard data={officer.cv !== null ? officer.cv : []} officerId={officer.id} />
             </div>
 
             <PublicOfficerForm open={isDialogOpen} onOpenChange={setIsDialogOpen} selectedRecord={officer} />

@@ -32,6 +32,16 @@ class PublicOfficerRepository extends BaseRepository implements PublicOfficerRep
         return $this->resource::collection($records);
     }
 
+    public function all(): JsonResource
+    {
+        $records = PublicOfficer::with(['office', 'position', 'curriculumVitaeOfficers'])->where('is_active', true)->orderBy(
+            \App\Models\MasterData\Office::select('rank')
+                ->whereColumn('offices.id', 'public_officers.office_id')
+        )->get();
+
+        return $this->resource::collection($records);
+    }
+
     public function delete(int|string $value, ?string $columnName = null): bool
     {
         $record = $this->find(value: $value, columnName: $columnName ?? $this->defaultColumnName, wrap: false);
