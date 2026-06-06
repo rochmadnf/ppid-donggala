@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Logo } from './logo';
 
 import { DotsCorner } from '@/components/dots-corner';
+import { Button } from '@/components/ui/button';
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -12,13 +13,34 @@ import {
     NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import type { PageDataProps } from '@/types';
+import type { PageDataProps, SharedData } from '@/types';
+import { LayoutPanelLeftIcon, LogInIcon } from 'lucide-react';
 import { ManuItems, type MenuItemsProps } from './constants/navigation-menu';
 
 export function Header({ openDrawer, setOpenDrawer }: DrawerProps) {
+    const { auth } = usePage<SharedData>().props;
+
     return (
         <header className="flex w-full flex-col">
-            <Logo openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
+            <div className="flex flex-row items-center justify-between">
+                <Logo openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
+
+                <Button asChild size="lg" variant={auth.user === null ? 'brand' : 'default'} className="mr-6 hidden rounded-xl md:inline-flex">
+                    <Link href={route(auth.user === null ? 'login' : 'console.dashboard')}>
+                        {auth.user === null ? (
+                            <>
+                                <LogInIcon />
+                                Login Admin
+                            </>
+                        ) : (
+                            <>
+                                <LayoutPanelLeftIcon />
+                                Dashboard
+                            </>
+                        )}
+                    </Link>
+                </Button>
+            </div>
 
             <div className="relative hidden items-center justify-center border-y border-line-brand py-6 text-sm md:flex">
                 <DotsCorner />

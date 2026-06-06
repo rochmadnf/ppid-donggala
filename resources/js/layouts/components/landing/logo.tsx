@@ -14,7 +14,7 @@ export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', op
         // Logo
         <div
             className={cn(
-                'flex items-center justify-between border-b border-b-line-brand px-4 py-3 shadow shadow-slate-500/20 md:justify-start md:gap-x-4 md:border-b-0 md:px-6 md:py-4 md:shadow-none',
+                'flex w-full items-center justify-between border-b border-b-line-brand px-4 py-3 shadow shadow-slate-500/20 md:justify-start md:gap-x-4 md:border-b-0 md:px-6 md:py-4 md:shadow-none',
                 className,
             )}
         >
