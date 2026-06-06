@@ -18,7 +18,7 @@ export const ManuItems: MenuItemsProps[] = [
         children: null,
     },
     {
-        id: 'a1f3b61e-713b-49a6-9b3d-54fe3a9c9b4c',
+        id: 'a11f84e6-b499-40b0-a1cb-44d66ba1c327',
         title: 'Profil',
         href: '#',
         children: {
@@ -27,13 +27,13 @@ export const ManuItems: MenuItemsProps[] = [
             },
             items: [
                 {
-                    id: 'a1f3b6fa-6939-41d6-aaaf-84078d2fe46d',
+                    id: 'a11f855c-7ee6-4b28-9e15-c745222360c6',
                     href: '#',
                     title: 'Profil PPID',
                 },
                 {
-                    id: 'a1f3d1eb-5c68-432a-86aa-253c7a634303',
-                    href: '#',
+                    id: 'a19cc394-4736-4cf7-a557-65080dd2d9a2',
+                    href: route('profile.public-officers.index'),
                     title: 'Profil Pejabat Publik',
                 },
             ],

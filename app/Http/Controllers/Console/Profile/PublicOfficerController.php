@@ -19,15 +19,15 @@ class PublicOfficerController extends Controller
     protected array $relations = ['office', 'position'];
     protected int $defaultPerPage = 10;
 
-    protected function breadcrumbs(array $extraItems = []): array
+    protected function breadcrumbs(array $extraItems = [], string $from = 'console'): array
     {
         return [
             'group_id' => 'a11f84e6-b499-40b0-a1cb-44d66ba1c327',
             'items' => [
                 [
                     'id'    => $this->pageId,
-                    'label' => 'Pejabat Publik',
-                    'url'   => route('console.profile.public-officers.index'),
+                    'label' => $from === 'console' ? 'Pejabat Publik' : 'Profil',
+                    'url'   => $from === 'console' ? route('console.profile.public-officers.index') : '#',
                 ],
                 ...$extraItems,
             ],
@@ -40,11 +40,24 @@ class PublicOfficerController extends Controller
 
     public function index(): InertiaResponse
     {
-        return inertia('console/profile/public-officers/index', [
+
+        $page = match (request()->route()->getName()) {
+            'console.profile.public-officers.index' => ['component' => 'console/profile/public-officers/index', 'breadcrumbs' => $this->breadcrumbs()],
+            'profile.public-officers.index' => ['component' => 'landing/profile/public-officers/index', 'breadcrumbs' => $this->breadcrumbs(from: 'landing', extraItems: [
+                [
+                    'id'    => $this->pageId,
+                    'label' => 'Pejabat Publik',
+                    'url'   => route('profile.public-officers.index'),
+                ],
+            ])],
+            default => abort(404)
+        };
+
+        return inertia($page['component'], [
             ...$this->pageDetails(
                 title: 'Pejabat Publik',
                 desc: 'Informasi Pejabat Publik Pemerintah Kabupaten Donggala',
-                breadcrumbs: $this->breadcrumbs(),
+                breadcrumbs: $page['breadcrumbs'],
             ),
             "resources" => $this->poRepo->paginate(relations: $this->relations, searchFields: ['fullname'], perPage: $this->defaultPerPage),
             "options" => [
