@@ -46,9 +46,20 @@ export function Header({ openDrawer, setOpenDrawer }: DrawerProps) {
                 <DotsCorner />
                 <NavigationMenu viewport={false}>
                     <NavigationMenuList className="gap-4">
-                        {ManuItems.map((menu) => (
-                            <NavItem key={menu.id} uuid={menu.id} routeName={menu.href} label={menu.title} children={menu.children} />
-                        ))}
+                        {ManuItems.map((menu) => {
+                            const menuIds = menu.children !== null ? [...menu.children.items.map((child) => child.id), menu.id] : null;
+
+                            return (
+                                <NavItem
+                                    key={`nav-${menu.id}`}
+                                    menuIds={menuIds}
+                                    uuid={menu.id}
+                                    routeName={menu.href}
+                                    label={menu.title}
+                                    children={menu.children}
+                                />
+                            );
+                        })}
                     </NavigationMenuList>
                 </NavigationMenu>
             </div>
@@ -60,24 +71,32 @@ const baseClassName = 'font-medium tracking-wide text-gray-600 uppercase hover:t
 
 function NavItem({
     uuid,
+    menuIds,
     routeName,
     label,
     children,
     wrapperClassName,
 }: {
     uuid: string;
+    menuIds: string[] | null;
     routeName: string;
     label: string;
     children: Pick<MenuItemsProps, 'children'>['children'];
     wrapperClassName?: string;
 }) {
     const { page } = usePage<PageDataProps>().props;
+
+    console.log(page);
     return (
         <NavigationMenuItem className={wrapperClassName}>
             {children !== null && children.items.length > 0 ? (
                 <>
                     <NavigationMenuTrigger
-                        className={cn(baseClassName, 'data-[state=open]:text-ppid-primary data-[state=open]:focus:text-ppid-primary')}
+                        className={cn(
+                            baseClassName,
+                            menuIds !== null && menuIds.includes(page.id) ? 'text-ppid-primary' : '',
+                            'data-[state=open]:text-ppid-primary data-[state=open]:focus:text-ppid-primary',
+                        )}
                     >
                         {label}
                     </NavigationMenuTrigger>
@@ -89,11 +108,17 @@ function NavItem({
                                     className={cn(
                                         baseClassName,
                                         'group/nav-link relative inline-flex w-full items-center rounded px-4 py-2 font-normal hover:bg-ppid-primary/5 md:text-[13px]',
+                                        child.id === page.id ? 'bg-ppid-primary/5 text-ppid-primary' : '',
                                     )}
                                     asChild
                                 >
                                     <Link href={child.href}>
-                                        <div className="absolute left-0 h-full w-1 transform bg-ppid-primary opacity-0 transition duration-150 group-hover/nav-link:opacity-100"></div>
+                                        <div
+                                            className={cn(
+                                                'absolute left-0 h-full w-1 transform bg-ppid-primary opacity-0 transition duration-150 group-hover/nav-link:opacity-100',
+                                                child.id === page.id ? 'opacity-100' : '',
+                                            )}
+                                        ></div>
                                         {child.title}
                                     </Link>
                                 </NavigationMenuLink>
