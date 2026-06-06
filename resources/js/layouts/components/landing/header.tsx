@@ -20,7 +20,7 @@ export function Header({ openDrawer, setOpenDrawer }: DrawerProps) {
         <header className="flex w-full flex-col">
             <Logo openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
 
-            <div className="relative hidden items-center justify-center border-y border-slate-300/50 py-6 text-sm md:flex">
+            <div className="relative hidden items-center justify-center border-y border-line-brand py-6 text-sm md:flex">
                 <DotsCorner />
                 <NavigationMenu viewport={false}>
                     <NavigationMenuList className="gap-4">

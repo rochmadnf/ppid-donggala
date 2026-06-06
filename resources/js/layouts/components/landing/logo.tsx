@@ -14,7 +14,7 @@ export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', op
         // Logo
         <div
             className={cn(
-                'flex items-center justify-between border-b border-b-slate-300/50 px-4 py-3 shadow shadow-slate-500/20 md:justify-start md:gap-x-4 md:border-b-0 md:px-6 md:py-4 md:shadow-none',
+                'flex items-center justify-between border-b border-b-line-brand px-4 py-3 shadow shadow-slate-500/20 md:justify-start md:gap-x-4 md:border-b-0 md:px-6 md:py-4 md:shadow-none',
                 className,
             )}
         >
@@ -26,7 +26,7 @@ export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', op
                     title="Pejabat Pengelola Informasi dan Dokumentasi"
                 />
             </Link>
-            <div aria-label="logo" className="hidden border-l border-slate-300/50 pl-4 md:block">
+            <div aria-label="logo" className="hidden border-l border-line-brand pl-4 md:block">
                 <h1 className="font-bold text-slate-950">Pejabat Pengelola Informasi dan Dokumentasi</h1>
                 <p>Kabupaten Donggala</p>
             </div>
