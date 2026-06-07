@@ -13,6 +13,9 @@ class Position extends Model
     protected $fillable = [
         'name',
         'only_for',
+        'rank',
+        'office_id',
+        'is_active',
     ];
 
     public function uniqueIds(): array

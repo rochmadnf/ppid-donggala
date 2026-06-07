@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->index();
-            $table->string('name');
+            $table->string('name')->index();
             $table->unsignedTinyInteger('only_for')->comment('If not zero, this position is only for the specified office rank');
+            $table->unsignedBigInteger('rank');
+            $table->foreignUuid('office_id')->nullable()->constrained('offices', 'uuid')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

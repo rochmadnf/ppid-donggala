@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('offices', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->index();
+            $table->uuid('uuid')->index()->unique();
             $table->string('name');
             $table->string('alias');
             $table->unsignedTinyInteger('rank')->comment('1: Kabupaten, 2: Dinas/Badan, 3: Kecamatan, 4: Desa, 5: Kelurahan');

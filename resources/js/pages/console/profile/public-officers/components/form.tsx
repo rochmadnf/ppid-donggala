@@ -244,7 +244,10 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         placeholder="Cari Jabatan..."
                         getLabel={(u) => u.name}
                         error={form.errors['position.id']}
-                        onSearch={ComboboxFetcher<PositionDataProps>('console.master-data.positions.index', { for: form.data.office?.rank })}
+                        onSearch={ComboboxFetcher<PositionDataProps>('console.master-data.positions.index', {
+                            rank: form.data.office?.rank,
+                            office_id: form.data.office?.id,
+                        })}
                         onChange={(opt) =>
                             form.setData('position', {
                                 id: opt?.id ?? '',
