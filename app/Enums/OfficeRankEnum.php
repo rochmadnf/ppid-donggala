@@ -5,16 +5,18 @@ namespace App\Enums;
 enum OfficeRankEnum: int
 {
     case PEMKAB = 1;
-    case DINAS = 2;
-    case BADAN = 3;
-    case KECAMATAN = 4;
-    case DESA = 5;
-    case KELURAHAN = 6;
+    case SETDA = 2;
+    case DINAS = 3;
+    case BADAN = 4;
+    case KECAMATAN = 5;
+    case DESA = 6;
+    case KELURAHAN = 7;
 
     public function label(): string
     {
         return match ($this) {
             self::PEMKAB => 'Kabupaten',
+            self::SETDA => 'Sekretariat Daerah',
             self::DINAS => 'Dinas',
             self::BADAN => 'Badan',
             self::KECAMATAN => 'Kecamatan',

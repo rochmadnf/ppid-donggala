@@ -23,6 +23,14 @@ class OfficeSeeder extends Seeder
                 'site_url' => 'https://donggala.go.id',
             ],
             [
+                'name' => 'Sekretariat Daerah',
+                'alias' => 'Setda',
+                'rank' => OfficeRankEnum::SETDA->value,
+                'address' => null,
+                'phone' => null,
+                'site_url' => 'https://donggala.go.id',
+            ],
+            [
                 'name' => 'Dinas Komunikasi dan Informatika',
                 'alias' => 'Diskominfo',
                 'rank' => OfficeRankEnum::DINAS->value,
