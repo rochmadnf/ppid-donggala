@@ -1,8 +1,8 @@
-import { useRef, useEffect } from "react";
-import { Check, Loader2, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { Option } from "../types";
-import { useComboBoxContext } from "../combobox";
+import { cn } from '@/lib/utils';
+import { Check, Loader2, Trash2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useComboBoxContext } from '../combobox';
+import type { Option } from '../types';
 
 interface ComboBoxItemProps {
     option: Option;
@@ -12,21 +12,15 @@ interface ComboBoxItemProps {
     onMouseEnter: () => void;
 }
 
-export function ComboBoxItem({
-    option,
-    isActive,
-    isSelected,
-    onMouseEnter,
-}: ComboBoxItemProps) {
-    const { selectOption, deletable, handleDelete, deletingIds, renderOption } =
-        useComboBoxContext();
+export function ComboBoxItem({ option, isActive, isSelected, onMouseEnter }: ComboBoxItemProps) {
+    const { selectOption, deletable, handleDelete, deletingIds, renderOption } = useComboBoxContext();
 
     const isDeleting = deletingIds.has(option.id);
     const ref = useRef<HTMLDivElement>(null);
 
     // Scroll active item into view
     useEffect(() => {
-        if (isActive) ref.current?.scrollIntoView({ block: "nearest" });
+        if (isActive) ref.current?.scrollIntoView({ block: 'nearest' });
     }, [isActive]);
 
     return (
@@ -38,21 +32,17 @@ export function ComboBoxItem({
             onClick={() => !isDeleting && selectOption(option)}
             onMouseEnter={onMouseEnter}
             className={cn(
-                "group relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 text-sm outline-none",
-                "transition-colors",
-                isActive && "bg-blue-100 text-blue-800",
-                isDeleting && "opacity-50 pointer-events-none"
+                'group relative flex cursor-pointer items-center rounded-sm px-2 py-2 text-sm outline-none select-none',
+                'transition-colors',
+                isActive && 'bg-blue-100 text-blue-800',
+                isDeleting && 'pointer-events-none opacity-50',
             )}
         >
             {/* Check mark */}
-            <span className="mr-2 h-4 w-4 shrink-0 text-blue-800">
-                {isSelected && <Check className="h-4 w-4" />}
-            </span>
+            <span className="mr-2 h-4 w-4 shrink-0 text-blue-800">{isSelected && <Check className="h-4 w-4" />}</span>
 
             {/* Label */}
-            <span className={cn("flex-1 truncate", isSelected ? "text-blue-800" : "")}>
-                {renderOption ? renderOption(option) : option.label}
-            </span>
+            <span className={cn('flex-1 truncate', isSelected ? 'text-blue-800' : '')}>{renderOption ? renderOption(option) : option.label}</span>
 
             {/* Delete button */}
             {deletable && (
@@ -64,23 +54,19 @@ export function ComboBoxItem({
                         handleDelete(option);
                     }}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                        if (e.key === 'Enter' || e.key === ' ') {
                             e.stopPropagation();
                             handleDelete(option);
                         }
                     }}
                     className={cn(
-                        "ml-2 hidden h-6 w-6 items-center justify-center rounded-sm",
-                        "text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
-                        "group-hover:flex",
-                        isActive && "flex"
+                        'ml-2 hidden h-6 w-6 items-center justify-center rounded-sm',
+                        'text-muted-foreground hover:bg-destructive/10 hover:text-destructive',
+                        'group-hover:flex',
+                        isActive && 'flex',
                     )}
                 >
-                    {isDeleting ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                        <Trash2 className="h-3.5 w-3.5" />
-                    )}
+                    {isDeleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                 </span>
             )}
         </div>

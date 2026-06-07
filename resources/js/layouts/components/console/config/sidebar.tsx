@@ -36,7 +36,7 @@ export const menuItems: MenuItemProps[] = [
                 label: 'Pejabat Publik',
                 url: route('console.profile.public-officers.index'),
                 permissions: ['read p-public-officer'],
-            }
+            },
         ],
     },
     {
