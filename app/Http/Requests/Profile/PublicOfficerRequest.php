@@ -6,6 +6,7 @@ use App\Enums\{EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use SanderMuller\FluentValidation\{FluentRule, HasFluentRules};
 
 class PublicOfficerRequest extends FormRequest
@@ -74,13 +75,19 @@ class PublicOfficerRequest extends FormRequest
             'gender' => FluentRule::boolean()->bail()->required(),
             'is_active' => FluentRule::boolean()->bail()->required(),
             'office.id' => FluentRule::integer()->bail()->required()->exists(table: 'offices', column: 'id'),
-            'position.id' => FluentRule::integer()->bail()->required()
-                ->exists(table: 'positions', column: 'id', callback: fn($eq) => $eq->where('only_for', $this->office['rank']))
-                ->when(value: $this->is_active, callback: fn($rule) => $rule->unique(
-                    table: 'public_officers',
-                    column: 'position_id',
-                    callback: fn($uq) => ($this->updateRoute()) ? $uq->when($this->is_active, fn($_uq) => $_uq->where('office_id', $this->office['id'])->where('is_active', true))->ignore(id: $this->id, idColumn: 'uuid') : null
-                )),
+            'position.id' => [
+                'bail',
+                'required',
+                'integer',
+                Rule::exists(table: 'positions', column: 'id')
+                    ->where(fn($q) => $q->where('only_for', $this->office['rank'])),
+
+                ...($this->is_active ? [
+                    Rule::unique(table: 'public_officers', column: 'position_id')
+                        ->where(fn($q) => $q->where('office_id', $this->office['id']))
+                        ->ignore($this->updateRoute() ? $this->id : null),
+                ] : []),
+            ],
             'period_start' => FluentRule::date()->bail()->required()->beforeToday()->format('Y-m-d\TH:i:s.u\Z'),
             'period_end' => FluentRule::date()->bail()->requiredIf(fn() => !$this->is_active)->nullable()->when(value: fn() => !is_null($this->period_start), callback: function ($rule) {
                 return $rule->after($this->period_start);
