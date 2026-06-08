@@ -5,6 +5,7 @@ namespace App\Models\Profile;
 use App\Enums\{EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
 use App\Models\MasterData\{Office, Position};
 use App\Models\Scopes\SearchableScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -59,5 +60,39 @@ class PublicOfficer extends Model
     public function curriculumVitaeOfficers()
     {
         return $this->hasMany(CurriculumVitaeOfficer::class);
+    }
+
+    // -------------------------------------------------------------------------
+    // Scopes
+    // -------------------------------------------------------------------------
+
+    /**
+     * Order by office rank first, then position rank.
+     * Menggunakan join agar sorting terjadi di DB level, bukan PHP.
+     */
+    public function scopeOrderByRank(Builder $query): Builder
+    {
+        return $query
+            ->join('offices', 'offices.id', '=', 'public_officers.office_id')
+            ->join('positions', 'positions.id', '=', 'public_officers.position_id')
+            ->orderBy('offices.rank')
+            ->orderBy('positions.rank')
+            ->select('public_officers.*');
+    }
+
+    /**
+     * Filter hanya yang aktif.
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('public_officers.is_active', true);
+    }
+
+    /**
+     * Filter berdasarkan office.
+     */
+    public function scopeByOffice(Builder $query, int $officeId): Builder
+    {
+        return $query->where('public_officers.office_id', $officeId);
     }
 }

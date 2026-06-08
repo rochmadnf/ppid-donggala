@@ -34,10 +34,11 @@ class PublicOfficerRepository extends BaseRepository implements PublicOfficerRep
 
     public function all(): JsonResource
     {
-        $records = PublicOfficer::with(['office', 'position', 'curriculumVitaeOfficers'])->where('is_active', true)->orderBy(
-            \App\Models\MasterData\Office::select('rank')
-                ->whereColumn('offices.id', 'public_officers.office_id')
-        )->get();
+        $records = PublicOfficer::query()
+            ->orderByRank()
+            ->active()
+            ->with(['office', 'position'])
+            ->paginate(20);;
 
         return $this->resource::collection($records);
     }
