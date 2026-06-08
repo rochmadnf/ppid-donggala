@@ -28,4 +28,53 @@ export default defineConfig({
             '@css': resolve(__dirname, 'resources/css'),
         },
     },
+    build: {
+        sourcemap: process.env.VITE_SOURCE_MAP === 'true',
+        chunkSizeWarningLimit: 2000,
+        assetsInlineLimit: 0,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'pdf-engine': ['@embedpdf/react-pdf-viewer'],
+                    'radix-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-slot', '@radix-ui/react-label'],
+                    'tiptap-core': ['@tiptap/core', '@tiptap/react'],
+                    'tiptap-ext': [
+                        '@tiptap/extension-collaboration',
+                        '@tiptap/extension-color',
+                        '@tiptap/extension-drag-handle',
+                        '@tiptap/extension-drag-handle-react',
+                        '@tiptap/extension-highlight',
+                        '@tiptap/extension-image',
+                        '@tiptap/extension-node-range',
+                        '@tiptap/extension-task-item',
+                        '@tiptap/extension-task-list',
+                        '@tiptap/extension-text-align',
+                        '@tiptap/extension-text-style',
+                        '@tiptap/extension-typography',
+                        '@tiptap/extension-unique-id',
+                        '@tiptap/extensions',
+                        '@tiptap/starter-kit',
+                    ],
+                    'embedpdf-plugins': [
+                        '@embedpdf/plugin-document-manager',
+                        '@embedpdf/plugin-interaction-manager',
+                        '@embedpdf/plugin-render',
+                        '@embedpdf/plugin-scroll',
+                        '@embedpdf/plugin-selection',
+                        '@embedpdf/plugin-viewport',
+                        '@embedpdf/plugin-zoom',
+                    ],
+                    icons: ['lucide-react'],
+                },
+            },
+        },
+    },
+
+    optimizeDeps: {
+        include: ['react', 'react-dom', '@inertiajs/react', 'lucide-react', '@embedpdf/react-pdf-viewer'],
+    },
+
+    worker: {
+        format: 'es',
+    },
 });
