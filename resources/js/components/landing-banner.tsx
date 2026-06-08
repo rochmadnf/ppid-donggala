@@ -82,7 +82,11 @@ export function LandingBanner({
     return (
         <section
             aria-label={title}
-            className={cn('relative flex h-85 w-full flex-col justify-center border-b border-line-brand px-8', alignVariants[align], className)}
+            className={cn(
+                'relative flex h-90 w-full flex-col justify-center border-b border-line-brand px-4 sm:h-85 md:px-8',
+                alignVariants[align],
+                className,
+            )}
             style={{ backgroundImage: v.background }}
         >
             <Breadcrumb>
@@ -124,8 +128,8 @@ export function LandingBanner({
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <h1 className={cn('mb-4 text-3xl font-bold lg:text-5xl', v.heading)}>{title}</h1>
-            <p className={cn('max-w-3xl text-lg leading-relaxed', v.description)}>{description}</p>
+            <h1 className={cn('mb-4 text-4xl font-bold lg:text-5xl', v.heading)}>{title}</h1>
+            <p className={cn('max-w-3xl text-[15px] leading-relaxed md:text-lg', v.description)}>{description}</p>
 
             <DotsCorner side="bottom" />
         </section>

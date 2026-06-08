@@ -2,10 +2,10 @@ import { DotsCorner } from '@/components/dots-corner';
 import { LandingBanner } from '@/components/landing-banner';
 import { MetaTag } from '@/components/metatag';
 import { LandingLayout } from '@/layouts/landing-layouts';
-import { formatDate } from '@/lib/date';
 import type { PublicOfficerIndexProps } from '@/pages/console/profile/public-officers/types';
 import type { PageDataProps } from '@/types';
 import { usePage } from '@inertiajs/react';
+import { DatabaseZapIcon } from 'lucide-react';
 import { type ReactNode } from 'react';
 
 export default function PublicOfficerPage() {
@@ -26,56 +26,17 @@ export default function PublicOfficerPage() {
 
             <main className="relative w-full border-b border-line-brand px-10 pt-16 pb-8">
                 <DotsCorner side="bottom" />
-                <div className="section-label">
-                    <div className="dot"></div>
-                    <span>Pimpinan Utama</span>
-                </div>
-                <div className="officer-leader-row">
-                    {resources.data
-                        .filter((officer) =>
-                            ['Bupati', 'Wakil Bupati', 'Sekretaris Daerah'].some((position) => officer.position.name.includes(position)),
-                        )
-                        .map((officer) => (
-                            <div key={officer.id} className="officer-leader-card">
-                                <div className="officer-leader-card-top">
-                                    <div className="officer-leader-photo-wrap">
-                                        <img className="officer-leader-photo" src={officer.photo} alt={`Foto ${officer.name}`} />
-                                    </div>
-                                    <div className="officer-leader-info-top">
-                                        <div className="officer-leader-position-top">{officer.position.name}</div>
-                                        <div className="officer-leader-name-top">{officer.name}</div>
-                                    </div>
-                                </div>
-                                <div className="officer-leader-body">
-                                    <div className="officer-office">
-                                        <div className="officer-office-icon">🏛️</div>
-                                        <div>
-                                            <div className="officer-office-label">Instansi</div>
-                                            <div className="officer-office-name">{officer.office.name}</div>
-                                        </div>
-                                    </div>
-                                    <div className="officer-leader-meta">
-                                        <span className="officer-meta-pill">
-                                            Periode {formatDate(officer.period_start, 'YYYY')} -{' '}
-                                            {officer.period_end ? formatDate(officer.period_end, 'YYYY') : 'Sekarang'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                </div>
-
-                <div className="section-label">
-                    <div className="dot"></div>
-                    <span>Daftar Lengkap Pejabat Publik</span>
-                </div>
-                <div className="sgrid">
-                    {resources.data
-                        .filter(
-                            (staff) => !['Bupati', 'Wakil Bupati', 'Sekretaris Daerah'].some((position) => staff.position.name.includes(position)),
-                        )
-                        .map((staff) => (
-                            <div className="scard">
+                {resources.data.length === 0 ? (
+                    <div className="flex min-h-80 w-full flex-col items-center justify-center gap-y-2">
+                        <div className="rounded-full bg-blue-50/80 p-8">
+                            <DatabaseZapIcon className="size-18 text-blue-400 md:size-20" />
+                        </div>
+                        <p className="text-[15px] font-medium text-blue-400 sm:text-base">Belum ada data yang tersedia.</p>
+                    </div>
+                ) : (
+                    <div className="sgrid">
+                        {resources.data.map((staff) => (
+                            <div className="scard" key={staff.id + staff.name}>
                                 <div className="sphoto">
                                     <img src={staff.photo} alt={staff.name} />
                                     <div className="sdstrip">
@@ -91,7 +52,8 @@ export default function PublicOfficerPage() {
                                 </div>
                             </div>
                         ))}
-                </div>
+                    </div>
+                )}
             </main>
         </>
     );
