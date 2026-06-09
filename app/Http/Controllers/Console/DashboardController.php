@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Console;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\PageTrait;
 use Inertia\Response as InertiaResponse;
 
 class DashboardController extends Controller
 {
-    use \App\Http\Traits\PageTrait;
+    use PageTrait;
 
     protected string $pageId = 'a0e34911-a5c1-4d73-a38e-257e7e05df97';
 
@@ -21,7 +22,7 @@ class DashboardController extends Controller
                     'label' => 'Dashboard',
                     'url' => route('console.dashboard'),
                 ],
-            ]
+            ],
         ];
     }
 

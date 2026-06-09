@@ -16,8 +16,8 @@ class PpidRepository extends BaseRepository implements PpidRepositoryInterface
     public function __construct()
     {
         parent::__construct(
-            model: new Ppid(),
-            resource: PpidResource::class
+            model: new Ppid,
+            resource: PpidResource::class,
         );
     }
 }

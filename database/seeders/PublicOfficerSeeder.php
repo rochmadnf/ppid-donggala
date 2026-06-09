@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Enums\{CurriculumVitaeTypeEnum, EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
+use App\Enums\CurriculumVitaeTypeEnum;
+use App\Enums\EducationLevelEnum;
+use App\Enums\MaritalStatusEnum;
+use App\Enums\ReligionEnum;
+use App\Models\Profile\PublicOfficer;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
@@ -29,8 +33,8 @@ class PublicOfficerSeeder extends Seeder
             'photo' => null,
 
         ]])->each(function ($officer) {
-            $record = \App\Models\Profile\PublicOfficer::firstOrCreate([
-                'fullname' => $officer['fullname']
+            $record = PublicOfficer::firstOrCreate([
+                'fullname' => $officer['fullname'],
             ], Arr::except($officer, ['fullname']));
 
             // curriculum vitae
@@ -55,8 +59,8 @@ class PublicOfficerSeeder extends Seeder
                     'period_start' => 2015,
                     'period_end' => 2019,
                     'category' => CurriculumVitaeTypeEnum::ORGANIZATION,
-                ]
-            ])->each(fn($item) => $record->curriculumVitaeOfficers()->firstOrCreate(
+                ],
+            ])->each(fn ($item) => $record->curriculumVitaeOfficers()->firstOrCreate(
                 [
                     'title' => $item['title'],
                     'institution' => $item['institution'],

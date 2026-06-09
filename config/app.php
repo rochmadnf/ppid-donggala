@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -13,7 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-    'version' => env('APP_VERSION', '0.1.0'),
+    'version' => env('APP_VERSION', '0.2.5'),
 
     /*
     |--------------------------------------------------------------------------
@@ -99,7 +100,11 @@ return [
 
     'key' => env('APP_KEY'),
 
-    'previous_keys' => [...array_filter(explode(',', (string) env('APP_PREVIOUS_KEYS', '')))],
+    'previous_keys' => [
+        ...array_filter(
+            explode(',', (string) env('APP_PREVIOUS_KEYS', '')),
+        ),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -118,4 +123,5 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
 ];

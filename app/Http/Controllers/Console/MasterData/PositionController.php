@@ -14,11 +14,10 @@ class PositionController extends Controller
         $resources = PositionResource::collection(
             Position::searchByKeyword(['name'])
                 ->where('only_for', request()->integer('rank'))
-                ->where(fn($oq) => $oq->whereNull('office_id')->orWhere('office_id', request()->string('office_id')))
+                ->where(fn ($oq) => $oq->whereNull('office_id')->orWhere('office_id', request()->string('office_id')))
                 ->orderBy('rank')
-                ->paginate(perPage: 8)
+                ->paginate(perPage: 8),
         );
-
 
         return response()->json($resources);
     }

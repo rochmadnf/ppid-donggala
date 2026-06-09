@@ -11,7 +11,7 @@ interface BaseRepositoryInterface
 {
     public function paginate(array $relations = [], array $searchFields = [], int $perPage = 10): JsonResource;
 
-    public function find(int|string $value, ?string $columnName = null, array $relations = [], array $resourceParams = [], string $operator = '=', bool $wrap = true): Model | JsonResource;
+    public function find(int|string $value, ?string $columnName = null, array $relations = [], array $resourceParams = [], string $operator = '=', bool $wrap = true): Model|JsonResource;
 
     public function delete(int|string $value, ?string $columnName = null): bool;
 

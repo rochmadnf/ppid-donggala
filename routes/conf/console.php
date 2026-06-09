@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Console\DashboardController;
+use App\Http\Controllers\Console\MasterData;
+use App\Http\Controllers\Console\Profile;
+use App\Http\Controllers\Console\PublicInformationController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Console\{MasterData, Profile, DashboardController, PublicInformationController};
 
 Route::middleware('auth')->prefix('console')->name('console.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -15,7 +18,7 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
         });
 
     // @master-data
-    Route::prefix('master-data')->name("master-data.")->group(function () {
+    Route::prefix('master-data')->name('master-data.')->group(function () {
         // @offices
         Route::controller(MasterData\OfficeController::class)
             ->prefix('offices')
@@ -27,7 +30,7 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
                 Route::delete('{office_id}', 'destroy')->name('destroy');
             });
 
-        //@positions
+        // @positions
         Route::controller(MasterData\PositionController::class)
             ->prefix('positions')
             ->name('positions.')
@@ -37,7 +40,7 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
     });
 
     // @profile
-    Route::prefix('profile')->name("profile.")->group(function () {
+    Route::prefix('profile')->name('profile.')->group(function () {
         // @ppid
         Route::controller(Profile\PpidController::class)
             ->prefix('ppid')

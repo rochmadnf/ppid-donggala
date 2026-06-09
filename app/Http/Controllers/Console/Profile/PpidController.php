@@ -6,11 +6,13 @@ namespace App\Http\Controllers\Console\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\PpidRequest;
+use App\Http\Traits\PageTrait;
+use App\Repositories\Contracts\Profile\PpidRepositoryInterface;
 use Inertia\Response as InertiaResponse;
 
 class PpidController extends Controller
 {
-    use \App\Http\Traits\PageTrait;
+    use PageTrait;
 
     protected string $pageId = 'a11f855c-7ee6-4b28-9e15-c745222360c6';
 
@@ -24,11 +26,11 @@ class PpidController extends Controller
                     'label' => 'Profil PPID',
                     'url' => route('console.profile.ppid.index'),
                 ],
-            ]
+            ],
         ];
     }
 
-    public function __construct(private readonly \App\Repositories\Contracts\Profile\PpidRepositoryInterface $ppidRepository)
+    public function __construct(private readonly PpidRepositoryInterface $ppidRepository)
     {
         //
     }
@@ -41,7 +43,7 @@ class PpidController extends Controller
                 desc: 'Profil singkat PPID Pemerintah Kabupaten Donggala',
                 breadcrumbs: $this->breadcrumbs(),
             ),
-            "resources" => $this->ppidRepository->paginate(),
+            'resources' => $this->ppidRepository->paginate(),
         ]);
     }
 
@@ -51,7 +53,7 @@ class PpidController extends Controller
     {
         $validData = $request->validated();
 
-        $this->ppidRepository->update(data: ["values" => $validData['values'], "html" =>  base64_decode($validData['html'])], columnValue: $validData['slug']);
+        $this->ppidRepository->update(data: ['values' => $validData['values'], 'html' => base64_decode($validData['html'])], columnValue: $validData['slug']);
 
         return to_route('console.profile.ppid.index');
     }

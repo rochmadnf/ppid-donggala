@@ -2,13 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Models\MasterData\Office;
+use App\Models\MasterData\Position;
 use Illuminate\Database\Seeder;
 
 class PositionSeeder extends Seeder
 {
     private function getOfficeUuidByAliasName(string $aliasName): ?string
     {
-        return \App\Models\MasterData\Office::where('alias', $aliasName)->value('uuid');
+        return Office::where('alias', $aliasName)->value('uuid');
     }
 
     public function run(): void
@@ -52,7 +54,7 @@ class PositionSeeder extends Seeder
 
             ['name' => 'Lurah', 'only_for' => 7, 'rank' => 1, 'office_id' => null],
             ['name' => 'Sekretaris Kelurahan', 'only_for' => 7, 'rank' => 2, 'office_id' => null],
-        ])->each(fn($position) => \App\Models\MasterData\Position::updateOrCreate([
+        ])->each(fn ($position) => Position::updateOrCreate([
             'name' => $position['name'],
         ], [
             'only_for' => $position['only_for'],

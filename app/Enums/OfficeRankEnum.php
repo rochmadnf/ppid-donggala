@@ -28,8 +28,7 @@ enum OfficeRankEnum: int
     public static function options(): array
     {
         return collect(self::cases())
-            ->map(fn($item) =>
-            [
+            ->map(fn ($item) => [
                 'id' => $item->value,
                 'label' => $item->label(),
 

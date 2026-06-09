@@ -13,11 +13,10 @@ class CurriculumVitaeOfficerResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'institution' => $this->institution,
-            'period' =>
-            [
+            'period' => [
                 's' => (int) $this->period_start,
                 'e' => (int) $this->period_end,
-                'display' => $this->period_start . " - " . ($this->period_end ? $this->period_end : 'Sekarang'),
+                'display' => $this->period_start . ' - ' . ($this->period_end ? $this->period_end : 'Sekarang'),
             ],
             'category' => $this->category,
         ];
