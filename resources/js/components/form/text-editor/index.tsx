@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { type JSONContent } from '@tiptap/core';
+import { type HTMLContent, type JSONContent } from '@tiptap/core';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
@@ -104,7 +104,7 @@ export function TextEditorSeparator({ className, ...props }: HTMLAttributes<HTML
 
 export type TextEditorProps = {
     content?: Record<string, unknown>;
-    onSave?: (json: JSONContent) => void;
+    onSave?: (json: JSONContent, html: HTMLContent) => void;
 };
 
 export function TextEditor({ content, onSave }: TextEditorProps) {
@@ -185,12 +185,13 @@ export function TextEditor({ content, onSave }: TextEditorProps) {
 
     const handleSave = () => {
         const json = editor.getJSON();
+        const html = editor.getHTML();
 
         if (onSave) {
-            onSave(json);
+            onSave(json, html);
         }
 
-        initialHtmlRef.current = editor.getHTML();
+        initialHtmlRef.current = html;
         setIsDirty(false);
     };
 

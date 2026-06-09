@@ -5,7 +5,7 @@ import ConsoleLayout from '@/layouts/console-layout';
 import { spoofMethod } from '@/lib/inertia';
 import type { PageDataProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import type { JSONContent } from '@tiptap/core';
+import type { HTMLContent, JSONContent } from '@tiptap/core';
 import { useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import type { PpidIndexProps } from './types';
@@ -17,16 +17,23 @@ const tabs: { label: string; id: string }[] = [
     { label: 'Struktur Organisasi', id: 'struktur-organisasi' },
 ];
 
+const encodeHtml = (html: string): string => {
+    const bytes = new TextEncoder().encode(html);
+    const binary = Array.from(bytes, (b) => String.fromCodePoint(b)).join('');
+    return btoa(binary);
+};
+
 export default function PpidIndexPage() {
     const { page, resources } = usePage<PageDataProps & PpidIndexProps>().props;
     const [activeTab, setActiveTab] = useState(resources.data[0].slug);
 
-    const updateContent = (content: JSONContent, slug: string) => {
+    const updateContent = (content: JSONContent, htmlContent: HTMLContent, slug: string) => {
         router.post(
-            `/console/profile/ppid/${slug}/content-update`,
+            route('console.profile.ppid.update', { slug }),
             spoofMethod(
                 {
                     values: content,
+                    html: encodeHtml(htmlContent),
                     slug,
                 },
                 'PATCH',
@@ -66,8 +73,8 @@ export default function PpidIndexPage() {
                 <TabsContent className="rounded-t-none border-t-0 px-0 py-8">
                     <TextEditor
                         key={activeTab}
-                        content={resources.data.find((tab) => tab.slug === activeTab)?.js_val}
-                        onSave={(json) => updateContent(json, activeTab)}
+                        content={resources.data.find((tab) => tab.slug === activeTab)?.values}
+                        onSave={(json, html) => updateContent(json, html, activeTab)}
                     />
                 </TabsContent>
             </Tabs>

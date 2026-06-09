@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Console\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\PpidRequest;
 use Inertia\Response as InertiaResponse;
-use Tiptap\Editor;
 
 class PpidController extends Controller
 {
@@ -52,19 +51,7 @@ class PpidController extends Controller
     {
         $validData = $request->validated();
 
-        $editor = new Editor([
-            'content' => $validData['values'],
-        ]);
-
-        $html = $editor->getHTML();
-
-        $this->ppidRepository->update(
-            data: [
-                'js_val' => $validData['values'],
-                'html'   => $html,
-            ],
-            columnValue: $validData['slug'],
-        );
+        $this->ppidRepository->update(data: ["values" => $validData['values'], "html" =>  base64_decode($validData['html'])], columnValue: $validData['slug']);
 
         return to_route('console.profile.ppid.index');
     }
