@@ -19,8 +19,8 @@ export default function WelcomePage() {
             >
                 <meta name="keywords" content="ppid, ppid donggala, ppid kabupaten donggala, kabupaten donggala, pemda donggala" />
 
-                <meta property="og:url" content={route('welcome')} />
-                <link rel="canonical" href={route('welcome')} />
+                <meta property="og:url" content={'/'} />
+                <link rel="canonical" href={'/'} />
             </MetaTag>
 
             {/* HERO */}
@@ -70,7 +70,7 @@ export default function WelcomePage() {
                     <div className="mt-8 flex flex-col gap-x-0 gap-y-6 md:flex-row md:items-center md:gap-x-4 md:gap-y-0">
                         <ButtonFlatIcon asChild>
                             <Link
-                                href={route('welcome')}
+                                href={'/'}
                                 className="group flex-col items-start bg-white text-slate-950 transition-colors duration-200 ease-out hover:bg-white/90 md:items-center"
                             >
                                 <small className="self-start text-[13.5px]/[1.43] text-slate-700">Ajukan</small>
@@ -82,7 +82,7 @@ export default function WelcomePage() {
                         </ButtonFlatIcon>
                         <ButtonFlatIcon asChild>
                             <Link
-                                href={route('welcome')}
+                                href={'/'}
                                 className="group flex-col items-start border border-white text-white transition-colors duration-200 ease-out hover:bg-white hover:text-slate-950 md:items-center"
                             >
                                 <small className="self-start text-[13.5px]/[1.43] text-white/90 group-hover:text-slate-700">Ajukan</small>

@@ -14,8 +14,8 @@ export default function PublicOfficerPage() {
     return (
         <>
             <MetaTag robots="11" withAppName {...page}>
-                <meta name="og:url" content={route('profile.public-officers.index')} />
-                <link rel="canonical" href={route('profile.public-officers.index')} />
+                <meta name="og:url" content={'/profile/public-officers'} />
+                <link rel="canonical" href={'/profile/public-officers'} />
             </MetaTag>
 
             <LandingBanner
