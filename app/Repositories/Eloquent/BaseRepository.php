@@ -19,16 +19,16 @@ abstract class BaseRepository
 
     public function paginate(array $relations = [], array $searchFields = ['name'], int $perPage = 10): JsonResource
     {
-        $records = $this->model->when(method_exists($this->model, 'scopeSearchByKeyword'), fn($qSearch) => $qSearch->searchByKeyword($searchFields))->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))->paginate(perPage: request()->input('per_page', $perPage));
+        $records = $this->model->when(method_exists($this->model, 'scopeSearchByKeyword'), fn ($qSearch) => $qSearch->searchByKeyword($searchFields))->when(count($relations) >= 1, fn ($qWith) => $qWith->with($relations))->paginate(perPage: request()->input('per_page', $perPage));
 
         return $this->resource::collection($records);
     }
 
-    public function find(int|string $value, ?string $columnName = null, array $relations = [], array $resourceParams = [], string $operator = '=', bool $wrap = true): Model | JsonResource
+    public function find(int|string $value, ?string $columnName = null, array $relations = [], array $resourceParams = [], string $operator = '=', bool $wrap = true): Model|JsonResource
     {
 
         $record = $this->model
-            ->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))
+            ->when(count($relations) >= 1, fn ($qWith) => $qWith->with($relations))
             ->where(column: $columnName ?? $this->defaultColumnName, operator: $operator, value: $value)
             ->firstOrFail();
 
@@ -45,6 +45,7 @@ abstract class BaseRepository
             return $record;
         } catch (\Throwable $th) {
             DB::rollBack();
+
             throw $th;
         }
     }
@@ -61,7 +62,7 @@ abstract class BaseRepository
     public function count(?string $keyword = null, string $defaultColumn = 'name'): int
     {
         return $this->model
-            ->when($keyword, fn($q) => $q->where($defaultColumn, 'LIKE', "%{$keyword}%"))
+            ->when($keyword, fn ($q) => $q->where($defaultColumn, 'LIKE', "%{$keyword}%"))
             ->count();
     }
 

@@ -3,8 +3,8 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
@@ -29,7 +29,7 @@ class LoginRequest extends FormRequest
     {
         $validData = collect($this->validated());
 
-        if (!Auth::guard('web')->attempt($validData->except('remember_me')->toArray(), $validData->get('remember_me', false))) {
+        if (! Auth::guard('web')->attempt($validData->except('remember_me')->toArray(), $validData->get('remember_me', false))) {
             throw ValidationException::withMessages([
                 'username' => trans('auth.failed'),
             ]);

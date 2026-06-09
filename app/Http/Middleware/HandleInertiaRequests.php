@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Http\Resources\Auth\AuthenticatedUserResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -45,9 +46,9 @@ class HandleInertiaRequests extends Middleware
                 'name' => config('app.name'),
                 'version' => config('app.version'),
             ],
-            'ziggy' => fn(): array => [
-                ...(new \Tighten\Ziggy\Ziggy())->toArray(),
-                'location' => config('app.env') === 'production' ? preg_replace('/^https?:\/\//', 'https://', $request->url()) : $request->url()
+            'ziggy' => fn (): array => [
+                ...(new Ziggy)->toArray(),
+                'location' => config('app.env') === 'production' ? preg_replace('/^https?:\/\//', 'https://', $request->url()) : $request->url(),
             ],
         ];
     }

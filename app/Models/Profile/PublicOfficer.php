@@ -2,8 +2,11 @@
 
 namespace App\Models\Profile;
 
-use App\Enums\{EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
-use App\Models\MasterData\{Office, Position};
+use App\Enums\EducationLevelEnum;
+use App\Enums\MaritalStatusEnum;
+use App\Enums\ReligionEnum;
+use App\Models\MasterData\Office;
+use App\Models\MasterData\Position;
 use App\Models\Scopes\SearchableScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;

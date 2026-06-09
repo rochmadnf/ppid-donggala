@@ -5,19 +5,20 @@ namespace App\Http\Controllers\Console\MasterData;
 use App\Enums\OfficeRankEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MasterData\OfficeRequest;
-use Inertia\Response as InertiaResponse;
-use App\Http\Traits\{PageTrait, HandlePaginationTrait};
+use App\Http\Traits\HandlePaginationTrait;
+use App\Http\Traits\PageTrait;
+use App\Repositories\Contracts\MasterData\OfficeRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Response as InertiaResponse;
 
 class OfficeController extends Controller
 {
-
-    use PageTrait, HandlePaginationTrait;
+    use HandlePaginationTrait, PageTrait;
 
     protected int $defaultPerPage = 5;
 
-    public function __construct(private readonly \App\Repositories\Contracts\MasterData\OfficeRepositoryInterface $officeRepository)
+    public function __construct(private readonly OfficeRepositoryInterface $officeRepository)
     {
         //
     }
@@ -34,11 +35,11 @@ class OfficeController extends Controller
                     'label' => 'Perangkat Daerah',
                     'url' => route('console.master-data.offices.index'),
                 ],
-            ]
+            ],
         ];
     }
 
-    public function index(): InertiaResponse | JsonResponse
+    public function index(): InertiaResponse|JsonResponse
     {
         $resources = $this->officeRepository->paginate(perPage: $this->defaultPerPage);
 
@@ -54,9 +55,9 @@ class OfficeController extends Controller
                     desc: 'Daftar Perangkat Daerah pada lingkup kerja Pemerintahan Kabupaten Donggala.',
                     breadcrumbs: $this->breadcrumbs(),
                 ),
-                "resources" => $this->officeRepository->paginate(perPage: $this->defaultPerPage),
-                "ranks" => OfficeRankEnum::options(),
-            ]
+                'resources' => $this->officeRepository->paginate(perPage: $this->defaultPerPage),
+                'ranks' => OfficeRankEnum::options(),
+            ],
         );
     }
 

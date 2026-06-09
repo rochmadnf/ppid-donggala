@@ -2,21 +2,28 @@
 
 namespace App\Http\Controllers\Console\Profile;
 
-use App\Enums\{CurriculumVitaeTypeEnum, EducationLevelEnum, MaritalStatusEnum, ReligionEnum};
+use App\Enums\CurriculumVitaeTypeEnum;
+use App\Enums\EducationLevelEnum;
+use App\Enums\MaritalStatusEnum;
+use App\Enums\ReligionEnum;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Profile\{CurriculumVitaeRequest, PublicOfficerRequest};
-use App\Http\Traits\{HandlePaginationTrait, PageTrait};
+use App\Http\Requests\Profile\CurriculumVitaeRequest;
+use App\Http\Requests\Profile\PublicOfficerRequest;
+use App\Http\Traits\HandlePaginationTrait;
+use App\Http\Traits\PageTrait;
 use App\Models\Profile\CurriculumVitaeOfficer;
+use App\Repositories\Contracts\Profile\PublicOfficerRepositoryInterface;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response as InertiaResponse;
 
-
 class PublicOfficerController extends Controller
 {
-    use PageTrait, HandlePaginationTrait;
+    use HandlePaginationTrait, PageTrait;
 
     protected string $pageId = 'a19cc394-4736-4cf7-a557-65080dd2d9a2';
+
     protected array $relations = ['office', 'position'];
+
     protected int $defaultPerPage = 10;
 
     protected function breadcrumbs(array $extraItems = [], string $from = 'console'): array
@@ -25,9 +32,9 @@ class PublicOfficerController extends Controller
             'group_id' => 'a11f84e6-b499-40b0-a1cb-44d66ba1c327',
             'items' => [
                 [
-                    'id'    => $this->pageId,
+                    'id' => $this->pageId,
                     'label' => $from === 'console' ? 'Pejabat Publik' : 'Profil',
-                    'url'   => $from === 'console' ? route('console.profile.public-officers.index') : '#',
+                    'url' => $from === 'console' ? route('console.profile.public-officers.index') : '#',
                 ],
                 ...$extraItems,
             ],
@@ -35,7 +42,7 @@ class PublicOfficerController extends Controller
     }
 
     public function __construct(
-        private readonly \App\Repositories\Contracts\Profile\PublicOfficerRepositoryInterface $poRepo,
+        private readonly PublicOfficerRepositoryInterface $poRepo,
     ) {}
 
     public function index(): InertiaResponse
@@ -49,12 +56,12 @@ class PublicOfficerController extends Controller
             ],
             'profile.public-officers.index' => ['component' => 'landing/profile/public-officers/index', 'breadcrumbs' => $this->breadcrumbs(from: 'landing', extraItems: [
                 [
-                    'id'    => $this->pageId,
+                    'id' => $this->pageId,
                     'label' => 'Pejabat Publik',
-                    'url'   => route('profile.public-officers.index'),
+                    'url' => route('profile.public-officers.index'),
                 ],
             ]), 'resources' => $this->poRepo->all()],
-            default => abort(404)
+            default => abort(404),
         };
 
         return inertia($page['component'], [
@@ -63,11 +70,11 @@ class PublicOfficerController extends Controller
                 desc: 'Informasi Pejabat Publik Pemerintah Kabupaten Donggala',
                 breadcrumbs: $page['breadcrumbs'],
             ),
-            "resources" => $page['resources'],
-            "options" => [
-                "educations" => EducationLevelEnum::options(),
-                "religions" => ReligionEnum::options(),
-                "maritalStatuses" => MaritalStatusEnum::options(),
+            'resources' => $page['resources'],
+            'options' => [
+                'educations' => EducationLevelEnum::options(),
+                'religions' => ReligionEnum::options(),
+                'maritalStatuses' => MaritalStatusEnum::options(),
             ],
         ]);
     }
@@ -79,7 +86,6 @@ class PublicOfficerController extends Controller
         return back()->with('success', 'Pejabat publik berhasil ditambahkan!');
     }
 
-
     public function show(string $poid): InertiaResponse
     {
         $publicOfficer = $this->poRepo->find(value: $poid, columnName: 'uuid', relations: [...$this->relations, 'curriculumVitaeOfficers'], resourceParams: ['isDetail' => true]);
@@ -90,20 +96,20 @@ class PublicOfficerController extends Controller
                 desc: "{$publicOfficer->position->name} - {$publicOfficer->office->name}",
                 breadcrumbs: $this->breadcrumbs(extraItems: [
                     [
-                        'id'    => $publicOfficer->id,
+                        'id' => $publicOfficer->id,
                         'label' => $publicOfficer->fullname,
-                        'url'   => route('console.profile.public-officers.show', ['poid' => $publicOfficer->id]),
+                        'url' => route('console.profile.public-officers.show', ['poid' => $publicOfficer->id]),
                     ],
                 ]),
             ),
             'resources' => [
                 'data' => $publicOfficer->resolve(),
             ],
-            "options" => [
-                "educations" => EducationLevelEnum::options(),
-                "religions" => ReligionEnum::options(),
-                "maritalStatuses" => MaritalStatusEnum::options(),
-                "cvCategories" => CurriculumVitaeTypeEnum::options(),
+            'options' => [
+                'educations' => EducationLevelEnum::options(),
+                'religions' => ReligionEnum::options(),
+                'maritalStatuses' => MaritalStatusEnum::options(),
+                'cvCategories' => CurriculumVitaeTypeEnum::options(),
             ],
         ]);
     }
