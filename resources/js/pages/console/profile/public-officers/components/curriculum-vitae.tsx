@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { withMethod } from '@/lib/inertia';
 import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import {
@@ -189,7 +190,9 @@ function CvFormSheet({ open, onOpenChange, tabIndex, officerId, selectedData }: 
         e.preventDefault();
 
         if (selectedData) {
-            form.put(route('console.profile.public-officers.cv.update', { cvid: selectedData.id }), {
+            form.transform(withMethod('PUT'));
+
+            form.post(route('console.profile.public-officers.cv.update', { cvid: selectedData.id }), {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {

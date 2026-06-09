@@ -2,6 +2,7 @@ import { TextEditor } from '@/components/form/text-editor';
 import { MetaTag } from '@/components/metatag';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/tabs';
 import ConsoleLayout from '@/layouts/console-layout';
+import { spoofMethod } from '@/lib/inertia';
 import type { PageDataProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import type { HTMLContent, JSONContent } from '@tiptap/core';
@@ -21,13 +22,16 @@ export default function PpidIndexPage() {
     const [activeTab, setActiveTab] = useState(resources.data[0].slug);
 
     const updateContent = (content: JSONContent, htmlContent: HTMLContent, slug: string) => {
-        router.patch(
+        router.post(
             route('console.profile.ppid.update', { slug }),
-            {
-                values: content,
-                html: htmlContent,
-                slug,
-            },
+            spoofMethod(
+                {
+                    values: content,
+                    html: htmlContent,
+                    slug,
+                },
+                'PATCH',
+            ),
             {
                 preserveScroll: true,
                 preserveState: true,

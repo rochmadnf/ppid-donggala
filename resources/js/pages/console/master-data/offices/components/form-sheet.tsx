@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
+import { withMethod } from '@/lib/inertia';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { LoaderCircleIcon, PlusCircleIcon, SquarePenIcon, XIcon } from 'lucide-react';
@@ -78,7 +79,8 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
 
     const handleSubmit = () => {
         if (isEditMode && displayOffice) {
-            form.put(route('console.master-data.offices.update', { office_id: displayOffice.id }), {
+            form.transform(withMethod('PUT'));
+            form.post(route('console.master-data.offices.update', { office_id: displayOffice.id }), {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {

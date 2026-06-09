@@ -5,6 +5,7 @@ import { FormSelect } from '@/components/form/select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { witaToUtc } from '@/lib/date';
+import { withMethod } from '@/lib/inertia';
 import { cn } from '@/lib/utils';
 import type { OfficeDataProps } from '@/pages/console/master-data/offices/types';
 import type { PositionDataProps } from '@/pages/console/master-data/positions/types';
@@ -53,11 +54,8 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
     const handleSubmit: SubmitEventHandler = (e) => {
         e.preventDefault();
         if (selectedRecord !== null) {
-            form.transform((data) => ({
-                ...data,
-                period_end: data.is_active ? null : data.period_end,
-            }));
-            form.put(route('console.profile.public-officers.update', selectedRecord.id), {
+            form.transform(withMethod('PUT', { period_end: form.data.is_active ? null : form.data.period_end }));
+            form.post(route('console.profile.public-officers.update', selectedRecord.id), {
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success('Data pejabat publik berhasil diperbarui.');
@@ -284,7 +282,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                         required
                         error={form.errors.is_active}
                     />
-                    <RowWrapper>
+                    <RowWrapper className="items-start">
                         <FormDatePicker
                             wrapperClassName="w-full"
                             name="period_start"
