@@ -12,11 +12,11 @@ class Ppid extends Model
         'name',
         'slug',
         'type',
-        'values',
+        'js_val',
         'html'
     ];
 
     protected $casts = [
-        'values' => 'array',
+        'js_val' => 'array',
     ];
 }

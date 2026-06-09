@@ -60,7 +60,7 @@ class PpidController extends Controller
 
         $this->ppidRepository->update(
             data: [
-                'values' => $validData['values'],
+                'js_val' => $validData['values'],
                 'html'   => $html,
             ],
             columnValue: $validData['slug'],

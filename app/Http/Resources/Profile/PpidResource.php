@@ -18,7 +18,7 @@ class PpidResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'type' => $this->type,
-            'values' => is_null($this->html) ? $this->values : $this->html,
+            'values' => is_null($this->html) ? $this->js_val : $this->html,
             'created_at' => $this->created_at->translatedFormat('d-m-Y'),
         ];
     }

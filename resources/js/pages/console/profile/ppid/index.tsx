@@ -66,7 +66,7 @@ export default function PpidIndexPage() {
                 <TabsContent className="rounded-t-none border-t-0 px-0 py-8">
                     <TextEditor
                         key={activeTab}
-                        content={resources.data.find((tab) => tab.slug === activeTab)?.values}
+                        content={resources.data.find((tab) => tab.slug === activeTab)?.js_val}
                         onSave={(json) => updateContent(json, activeTab)}
                     />
                 </TabsContent>

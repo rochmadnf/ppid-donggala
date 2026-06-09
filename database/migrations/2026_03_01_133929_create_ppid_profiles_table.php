@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('type');
-            $table->json('values');
+            $table->json('js_val');
             $table->longText('html')->nullable();
             $table->timestamps();
         });

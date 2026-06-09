@@ -314,7 +314,7 @@ class PpidProfileSeeder extends Seeder
             ], [
                 'name' => $ppidProfile['name'],
                 'type' => $ppidProfile['type'],
-                'values' => $ppidProfile['values'],
+                'js_val' => $ppidProfile['values'],
             ]);
 
             $this->command->info("Created Ppid Profile: {$p->name} (was " . ($p->wasRecentlyCreated ? 'created' : 'existing') . ")");

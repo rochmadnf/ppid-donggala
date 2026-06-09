@@ -30,7 +30,7 @@ class PpidRequest extends FormRequest
 
         if ($this->routeIs('console.profile.ppid.update')) {
             $rules['slug'][3] = Rule::exists('ppid_profiles', 'slug');
-            $rules = Arr::only($rules, ['values', 'html', 'slug']);
+            $rules = Arr::only($rules, ['values', 'slug']);
         }
 
         return $rules;
