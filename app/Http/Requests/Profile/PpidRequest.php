@@ -26,7 +26,6 @@ class PpidRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', 'unique:ppid_profiles'],
             'type' => ['required', 'string', Rule::in(['docs', 'json'])],
             'values' => ['required', 'array'],
-            'html' => ['required', 'string'],
         ];
 
         if ($this->routeIs('console.profile.ppid.update')) {

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { type HTMLContent, type JSONContent } from '@tiptap/core';
+import { type JSONContent } from '@tiptap/core';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
@@ -103,12 +103,11 @@ export function TextEditorSeparator({ className, ...props }: HTMLAttributes<HTML
 }
 
 export type TextEditorProps = {
-    variant?: 'default';
     content?: Record<string, unknown>;
-    onSave?: (json: JSONContent, html: HTMLContent) => void;
+    onSave?: (json: JSONContent) => void;
 };
 
-export function TextEditor({ variant = 'default', content, onSave }: TextEditorProps) {
+export function TextEditor({ content, onSave }: TextEditorProps) {
     const [isDirty, setIsDirty] = useState<boolean>(false);
 
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -186,13 +185,12 @@ export function TextEditor({ variant = 'default', content, onSave }: TextEditorP
 
     const handleSave = () => {
         const json = editor.getJSON();
-        const html = editor.getHTML();
 
         if (onSave) {
-            onSave(json, html);
+            onSave(json);
         }
 
-        initialHtmlRef.current = html;
+        initialHtmlRef.current = editor.getHTML();
         setIsDirty(false);
     };
 

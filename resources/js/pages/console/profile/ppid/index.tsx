@@ -5,7 +5,7 @@ import ConsoleLayout from '@/layouts/console-layout';
 import { spoofMethod } from '@/lib/inertia';
 import type { PageDataProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import type { HTMLContent, JSONContent } from '@tiptap/core';
+import type { JSONContent } from '@tiptap/core';
 import { useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import type { PpidIndexProps } from './types';
@@ -21,13 +21,12 @@ export default function PpidIndexPage() {
     const { page, resources } = usePage<PageDataProps & PpidIndexProps>().props;
     const [activeTab, setActiveTab] = useState(resources.data[0].slug);
 
-    const updateContent = (content: JSONContent, htmlContent: HTMLContent, slug: string) => {
+    const updateContent = (content: JSONContent, slug: string) => {
         router.post(
-            route('console.profile.ppid.update', { slug }),
+            `/console/profile/ppid/${slug}/content-update`,
             spoofMethod(
                 {
                     values: content,
-                    html: htmlContent,
                     slug,
                 },
                 'PATCH',
@@ -68,7 +67,7 @@ export default function PpidIndexPage() {
                     <TextEditor
                         key={activeTab}
                         content={resources.data.find((tab) => tab.slug === activeTab)?.values}
-                        onSave={(json, html) => updateContent(json, html, activeTab)}
+                        onSave={(json) => updateContent(json, activeTab)}
                     />
                 </TabsContent>
             </Tabs>
