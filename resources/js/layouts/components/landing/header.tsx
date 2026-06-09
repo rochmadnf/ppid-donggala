@@ -26,7 +26,7 @@ export function Header({ openDrawer, setOpenDrawer }: DrawerProps) {
                 <Logo openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
 
                 <Button asChild size="lg" variant={auth.user === null ? 'brand' : 'default'} className="mr-6 hidden rounded-xl md:inline-flex">
-                    <Link href={route(auth.user === null ? 'login' : 'console.dashboard')}>
+                    <Link href={auth.user === null ? '/console/login' : '/console'}>
                         {auth.user === null ? (
                             <>
                                 <LogInIcon />

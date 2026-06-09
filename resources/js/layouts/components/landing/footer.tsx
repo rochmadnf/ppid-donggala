@@ -5,7 +5,7 @@ export function Footer() {
     return (
         <footer className="flex w-full flex-col items-start justify-between gap-x-0 gap-y-3 border-t border-line-brand bg-white px-4 py-3 md:flex-row md:gap-x-4 md:gap-y-0 md:px-6 md:py-8">
             <div>
-                <Link href={route('welcome')}>
+                <Link href={'/'}>
                     <img
                         src={appAsset('/assets/img/ppid.png')}
                         alt="PPID Logo"

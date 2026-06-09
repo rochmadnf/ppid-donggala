@@ -18,7 +18,7 @@ export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', op
                 className,
             )}
         >
-            <Link href={route('welcome')}>
+            <Link href={'/'}>
                 <img
                     src={appAsset(src)}
                     alt="PPID Logo"
