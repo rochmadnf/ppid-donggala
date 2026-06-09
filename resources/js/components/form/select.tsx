@@ -21,7 +21,7 @@ export function FormSelect({
     value: string;
     onChange: (value: string) => void;
     wrapperClassName?: string;
-    error?: string;
+    error?: string | undefined;
     required?: boolean;
     tabIndex?: number;
 }) {

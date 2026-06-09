@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { spoofMethod } from '@/lib/inertia';
 import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { Trash2Icon, TriangleAlertIcon } from 'lucide-react';
@@ -52,7 +53,7 @@ export function DeleteButton({
     };
 
     const deleteSelectedData = (name: string) => {
-        router.delete(url, {
+        router.post(url, spoofMethod({}, 'DELETE'), {
             replace: true,
             preserveScroll: true,
             preserveUrl: true,
