@@ -18,9 +18,6 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
-    esbuild: {
-        jsx: 'automatic',
-    },
     resolve: {
         alias: {
             'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
@@ -34,46 +31,32 @@ export default defineConfig({
         assetsInlineLimit: 0,
         rollupOptions: {
             output: {
-                manualChunks: {
-                    'pdf-engine': ['@embedpdf/react-pdf-viewer'],
-                    'radix-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-slot', '@radix-ui/react-label'],
-                    'tiptap-core': ['@tiptap/core', '@tiptap/react'],
-                    'tiptap-ext': [
-                        '@tiptap/extension-collaboration',
-                        '@tiptap/extension-color',
-                        '@tiptap/extension-drag-handle',
-                        '@tiptap/extension-drag-handle-react',
-                        '@tiptap/extension-highlight',
-                        '@tiptap/extension-image',
-                        '@tiptap/extension-node-range',
-                        '@tiptap/extension-task-item',
-                        '@tiptap/extension-task-list',
-                        '@tiptap/extension-text-align',
-                        '@tiptap/extension-text-style',
-                        '@tiptap/extension-typography',
-                        '@tiptap/extension-unique-id',
-                        '@tiptap/extensions',
-                        '@tiptap/starter-kit',
-                    ],
-                    'embedpdf-plugins': [
-                        '@embedpdf/plugin-document-manager',
-                        '@embedpdf/plugin-interaction-manager',
-                        '@embedpdf/plugin-render',
-                        '@embedpdf/plugin-scroll',
-                        '@embedpdf/plugin-selection',
-                        '@embedpdf/plugin-viewport',
-                        '@embedpdf/plugin-zoom',
-                    ],
-                    icons: ['lucide-react'],
+                // ✅ Rolldown (Vite 8) hanya terima function, bukan object
+                manualChunks: (id): string | void => {
+                    if (id.includes('@embedpdf/react-pdf-viewer')) return 'pdf-engine';
+
+                    if (
+                        id.includes('@radix-ui/react-dialog') ||
+                        id.includes('@radix-ui/react-dropdown-menu') ||
+                        id.includes('@radix-ui/react-slot') ||
+                        id.includes('@radix-ui/react-label')
+                    )
+                        return 'radix-ui';
+
+                    // Cek tiptap-core dulu sebelum catch-all @tiptap/
+                    if (id.includes('@tiptap/core') || id.includes('@tiptap/react')) return 'tiptap-core';
+                    if (id.includes('@tiptap/')) return 'tiptap-ext';
+
+                    if (id.includes('@embedpdf/plugin-')) return 'embedpdf-plugins';
+
+                    if (id.includes('lucide-react')) return 'icons';
                 },
             },
         },
     },
-
     optimizeDeps: {
         include: ['react', 'react-dom', '@inertiajs/react', 'lucide-react', '@embedpdf/react-pdf-viewer'],
     },
-
     worker: {
         format: 'es',
     },
