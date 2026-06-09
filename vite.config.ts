@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
+import { bunny } from 'laravel-vite-plugin/fonts';
 import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
@@ -14,6 +15,31 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
+            fonts: [
+                bunny('Instrument Sans', {
+                    alias: 'sans',
+                    weights: [400, 500, 600, 700],
+                    styles: ['normal', 'italic'],
+                    subsets: ['latin'],
+                    display: 'swap',
+                    preload: [
+                        { weight: 400 },
+                        { weight: 700 },
+                    ],
+                    fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'],
+                }),
+                bunny('Inter', {
+                    alias: 'inter',
+                    weights: [300, 400, 700],
+                    styles: ['normal', 'italic'],
+                    subsets: ['latin'],
+                    display: 'swap',
+                    preload: [
+                        { weight: 400 },
+                    ],
+                    fallbacks: ['sans-serif'],
+                }),
+            ],
         }),
         react(),
         tailwindcss(),
@@ -31,7 +57,6 @@ export default defineConfig({
         assetsInlineLimit: 0,
         rollupOptions: {
             output: {
-                // ✅ Rolldown (Vite 8) hanya terima function, bukan object
                 manualChunks: (id): string | void => {
                     if (id.includes('@embedpdf/react-pdf-viewer')) return 'pdf-engine';
 
@@ -43,7 +68,6 @@ export default defineConfig({
                     )
                         return 'radix-ui';
 
-                    // Cek tiptap-core dulu sebelum catch-all @tiptap/
                     if (id.includes('@tiptap/core') || id.includes('@tiptap/react')) return 'tiptap-core';
                     if (id.includes('@tiptap/')) return 'tiptap-ext';
 
