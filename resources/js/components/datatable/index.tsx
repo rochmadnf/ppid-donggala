@@ -55,7 +55,7 @@ export function DataTable<T>({
     const sendRequest = (overrides: RequestParams = {}) => {
         const requestParams = buildRequestParams(overrides);
 
-        router.get(route(routeName), requestParams, {
+        router.get(routeName, requestParams, {
             preserveUrl: keepCurrentUrl,
             preserveState: true,
             preserveScroll: true,
