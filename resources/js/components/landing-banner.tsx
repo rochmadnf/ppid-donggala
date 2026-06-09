@@ -93,7 +93,7 @@ export function LandingBanner({
                 <BreadcrumbList className={cn('mb-6', v.breadcrumb.item.default)}>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link href={route('welcome')} className={cn(v.breadcrumb.item.default, v.breadcrumb.item.hover)}>
+                            <Link href={'/'} className={cn(v.breadcrumb.item.default, v.breadcrumb.item.hover)}>
                                 Beranda
                             </Link>
                         </BreadcrumbLink>

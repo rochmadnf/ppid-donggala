@@ -199,18 +199,13 @@ export function SidebarFooter() {
                     <DropdownMenuGroup>
                         <DropdownMenuLabel className="text-sidebar-menu-inactive-text select-none">Lainnya</DropdownMenuLabel>
                         <DropdownMenuItem asChild variant="primary">
-                            <Link
-                                href={route('welcome')}
-                                className="w-full py-2 text-base font-medium tracking-wide"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
+                            <Link href={'/'} className="w-full py-2 text-base font-medium tracking-wide" target="_blank" rel="noopener noreferrer">
                                 <Globe2Icon className="size-5 animate-spin [animation-duration:5s]" />
                                 Lihat Situs
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild variant="destructive">
-                            <Link href={route('logout')} className="w-full py-2 text-base font-medium tracking-wide" as="button" method="post">
+                            <Link href={'/console/logout'} className="w-full py-2 text-base font-medium tracking-wide" as="button" method="post">
                                 <LogOutIcon className="size-5" />
                                 Keluar
                             </Link>
