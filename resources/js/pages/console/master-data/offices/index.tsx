@@ -39,8 +39,8 @@ export default function OfficeIndexPage() {
     return (
         <>
             <MetaTag robots="00" withAppName {...page}>
-                <meta name="og:url" content={route('console.master-data.offices.index')} />
-                <link rel="canonical" href={route('console.master-data.offices.index')} />
+                <meta name="og:url" content={`/console/master-data/offices`} />
+                <link rel="canonical" href={`/console/master-data/offices`} />
             </MetaTag>
 
             <DataTable<OfficeDataProps>

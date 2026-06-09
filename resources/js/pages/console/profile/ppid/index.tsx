@@ -29,7 +29,7 @@ export default function PpidIndexPage() {
 
     const updateContent = (content: JSONContent, htmlContent: HTMLContent, slug: string) => {
         router.post(
-            route('console.profile.ppid.update', { slug }),
+            `/console/profile/ppid/${slug}/content-update`,
             spoofMethod(
                 {
                     values: content,
@@ -54,8 +54,8 @@ export default function PpidIndexPage() {
     return (
         <>
             <MetaTag robots="00" withAppName {...page}>
-                <meta name="og:url" content={route('console.profile.ppid.index')} />
-                <link rel="canonical" href={route('console.profile.ppid.index')} />
+                <meta name="og:url" content={`/console/profile/ppid`} />
+                <link rel="canonical" href={`/console/profile/ppid`} />
             </MetaTag>
 
             <Tabs>

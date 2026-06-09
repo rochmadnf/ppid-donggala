@@ -80,7 +80,7 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
     const handleSubmit = () => {
         if (isEditMode && displayOffice) {
             form.transform(withMethod('PUT'));
-            form.post(route('console.master-data.offices.update', { office_id: displayOffice.id }), {
+            form.post(`/console/master-data/offices/${displayOffice.id}`, {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {
@@ -89,7 +89,7 @@ export function OfficeFormSheet({ open, onOpenChange, selectedOffice }: OfficeFo
                 },
             });
         } else {
-            form.post(route('console.master-data.offices.store'), {
+            form.post(`/console/master-data/offices`, {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {

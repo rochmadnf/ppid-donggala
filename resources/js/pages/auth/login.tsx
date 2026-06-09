@@ -22,7 +22,7 @@ export default function Login() {
     const hitLoginButton: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        form.post(route('login'), {
+        form.post(`/console/login`, {
             onStart: () => {
                 form.clearErrors();
             },
@@ -33,8 +33,8 @@ export default function Login() {
     return (
         <AuthLayout title="Selamat Datang!" description="Silakan masukkan kredensial untuk melanjutkan.">
             <MetaTag withAppName title="Selamat Datang!" robots="00" description="Halaman untuk masuk ke aplikasi PPID Kabupaten Donggala.">
-                <meta property="og:url" content={route('login')} />
-                <link rel="canonical" href={route('login')} />
+                <meta property="og:url" content={`/console/login`} />
+                <link rel="canonical" href={`/console/login`} />
             </MetaTag>
 
             <form onSubmit={hitLoginButton} className="space-y-6">
