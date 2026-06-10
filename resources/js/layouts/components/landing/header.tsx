@@ -12,10 +12,11 @@ import {
     NavigationMenuList,
     NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import { getEndpoint } from '@/lib/endpoint';
 import { cn } from '@/lib/utils';
 import type { PageDataProps, SharedData } from '@/types';
 import { LayoutPanelLeftIcon, LogInIcon } from 'lucide-react';
-import { ManuItems, type MenuItemsProps } from './constants/navigation-menu';
+import { MenuItems, type MenuItemsProps } from './constants/navigation-menu';
 
 export function Header({ openDrawer, setOpenDrawer }: DrawerProps) {
     const { auth } = usePage<SharedData>().props;
@@ -23,10 +24,10 @@ export function Header({ openDrawer, setOpenDrawer }: DrawerProps) {
     return (
         <header className="flex w-full flex-col">
             <div className="flex flex-row items-center justify-between">
-                <Logo openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
+                <Logo className="py-6" openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
 
                 <Button asChild size="lg" variant={auth.user === null ? 'brand' : 'default'} className="mr-6 hidden rounded-xl md:inline-flex">
-                    <Link href={auth.user === null ? '/console/login' : '/console'}>
+                    <Link href={auth.user === null ? getEndpoint('login') : getEndpoint('dashboard')}>
                         {auth.user === null ? (
                             <>
                                 <LogInIcon />
@@ -46,7 +47,7 @@ export function Header({ openDrawer, setOpenDrawer }: DrawerProps) {
                 <DotsCorner />
                 <NavigationMenu viewport={false}>
                     <NavigationMenuList className="gap-4">
-                        {ManuItems.map((menu) => {
+                        {MenuItems.map((menu) => {
                             const menuIds = menu.children !== null ? [...menu.children.items.map((child) => child.id), menu.id] : null;
 
                             return (

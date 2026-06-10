@@ -1,8 +1,10 @@
 import type { DrawerProps } from '@/layouts/types';
 import { getEndpoint } from '@/lib/endpoint';
 import { appAsset, cn } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
-import { LogInIcon, PlusIcon } from 'lucide-react';
+import type { SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { LayoutPanelLeftIcon, LogInIcon } from 'lucide-react';
+import { DrawerTrigger } from './components/drawer-trigger';
 
 export type LogoProps = {
     className?: string;
@@ -11,6 +13,9 @@ export type LogoProps = {
 };
 
 export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', openDrawer, setOpenDrawer }: LogoProps & DrawerProps) {
+    const { auth } = usePage<SharedData>().props;
+    const loggedIn = auth.user !== null;
+
     return (
         // Logo
         <div
@@ -34,23 +39,25 @@ export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', op
 
             <div className="flex items-center gap-x-2">
                 <Link
-                    href={getEndpoint('login')}
-                    onClick={() => setOpenDrawer(!openDrawer)}
-                    className="inline-flex size-8 cursor-pointer items-center justify-center rounded-xs border-2 border-white bg-blue-200 text-blue-700 ring-1 ring-blue-500/60 transition duration-150 hover:bg-gray-300 md:hidden"
+                    href={getEndpoint(loggedIn ? 'dashboard' : 'login')}
+                    className={cn(
+                        'inline-flex size-8 cursor-pointer items-center justify-center rounded-xs border-2 border-white ring-1 transition duration-150 md:hidden [&_svg]:pointer-events-none [&_svg]:size-5',
+                        loggedIn
+                            ? 'bg-primary/65 text-white/85 ring-primary/60 hover:bg-primary/85'
+                            : 'bg-blue-200 text-blue-700 ring-blue-500/60 hover:bg-blue-300',
+                    )}
                 >
-                    <LogInIcon className={cn('pointer-events-none size-5 transform transition-transform duration-300')} />
+                    {loggedIn ? (
+                        <>
+                            <LayoutPanelLeftIcon />
+                        </>
+                    ) : (
+                        <>
+                            <LogInIcon />
+                        </>
+                    )}
                 </Link>
-                <button
-                    onClick={() => setOpenDrawer(!openDrawer)}
-                    className="inline-flex size-8 cursor-pointer items-center justify-center rounded-xs border-2 border-white bg-gray-200 text-slate-700 ring-1 ring-black/30 transition duration-150 hover:bg-gray-300 md:hidden"
-                >
-                    <PlusIcon
-                        className={cn(
-                            'pointer-events-none size-5 transform transition-transform duration-300',
-                            openDrawer ? 'rotate-45' : 'rotate-0',
-                        )}
-                    />
-                </button>
+                <DrawerTrigger openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
             </div>
         </div>
     );

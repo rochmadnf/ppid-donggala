@@ -5,9 +5,9 @@ import { BottomNav, Footer, Header } from './components/landing';
 export function LandingLayout({ children }: PropsWithChildren) {
     const [openDrawer, setOpenDrawer] = useState(false);
     return (
-        <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col items-center border-line-brand md:border-x">
+        <div className="relative mx-auto flex min-h-dvh w-full max-w-7xl flex-col items-center border-line-brand md:border-x">
             <Header openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
-            <main className="relative min-h-screen w-full pb-8">
+            <main className="relative min-h-dvh w-full pb-8">
                 <DotsCorner />
                 {children}
             </main>
