@@ -1,4 +1,6 @@
+allowBuilds:
+  esbuild: true
 onlyBuiltDependencies:
-    - '@tailwindcss/oxide'
-    - esbuild
-    - msw
+  - '@tailwindcss/oxide'
+  - esbuild
+  - msw
