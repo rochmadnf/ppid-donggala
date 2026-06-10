@@ -18,6 +18,10 @@
 }
 
 @theme inline {
+    --breakpoint-mobile-xs: 21.875rem; /* 350px */
+    --breakpoint-mobile-sm: 23.4375rem;
+    --breakpoint-mobile: 24.375rem; /* 390px */
+
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
@@ -164,6 +168,17 @@
 
 @utility animate-glow {
     animation: glow 2s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+    * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 @layer components {
