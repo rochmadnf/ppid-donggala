@@ -17,15 +17,15 @@ export default function PublicOfficerIndex() {
     return (
         <>
             <MetaTag robots="00" withAppName {...page}>
-                <meta name="og:url" content={route('console.profile.public-officers.index')} />
-                <link rel="canonical" href={route('console.profile.public-officers.index')} />
+                <meta name="og:url" content={'/console/profile/public-officers'} />
+                <link rel="canonical" href={'/console/profile/public-officers'} />
             </MetaTag>
 
             <DataTable<PublicOfficerDataIndexProps>
                 data={resources.data}
                 metadata={resources.meta}
                 columns={columns({ metadata: resources.meta })}
-                routeName="console.profile.public-officers.index"
+                routeName="/console/profile/public-officers"
                 searchable
                 toolbarRight={
                     <Button variant="brand" className="cursor-pointer" onClick={() => setOpenDialog(true)}>

@@ -94,7 +94,7 @@ export const ComboboxFetcher = <T,>(routeName: string, params?: Record<string, u
         try {
             if (query.length < minLength) return [];
 
-            const response = await axios.get(route(routeName), {
+            const response = await axios.get(routeName, {
                 params: { keyword: query, per_page: 15, ...params },
             });
 

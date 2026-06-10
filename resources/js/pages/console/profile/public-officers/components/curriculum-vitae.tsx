@@ -136,7 +136,7 @@ export function CurriculumVitaeCard({ data, officerId }: { data: curriculumVitae
 
                                             {/* Tombol Delete */}
                                             <DeleteButton
-                                                url={route('console.profile.public-officers.cv.destroy', { cvid: item.id })}
+                                                url={`/console/profile/public-officers/d/cv/${item.id}`}
                                                 title="Hapus Riwayat"
                                                 variant="rect"
                                                 popSide="bottom"
@@ -192,7 +192,7 @@ function CvFormSheet({ open, onOpenChange, tabIndex, officerId, selectedData }: 
         if (selectedData) {
             form.transform(withMethod('PUT'));
 
-            form.post(route('console.profile.public-officers.cv.update', { cvid: selectedData.id }), {
+            form.post(`/console/profile/public-officers/d/cv/${selectedData.id}`, {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {
@@ -204,7 +204,7 @@ function CvFormSheet({ open, onOpenChange, tabIndex, officerId, selectedData }: 
                 },
             });
         } else {
-            form.post(route('console.profile.public-officers.cv.store', { poid: officerId }), {
+            form.post(`/console/profile/public-officers/d/${officerId}/cv`, {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {

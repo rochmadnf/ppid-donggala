@@ -91,7 +91,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicOfficerDa
                                 aria-label={`Info ${name}`}
                                 asChild
                             >
-                                <Link href={route('console.profile.public-officers.show', { poid: id })}>
+                                <Link href={`/console/profile/public-officers/d/${id}`}>
                                     <BookUserIcon className="size-5" />
                                 </Link>
                             </Button>
@@ -103,7 +103,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicOfficerDa
 
                     {/* Tombol Delete */}
                     <DeleteButton
-                        url={route('console.profile.public-officers.destroy', { poid: id })}
+                        url={`/console/profile/public-officers/${id}`}
                         title="Hapus Pejabat Publik"
                         variant="rect"
                         popSide="bottom"

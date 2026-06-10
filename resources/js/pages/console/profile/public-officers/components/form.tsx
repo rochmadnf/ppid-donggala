@@ -55,7 +55,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
         e.preventDefault();
         if (selectedRecord !== null) {
             form.transform(withMethod('PUT', { period_end: form.data.is_active ? null : form.data.period_end }));
-            form.post(route('console.profile.public-officers.update', selectedRecord.id), {
+            form.post(`/console/profile/public-officers/d/${selectedRecord.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success('Data pejabat publik berhasil diperbarui.');
@@ -68,7 +68,7 @@ export function PublicOfficerForm({ open, onOpenChange, selectedRecord = null }:
                 },
             });
         } else {
-            form.post(route('console.profile.public-officers.store'), {
+            form.post(`/console/profile/public-officers`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success('Pejabat publik berhasil ditambahkan.');

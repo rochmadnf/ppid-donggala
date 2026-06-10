@@ -135,7 +135,7 @@ export const columns = ({ metadata, onEdit }: ColumnsOptions): ColumnDef<OfficeD
 
                     {/* Tombol Delete */}
                     <DeleteButton
-                        url={route('console.master-data.offices.destroy', { office_id: id })}
+                        url={`/console/master-data/offices/${id}`}
                         title="Hapus Perangkat Daerah"
                         variant="rect"
                         popSide="bottom"

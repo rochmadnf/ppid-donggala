@@ -30,7 +30,7 @@ export default function PublicOfficerShow() {
         return new Promise((resolve, reject) => {
             photoForm.transform(() => ({ photo: file }));
 
-            photoForm.post(route('console.profile.public-officers.photo.update', { poid: officer.id }), {
+            photoForm.post(`/console/profile/public-officers/${officer.id}/photo`, {
                 forceFormData: true,
                 preserveScroll: true,
                 onError: () => {
@@ -50,8 +50,8 @@ export default function PublicOfficerShow() {
     return (
         <>
             <MetaTag robots="00" withAppName {...page}>
-                <meta name="og:url" content={route('console.profile.public-officers.show', { poid: resources.data.id })} />
-                <link rel="canonical" href={route('console.profile.public-officers.index')} />
+                <meta name="og:url" content={`/console/profile/public-officers/d/${resources.data.id}`} />
+                <link rel="canonical" href={`/console/profile/public-officers`} />
             </MetaTag>
 
             <div className="flex flex-col gap-y-4">
