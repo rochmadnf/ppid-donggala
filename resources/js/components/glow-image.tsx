@@ -6,13 +6,14 @@ interface GlowImageProps {
     className?: string;
     color?: string;
     animate?: boolean;
+    dropShadowSize?: number;
 }
 
-export function GlowImage({ src, alt = '', className = '', color = '--color-blue-700', animate = false }: GlowImageProps) {
+export function GlowImage({ src, alt = '', className = '', dropShadowSize = 15, color = '--color-blue-700', animate = false }: GlowImageProps) {
     return (
         <div className={cn(`relative`, className)}>
             <img src={src} aria-hidden className={cn('absolute inset-0 scale-90 blur-2xl', animate ? 'animate-glow opacity-70' : 'opacity-50')} />
-            <img src={src} alt={alt} className="relative" style={{ filter: `drop-shadow(0 0 15px var(${color}))` }} />
+            <img src={src} alt={alt} className="relative" style={{ filter: `drop-shadow(0 0 ${dropShadowSize}px var(${color}))` }} />
         </div>
     );
 }

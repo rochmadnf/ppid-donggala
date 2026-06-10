@@ -10,8 +10,8 @@ export function DotsCorner({ side = 'top' }: { side?: keyof typeof sides }) {
 
     return (
         <>
-            <div className={cn('absolute -left-[4px] z-99 size-[7px] bg-ppid-primary', positionClass)} aria-hidden="true" />
-            <div className={cn('absolute -right-[4px] z-99 size-[7px] bg-ppid-primary', positionClass)} aria-hidden="true" />
+            <div className={cn('absolute -left-[4px] z-25 size-[7px] bg-ppid-primary', positionClass)} aria-hidden="true" />
+            <div className={cn('absolute -right-[4px] z-25 size-[7px] bg-ppid-primary', positionClass)} aria-hidden="true" />
         </>
     );
 }

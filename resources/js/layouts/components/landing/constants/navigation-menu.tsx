@@ -1,3 +1,5 @@
+import { getEndpoint } from '@/lib/endpoint';
+
 export interface MenuItemsProps {
     id: string;
     title: string;
@@ -10,11 +12,11 @@ export interface MenuItemsProps {
     } | null;
 }
 
-export const ManuItems: MenuItemsProps[] = [
+export const MenuItems: MenuItemsProps[] = [
     {
         id: 'a1f3b461-f0f0-40b9-9515-0c1024fb73f4',
         title: 'Beranda',
-        href: '/',
+        href: getEndpoint('home'),
         children: null,
     },
     {
@@ -33,7 +35,7 @@ export const ManuItems: MenuItemsProps[] = [
                 },
                 {
                     id: 'a19cc394-4736-4cf7-a557-65080dd2d9a2',
-                    href: '/profile/public-officers',
+                    href: getEndpoint('officers.public'),
                     title: 'Profil Pejabat Publik',
                 },
             ],
