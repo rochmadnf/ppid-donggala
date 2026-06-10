@@ -1,21 +1,24 @@
 import AppLogo from '@/components/app-logo';
 import { GlowImage } from '@/components/glow-image';
+import { getEndpoint } from '@/lib/endpoint';
 import { appAsset } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
+import { EarthIcon } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { Toaster } from 'react-hot-toast';
 import type { AuthLayoutProps } from './types';
 
 export default function AuthLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
     return (
-        <div className="relative grid h-dvh flex-col items-center justify-center px-0 sm:px-8 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="relative hidden size-full lg:block">
+        <div className="relative grid min-h-dvh flex-col items-center justify-center px-0 sm:px-8 lg:max-w-none lg:grid-cols-2 lg:px-0">
+            <div className="relative hidden min-h-dvh w-full lg:block">
                 <div
                     className="absolute inset-0 z-0"
                     style={{
                         background: `radial-gradient(125% 125% at 50% 0%, #0d1a36 0%, transparent 60%),radial-gradient(125% 125% at 50% 100%, #010133 0%, transparent 60%), #000000`,
                     }}
                 />
-                <div className="relative flex size-full flex-col justify-center gap-y-12 px-24">
+                <div className="relative flex min-h-dvh w-full flex-col justify-center gap-y-12 px-24">
                     <div className="flex flex-row items-center justify-between gap-x-2.5 text-white">
                         <GlowImage
                             src={appAsset('/assets/img/logo.png')}
@@ -39,7 +42,14 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                     </p>
                 </div>
             </div>
-            <div className="relative flex h-dvh items-center justify-center bg-white lg:p-8">
+            <div className="relative flex min-h-dvh flex-col items-center justify-center bg-white md:flex-row lg:p-8">
+                <Link
+                    href={getEndpoint('home')}
+                    className="group absolute bottom-10 z-10 inline-flex max-h-10 items-center rounded-xl border border-b-2 border-ppid-primary bg-ppid-primary px-4 py-2 text-white shadow transition-all duration-100 hover:bg-ppid-primary/85 hover:shadow-blue-500/50 active:border-b-[2.8px] md:top-6 md:left-8"
+                >
+                    <EarthIcon className="pointer-events-none mr-2 size-4" />
+                    <span className="text-[13px] font-medium md:text-[15px]">Portal PPID</span>
+                </Link>
                 <div
                     id="diagonal-cross-grid"
                     className="absolute inset-0"

@@ -1,7 +1,8 @@
 import type { DrawerProps } from '@/layouts/types';
+import { getEndpoint } from '@/lib/endpoint';
 import { appAsset, cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { PlusIcon } from 'lucide-react';
+import { LogInIcon, PlusIcon } from 'lucide-react';
 
 export type LogoProps = {
     className?: string;
@@ -31,14 +32,26 @@ export function Logo({ className, imgClassName, src = '/assets/img/ppid.png', op
                 <p>Kabupaten Donggala</p>
             </div>
 
-            <button
-                onClick={() => setOpenDrawer(!openDrawer)}
-                className="inline-flex size-8 cursor-pointer items-center justify-center rounded-xs border-2 border-white bg-gray-200 text-slate-700 ring-1 ring-black/30 transition duration-150 hover:bg-gray-300 md:hidden"
-            >
-                <PlusIcon
-                    className={cn('pointer-events-none size-5 transform transition-transform duration-300', openDrawer ? 'rotate-45' : 'rotate-0')}
-                />
-            </button>
+            <div className="flex items-center gap-x-2">
+                <Link
+                    href={getEndpoint('login')}
+                    onClick={() => setOpenDrawer(!openDrawer)}
+                    className="inline-flex size-8 cursor-pointer items-center justify-center rounded-xs border-2 border-white bg-blue-200 text-blue-700 ring-1 ring-blue-500/60 transition duration-150 hover:bg-gray-300 md:hidden"
+                >
+                    <LogInIcon className={cn('pointer-events-none size-5 transform transition-transform duration-300')} />
+                </Link>
+                <button
+                    onClick={() => setOpenDrawer(!openDrawer)}
+                    className="inline-flex size-8 cursor-pointer items-center justify-center rounded-xs border-2 border-white bg-gray-200 text-slate-700 ring-1 ring-black/30 transition duration-150 hover:bg-gray-300 md:hidden"
+                >
+                    <PlusIcon
+                        className={cn(
+                            'pointer-events-none size-5 transform transition-transform duration-300',
+                            openDrawer ? 'rotate-45' : 'rotate-0',
+                        )}
+                    />
+                </button>
+            </div>
         </div>
     );
 }
