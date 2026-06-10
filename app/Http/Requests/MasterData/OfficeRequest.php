@@ -15,7 +15,6 @@ class OfficeRequest extends FormRequest
 
     protected array $originalValues = [];
 
-
     public function authorize(): bool
     {
         return true;
@@ -37,8 +36,8 @@ class OfficeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => FluentRule::string()->bail()->required()->min(3)->max(175)->unique(table: 'offices', column: 'name', callback: fn($_u) => $this->routeIs($this->baseRouteName . '.update') ? $_u->ignore(id: $this->route('office_id'), idColumn: 'uuid') : null),
-            'alias' => FluentRule::string()->bail()->required()->min(3)->max(175)->different('name')->unique(table: 'offices', column: 'alias', callback: fn($_u) => $this->routeIs($this->baseRouteName . '.update') ? $_u->ignore(id: $this->route('office_id'), idColumn: 'uuid') : null),
+            'name' => FluentRule::string()->bail()->required()->min(3)->max(175)->unique(table: 'offices', column: 'name', callback: fn ($_u) => $this->routeIs($this->baseRouteName . '.update') ? $_u->ignore(id: $this->route('office_id'), idColumn: 'uuid') : null),
+            'alias' => FluentRule::string()->bail()->required()->min(3)->max(175)->different('name')->unique(table: 'offices', column: 'alias', callback: fn ($_u) => $this->routeIs($this->baseRouteName . '.update') ? $_u->ignore(id: $this->route('office_id'), idColumn: 'uuid') : null),
             'rank_id' => FluentRule::string()->bail()->required()->enum(OfficeRankEnum::class),
             'address' => FluentRule::string()->bail()->nullable()->min(3)->max(150),
             'phone' => FluentRule::field()->bail()->nullable()->rule('numeric')->rule('digits_between:8,15'),

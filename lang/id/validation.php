@@ -38,7 +38,7 @@ return [
     // 'doesnt_start_with' => '',
     'email' => ':Attribute harus berupa email yang valid.',
     // 'ends_with'         => '',
-    'enum'              => ':Attribute yang dipilih tidak valid.',
+    'enum' => ':Attribute yang dipilih tidak valid.',
     'exists' => ':Attribute belum tersedia.',
     // 'file'              => '',
     // 'filled'            => '',
@@ -113,7 +113,7 @@ return [
     // 'prohibited_if'        => '',
     // 'prohibited_unless'    => '',
     // 'prohibits'            => '',
-    'regex'                => 'format :Attribute tidak valid',
+    'regex' => 'format :Attribute tidak valid',
     'required' => ':Attribute wajib diisi.',
     'required_array_keys' => ':Attribute harus memiliki item berikut: :values.',
     'required_if' => ':Attribute wajib diisi jika :other bernilai :value',
@@ -136,7 +136,7 @@ return [
     'unique' => ':Attribute telah digunakan.',
     // 'uploaded'    => '',
     // 'uppercase'   => '',
-    'url'         => ':Attribute harus berupa URL yang valid.',
+    'url' => ':Attribute harus berupa URL yang valid.',
     // 'ulid'        => '',
     'uuid' => ':Attribute harus berupa uuid.',
 
@@ -144,6 +144,6 @@ return [
 
     'attributes' => [
         'username' => 'Nama Pengguna',
-        'password' => 'Kata Sandi'
+        'password' => 'Kata Sandi',
     ],
 ];

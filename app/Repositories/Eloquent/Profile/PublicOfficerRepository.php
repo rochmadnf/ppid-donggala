@@ -17,15 +17,15 @@ class PublicOfficerRepository extends BaseRepository implements PublicOfficerRep
     public function __construct()
     {
         parent::__construct(
-            model: new PublicOfficer(),
-            resource: PublicOfficerResource::class
+            model: new PublicOfficer,
+            resource: PublicOfficerResource::class,
         );
     }
 
     public function paginate(array $relations = [], array $searchFields = ['name'], int $perPage = 10): JsonResource
     {
         $records = PublicOfficer::searchByKeyword($searchFields)
-            ->when(count($relations) >= 1, fn($qWith) => $qWith->with($relations))
+            ->when(count($relations) >= 1, fn ($qWith) => $qWith->with($relations))
             ->where('is_active', request()->input('is_active') === 'no' ? false : true)
             ->paginate(perPage: request()->input('per_page', $perPage));
 
@@ -38,7 +38,7 @@ class PublicOfficerRepository extends BaseRepository implements PublicOfficerRep
             ->orderByRank()
             ->active()
             ->with(['office', 'position'])
-            ->paginate(20);;
+            ->paginate(20);
 
         return $this->resource::collection($records);
     }

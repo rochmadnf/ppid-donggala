@@ -2,13 +2,13 @@
 
 namespace App\Http\Requests\Profile;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 
 class PpidRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -17,7 +17,7 @@ class PpidRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

@@ -52,9 +52,9 @@ enum EducationLevelEnum: int
     public static function options(): array
     {
         return collect(self::cases())
-            ->map(fn($item) => [
-                "id" => $item->value,
-                "label" => $item->label()
+            ->map(fn ($item) => [
+                'id' => $item->value,
+                'label' => $item->label(),
             ])
             ->toArray();
     }

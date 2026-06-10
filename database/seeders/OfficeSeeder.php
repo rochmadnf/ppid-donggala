@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\OfficeRankEnum;
+use App\Models\MasterData\Office;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
@@ -82,9 +83,9 @@ class OfficeSeeder extends Seeder
                 'name' => 'Desa Toaya',
                 'alias' => 'Toaya',
                 'rank' => OfficeRankEnum::DESA->value,
-                'address' => "Jl. Pue Lasadindi No.19, Kec. Sindue, Kab. Donggala",
-                'phone' => "+6281314560100",
-                'site_url' => "https://toaya-sindue.desa.id",
+                'address' => 'Jl. Pue Lasadindi No.19, Kec. Sindue, Kab. Donggala',
+                'phone' => '+6281314560100',
+                'site_url' => 'https://toaya-sindue.desa.id',
             ],
             [
                 'name' => 'Desa Towale',
@@ -92,7 +93,7 @@ class OfficeSeeder extends Seeder
                 'rank' => OfficeRankEnum::DESA->value,
                 'address' => null,
                 'phone' => null,
-                'site_url' => "https://towale.digitaldesa.id",
+                'site_url' => 'https://towale.digitaldesa.id',
             ],
             [
                 'name' => 'Kelurahan Boneoge',
@@ -106,12 +107,12 @@ class OfficeSeeder extends Seeder
                 'name' => 'Kelurahan Ganti',
                 'alias' => 'Ganti',
                 'rank' => OfficeRankEnum::KELURAHAN->value,
-                'address' => "Jl. Trans Sulawesi Donggala",
+                'address' => 'Jl. Trans Sulawesi Donggala',
                 'phone' => null,
                 'site_url' => null,
             ],
         ])->each(function ($office) {
-            \App\Models\MasterData\Office::updateOrCreate(['name' => $office['name']], Arr::except($office, ['name']));
+            Office::updateOrCreate(['name' => $office['name']], Arr::except($office, ['name']));
         });
     }
 }

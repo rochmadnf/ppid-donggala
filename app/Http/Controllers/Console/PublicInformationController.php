@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Console;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Traits\PageTrait;
 
 class PublicInformationController extends Controller
 {
-    use \App\Http\Traits\PageTrait;
+    use PageTrait;
 
     protected function breadcrumbs($id, $mainLabel, $category): array
     {
@@ -19,7 +19,7 @@ class PublicInformationController extends Controller
                     'label' => $mainLabel,
                     'url' => route('console.public-information.index', ['category' => $category]),
                 ],
-            ]
+            ],
         ];
     }
 
@@ -50,6 +50,7 @@ class PublicInformationController extends Controller
 
         return $categories[$name];
     }
+
     public function index(string $category)
     {
         $page = $this->categories($category);

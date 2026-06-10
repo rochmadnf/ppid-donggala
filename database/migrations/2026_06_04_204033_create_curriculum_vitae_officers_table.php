@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Profile\PublicOfficer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->string('institution');
             $table->char('period_start', 4);
             $table->string('period_end', 4)->nullable();
-            $table->foreignIdFor(\App\Models\Profile\PublicOfficer::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignIdFor(PublicOfficer::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->unsignedSmallInteger('category')->comment('1: Pendidikan, 2: Jabatan, 3: Organisasi');
             $table->timestamps();
         });

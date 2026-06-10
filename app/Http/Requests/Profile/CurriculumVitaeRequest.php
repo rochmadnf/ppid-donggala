@@ -5,7 +5,8 @@ namespace App\Http\Requests\Profile;
 use App\Enums\CurriculumVitaeTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Override;
-use SanderMuller\FluentValidation\{FluentRule, HasFluentRules};
+use SanderMuller\FluentValidation\FluentRule;
+use SanderMuller\FluentValidation\HasFluentRules;
 
 class CurriculumVitaeRequest extends FormRequest
 {
@@ -44,7 +45,7 @@ class CurriculumVitaeRequest extends FormRequest
 
         return array_merge($data, [
             'period_start' => $data['period']['s'],
-            'period_end' =>  $data['period']['e'] ?? null,
+            'period_end' => $data['period']['e'] ?? null,
         ]);
     }
 }

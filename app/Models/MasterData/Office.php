@@ -7,7 +7,7 @@ use App\Models\Scopes\SearchableScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{BelongsToMany};
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Office extends Model
 {
@@ -30,7 +30,7 @@ class Office extends Model
     public function uniqueIds(): array
     {
         return [
-            'uuid'
+            'uuid',
         ];
     }
 
@@ -47,9 +47,6 @@ class Office extends Model
     /**
      * Standalone office
      * office that is not involved in any merger
-     *
-     * @param Builder $query
-     * @return void
      */
     public function scopeStandalone(Builder $query): void
     {
@@ -59,9 +56,6 @@ class Office extends Model
     /**
      * Consolidated office
      * office that has merged other offices but is not merged by another office
-     *
-     * @param Builder $query
-     * @return void
      */
     public function scopeConsolidated(Builder $query): void
     {
@@ -71,9 +65,6 @@ class Office extends Model
     /**
      * Subsidiary office
      * office that is merged by another office but has not merged other offices
-     *
-     * @param Builder $query
-     * @return void
      */
     public function scopeSubsidiary(Builder $query): void
     {

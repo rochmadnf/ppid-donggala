@@ -2,7 +2,8 @@
 
 namespace App\Http\Resources\MasterData;
 
-use Illuminate\Http\{Request, Resources\Json\JsonResource};
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 
 class OfficeResource extends JsonResource
@@ -25,7 +26,7 @@ class OfficeResource extends JsonResource
                 'of' => $mergerOf = $this->resolveMerger('mergerOf'),
                 'by' => $mergedBy = $this->resolveMerger('mergedBy'),
             ],
-            'site_url' => $mergerOf->isEmpty() && $mergedBy->isNotEmpty() ? "#" : $this->site_url,
+            'site_url' => $mergerOf->isEmpty() && $mergedBy->isNotEmpty() ? '#' : $this->site_url,
         ];
     }
 
@@ -33,17 +34,17 @@ class OfficeResource extends JsonResource
     {
         return $this->whenLoaded(
             $relation,
-            fn() => $this->{$relation}
-                ->map(fn($office) => [
+            fn () => $this->{$relation}
+                ->map(fn ($office) => [
                     'id' => $office->uuid,
                     'name' => [
                         'raw' => $office->name,
                         'alias' => $office->alias,
                     ],
-                    'site_url' => $relation === 'mergerOf' ? "#" : $office->site_url,
+                    'site_url' => $relation === 'mergerOf' ? '#' : $office->site_url,
                 ])
                 ->values(),
-            collect()
+            collect(),
         );
     }
 }
