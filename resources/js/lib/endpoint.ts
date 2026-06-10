@@ -1,26 +1,9 @@
-interface EndpointsProps {
-    name: string;
-    href: string;
-}
-
-const endpoints: EndpointsProps[] = [
-    {
-        name: 'home',
-        href: '/',
-    },
-    {
-        name: 'login',
-        href: '/console/login',
-    },
-    {
-        name: 'dashboard',
-        href: '/console/dashboard',
-    },
-    {
-        name: 'officer.public',
-        href: '/profile/public-officers',
-    },
-];
+const endpoints = [
+    { name: 'home', href: '/' },
+    { name: 'login', href: '/console/login' },
+    { name: 'dashboard', href: '/console' },
+    { name: 'officers.public', href: '/profile/public-officers' },
+] as const;
 
 export type EndpointName = (typeof endpoints)[number]['name'];
 
