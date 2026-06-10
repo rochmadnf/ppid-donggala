@@ -47,7 +47,7 @@ export default function OfficeIndexPage() {
                 data={resources.data}
                 metadata={resources.meta}
                 columns={columns({ metadata: resources.meta, onEdit: handleEdit })}
-                routeName="console.master-data.offices.index"
+                routeName="/console/master-data/offices"
                 searchable
                 toolbarRight={
                     <Button variant="brand" className="cursor-pointer" onClick={handleAdd}>
