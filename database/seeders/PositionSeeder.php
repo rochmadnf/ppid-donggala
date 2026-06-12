@@ -178,12 +178,20 @@ class PositionSeeder extends Seeder
 
             ['name' => 'Lurah', 'only_for' => 7, 'rank' => 1, 'office_id' => null],
             ['name' => 'Sekretaris Kelurahan', 'only_for' => 7, 'rank' => 2, 'office_id' => null],
-        ])->each(fn ($position) => Position::updateOrCreate([
-            'name' => $position['name'],
-        ], [
-            'only_for' => $position['only_for'],
-            'rank' => $position['rank'],
-            'office_id' => $position['office_id'] ? $this->getOfficeUuidByAliasName($position['office_id']) : null,
-        ]));
+        ])->each(function ($position) {
+            $p = Position::firstOrCreate(
+                [
+                    'name' => $position['name'],
+                ],
+                [
+                    'only_for' => $position['only_for'],
+                    'rank' => $position['rank'],
+                    'office_id' => $position['office_id'] ? $this->getOfficeUuidByAliasName($position['office_id']) : null,
+
+                ]
+            );
+
+            $this->command->info("\tPosition: {$p->name} (was " . ($p->wasRecentlyCreated ? 'created' : 'existing') . ')');
+        });
     }
 }

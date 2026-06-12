@@ -280,7 +280,8 @@ class OfficeSeeder extends Seeder
                 'site_url' => null,
             ],
         ])->each(function ($office) {
-            Office::updateOrCreate(['name' => $office['name']], Arr::except($office, ['name']));
+            $of = Office::firstOrCreate(['name' => $office['name']], Arr::except($office, ['name']));
+            $this->command->info("\tOffice: {$of->name} (was " . ($of->wasRecentlyCreated ? 'created' : 'existing') . ')');
         });
     }
 }
