@@ -2,7 +2,6 @@ import { ImageCropperDialog } from '@/components/image-cropper/image-cropper-sin
 import { MetaTag } from '@/components/metatag';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConsoleLayout from '@/layouts/console-layout';
 import { formatDate } from '@/lib/date';
 import { getEndpoint } from '@/lib/endpoint';
@@ -14,6 +13,7 @@ import { useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import { CurriculumVitaeCard } from './components/curriculum-vitae';
 import { PublicOfficerForm } from './components/form';
+import { ShowCard } from './components/show-card';
 import type { PublicOfficerShowProps } from './types';
 
 export default function PublicOfficerShow() {
@@ -168,20 +168,6 @@ export default function PublicOfficerShow() {
 
             <PublicOfficerForm open={isDialogOpen} onOpenChange={setIsDialogOpen} selectedRecord={officer} />
         </>
-    );
-}
-
-export function ShowCard({ title, children }: { title?: string | false; children: ReactNode }) {
-    return (
-        <Card>
-            {title ? (
-                <CardHeader>
-                    <CardTitle>{title}</CardTitle>
-                </CardHeader>
-            ) : null}
-
-            <CardContent>{children}</CardContent>
-        </Card>
     );
 }
 

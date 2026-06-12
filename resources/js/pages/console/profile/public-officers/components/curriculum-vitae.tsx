@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState, type SubmitEventHandler } from 'react';
 import { toast } from 'react-hot-toast';
-import { ShowCard } from '../show';
 import type { curriculumVitaeProps } from '../types';
+import { ShowCard } from './show-card';
 
 type tabProps = { id: number; label: string; table: string[] };
 const tabs: tabProps[] = [
