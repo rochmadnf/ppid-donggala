@@ -18,9 +18,34 @@
 }
 
 @theme inline {
-    --breakpoint-mobile-xs: 21.875rem; /* 350px */
-    --breakpoint-mobile-sm: 23.4375rem;
-    --breakpoint-mobile: 24.375rem; /* 390px */
+    /* ===================== */
+    /*       Breakpoints     */
+    /* ===================== */
+
+    /* ─── Phone ──────────────────────────────────── */
+    --breakpoint-phone-xs: 21.875rem; /* 350px  */
+    --breakpoint-phone-sm: 23.4375rem; /* 375px  */
+    --breakpoint-phone: 24.375rem; /* 390px  */
+    --breakpoint-phone-lg: 26.875rem; /* 430px  */
+    --breakpoint-phone-xl: 30rem; /* 480px  */
+
+    /* ─── Tablet ─────────────────────────────────── */
+    --breakpoint-tablet-sm: 37.5rem; /* 600px  */
+    --breakpoint-tablet: 48rem; /* 768px  */
+    --breakpoint-tablet-lg: 64rem; /* 1024px */
+
+    /* ─── Laptop ─────────────────────────────────── */
+    --breakpoint-laptop-sm: 80rem; /* 1280px */
+    --breakpoint-laptop: 85.375rem; /* 1366px · HD 720p standar */
+    --breakpoint-laptop-lg: 90rem; /* 1440px */
+
+    /* ─── Desktop ────────────────────────────────── */
+    --breakpoint-desktop: 96rem; /* 1536px */
+    --breakpoint-desktop-lg: 120rem; /* 1920px */
+    --breakpoint-desktop-xl: 160rem; /* 2560px */
+
+    /* ─── TV / 4K ────────────────────────────────── */
+    --breakpoint-tv: 240rem; /* 3840px */
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);

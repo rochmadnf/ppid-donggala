@@ -27,13 +27,13 @@ export function BottomNav({ openDrawer, setOpenDrawer }: DrawerProps) {
                     <GlowImage dropShadowSize={7} src={appAsset('/assets/img/logo.png')} alt="Kab. Donggala" className="w-18 self-start" />
 
                     <div className="w-full">
-                        <p className="mt-0.5 align-middle text-[13px] font-bold tracking-wide uppercase mobile-xs:mt-0 mobile-xs:text-sm">
-                            Pejabat Pengelola Informasi <br className="mobile-xs:hidden" /> dan Dokumentasi
+                        <p className="mt-0.5 align-middle text-[13px] font-bold tracking-wide uppercase phone-xs:mt-0 phone-xs:text-sm">
+                            Pejabat Pengelola Informasi <br className="phone-xs:hidden" /> dan Dokumentasi
                         </p>
 
                         <p className="mt-0.5 text-xs font-medium italic">Kabupaten Donggala</p>
                     </div>
-                    <DrawerTrigger openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} className="absolute right-6 -bottom-4 mobile-xs:right-4" />
+                    <DrawerTrigger openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} className="absolute right-6 -bottom-4 phone-xs:right-4" />
 
                     <DotsCorner side="bottom" />
                 </header>
@@ -73,7 +73,7 @@ function BottomNavMenu({ setOpenDrawer }: { setOpenDrawer: (open: boolean) => vo
     const handleClose = () => setOpenDrawer(false);
 
     return (
-        <ul className="mt-6 flex h-full flex-1 flex-col items-start justify-start gap-y-4 overflow-y-auto px-2 uppercase mobile-xs:px-4">
+        <ul className="mt-6 flex h-full flex-1 flex-col items-start justify-start gap-y-4 overflow-y-auto px-2 uppercase phone-xs:px-4">
             {MenuItems.map((menu) => {
                 if (menu !== null && menu.children?.items.length > 0) {
                     const menuIds = [...menu.children?.items.map((child) => child.id), menu.id];
