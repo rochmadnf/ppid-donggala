@@ -28,7 +28,7 @@ class PublicOfficerResource extends JsonResource
     public function toArray(Request $request): array
     {
         $base = [
-            'id' => $this->uuid,
+            'id' => base64_encode($this->uuid),
             'name' => $this->fullname,
             'office' => [
                 'id' => $this->office->uuid,
