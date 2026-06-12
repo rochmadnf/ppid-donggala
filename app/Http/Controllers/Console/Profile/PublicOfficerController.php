@@ -86,9 +86,17 @@ class PublicOfficerController extends Controller
         return back()->with('success', 'Pejabat publik berhasil ditambahkan!');
     }
 
-    public function show(string $poid): InertiaResponse
+    public function show(): InertiaResponse
     {
-        $publicOfficer = $this->poRepo->find(value: $poid, columnName: 'uuid', relations: [...$this->relations, 'curriculumVitaeOfficers'], resourceParams: ['isDetail' => true]);
+        $poid = request()->query('id');
+        abort_if(!$poid, 404);
+
+        $publicOfficer = $this->poRepo->find(
+            value: $poid,
+            columnName: 'uuid',
+            relations: [...$this->relations, 'curriculumVitaeOfficers'],
+            resourceParams: ['isDetail' => true]
+        );
 
         return inertia('console/profile/public-officers/show', [
             ...$this->pageDetails(
@@ -98,7 +106,7 @@ class PublicOfficerController extends Controller
                     [
                         'id' => $publicOfficer->id,
                         'label' => $publicOfficer->fullname,
-                        'url' => route('console.profile.public-officers.show', ['poid' => $publicOfficer->id]),
+                        'url' => route('console.profile.public-officers.show', ['id' => $publicOfficer->uuid]),
                     ],
                 ]),
             ),

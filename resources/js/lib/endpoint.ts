@@ -5,6 +5,8 @@ const endpoints = [
     { name: 'officers.public', href: '/profile/public-officers' },
     { name: 'officers.console', href: '/console/profile/public-officers' },
     { name: 'officers.console.update.photo', href: '/console/profile/public-officers/d/:id/photo' },
+    { name: 'officers.console.show', href: '/console/profile/public-officers/d/office?id=:id' },
+    { name: 'officers.console.delete', href: '/console/profile/public-officers/:id' },
 ] as const;
 
 export type EndpointName = (typeof endpoints)[number]['name'];

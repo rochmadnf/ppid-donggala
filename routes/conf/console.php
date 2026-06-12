@@ -59,9 +59,9 @@ Route::middleware('auth')->prefix('console')->name('console.')->group(function (
                 Route::delete('{poid}', 'destroy')->name('destroy');
 
                 Route::prefix('d')->group(function () {
+                    Route::get('officer', 'show')->name('show');
 
                     Route::prefix('{poid}')->group(function () {
-                        Route::get('', 'show')->name('show');
                         Route::put('', 'update')->name('update');
                         Route::post('/photo', 'updatePhoto')->name('photo.update');
 

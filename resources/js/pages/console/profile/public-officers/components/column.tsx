@@ -2,6 +2,7 @@ import { DeleteButton } from '@/components/delete-button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { getEndpoint } from '@/lib/endpoint';
 import type { PaginationMetaProps } from '@/types/pagination';
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -91,7 +92,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicOfficerDa
                                 aria-label={`Info ${name}`}
                                 asChild
                             >
-                                <Link href={`/console/profile/public-officers/d/${id}`}>
+                                <Link href={getEndpoint('officers.console.show', { id })}>
                                     <BookUserIcon className="size-5" />
                                 </Link>
                             </Button>
@@ -103,7 +104,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicOfficerDa
 
                     {/* Tombol Delete */}
                     <DeleteButton
-                        url={`/console/profile/public-officers/${id}`}
+                        url={getEndpoint('officers.console.delete', { id })}
                         title="Hapus Pejabat Publik"
                         variant="rect"
                         popSide="bottom"
