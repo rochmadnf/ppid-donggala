@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConsoleLayout from '@/layouts/console-layout';
 import { formatDate } from '@/lib/date';
+import { getEndpoint } from '@/lib/endpoint';
 import { cn } from '@/lib/utils';
 import type { PageDataProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
@@ -30,7 +31,7 @@ export default function PublicOfficerShow() {
         return new Promise((resolve, reject) => {
             photoForm.transform(() => ({ photo: file }));
 
-            photoForm.post(`/console/profile/public-officers/${officer.id}/photo`, {
+            photoForm.post(getEndpoint('officers.console.update.photo', { id: officer.id }), {
                 forceFormData: true,
                 preserveScroll: true,
                 onError: () => {
@@ -50,8 +51,8 @@ export default function PublicOfficerShow() {
     return (
         <>
             <MetaTag robots="00" withAppName {...page}>
-                <meta name="og:url" content={`/console/profile/public-officers/d/${resources.data.id}`} />
-                <link rel="canonical" href={`/console/profile/public-officers`} />
+                <meta name="og:url" content={getEndpoint('officers.console.update.photo', { id: resources.data.id })} />
+                <link rel="canonical" href={getEndpoint('officers.console')} />
             </MetaTag>
 
             <div className="flex flex-col gap-y-4">
@@ -114,6 +115,7 @@ export default function PublicOfficerShow() {
                                 });
                                 await submitNewPhoto(file);
                             }}
+                            imageSourceMode="base64"
                         />
 
                         <div className="flex flex-1 flex-col gap-y-4 [--wth:--spacing(50)]">
