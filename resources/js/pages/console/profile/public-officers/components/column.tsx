@@ -3,6 +3,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getEndpoint } from '@/lib/endpoint';
+import { encodeId } from '@/lib/utils';
 import type { PaginationMetaProps } from '@/types/pagination';
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -92,7 +93,7 @@ export const columns = ({ metadata }: ColumnsOptions): ColumnDef<PublicOfficerDa
                                 aria-label={`Info ${name}`}
                                 asChild
                             >
-                                <Link href={getEndpoint('officers.console.show', { id })}>
+                                <Link href={getEndpoint('officers.console.show', { id: encodeId(id) })}>
                                     <BookUserIcon className="size-5" />
                                 </Link>
                             </Button>

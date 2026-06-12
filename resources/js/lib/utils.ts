@@ -9,3 +9,5 @@ export function appAsset(path: string) {
     const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost';
     return `${appUrl}/${path.replace(/^\/+/, '')}?variant=${__ASSET_VERSION__}`;
 }
+
+export const encodeId = (uuid: string) => uuid.replace(/-/g, '');

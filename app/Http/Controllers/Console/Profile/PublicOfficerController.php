@@ -86,10 +86,27 @@ class PublicOfficerController extends Controller
         return back()->with('success', 'Pejabat publik berhasil ditambahkan!');
     }
 
+    private function decodeId(string $raw): string
+    {
+        // Restore format UUID: 8-4-4-4-12
+        return preg_replace(
+            '/^([a-f0-9]{8})([a-f0-9]{4})([a-f0-9]{4})([a-f0-9]{4})([a-f0-9]{12})$/',
+            '$1-$2-$3-$4-$5',
+            strtolower($raw)
+        );
+    }
+
+
     public function show(): InertiaResponse
     {
-        $poid = request()->query('id');
-        abort_if(!$poid, 404);
+        $raw = request()->query('id');
+        abort_if(!$raw, 404);
+
+        $poid = $this->decodeId($raw);
+
+        // Validasi format UUID setelah di-decode
+        abort_if(!preg_match('/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/', $poid), 404);
+
 
         $publicOfficer = $this->poRepo->find(
             value: $poid,
