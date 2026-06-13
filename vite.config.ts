@@ -33,12 +33,4 @@ export default defineConfig({
         chunkSizeWarningLimit: 2000,
         assetsInlineLimit: 0,
     },
-
-    optimizeDeps: {
-        include: ['react', 'react-dom', '@inertiajs/react', 'lucide-react', '@embedpdf/react-pdf-viewer'],
-    },
-
-    worker: {
-        format: 'es',
-    },
 });

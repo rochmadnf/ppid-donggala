@@ -10,16 +10,9 @@
  *  - Provide zoom, rotate, flip, reset actions
  *  - Generate cropped output (canvas / blob)
  *  - Enforce selection boundary constraints (canvas / image / none)
- *
- * SSR Safety:
- *  - `cropperjs` (and its `@cropper/element` dep) access `HTMLElement` at
- *    module-load time, which crashes Node.js SSR.
- *  - Fix: use a *dynamic* `import('cropperjs')` inside the `useEffect` so
- *    the module is only evaluated in the browser, never on the server.
  */
 
-import type Cropper from 'cropperjs';
-import type { CropperImage, CropperSelection } from 'cropperjs';
+import Cropper, { type CropperImage, type CropperSelection } from 'cropperjs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BUILT_IN_PRESETS, type CropPreset, getPreset, mergePresets } from './presets';
@@ -231,110 +224,246 @@ export function useCropper({ imageSrc, defaultPreset, customPresets = [], within
         let boundImageTransform: ((e: Event) => void) | null = null;
         let selectionEl: HTMLElement | null = null;
         let imageEl: HTMLElement | null = null;
+        let imageBoundsInCanvas: { x: number; y: number; width: number; height: number } | null = null;
         let resizeObserver: ResizeObserver | null = null;
 
-        // dynamic import keeps @cropper/element out of SSR
-        import('cropperjs').then(({ default: Cropper }) => {
+        const init = () => {
             if (cancelled) return;
 
-            const cropperInstance = new Cropper(img, {
+            // Destroy previous instance if any
+            if (cropperRef.current) {
+                cropperRef.current.destroy();
+                cropperRef.current = null;
+            }
+
+            const cropper = new Cropper(img, {
+                container: img.parentElement ?? undefined,
                 template: CROPPER_TEMPLATE,
             });
+            cropperRef.current = cropper;
 
-            cropperRef.current = cropperInstance;
+            const canvasHost = cropper.getCropperCanvas() as unknown as HTMLElement | null;
+            if (canvasHost) {
+                canvasHost.style.display = 'block';
+                canvasHost.style.width = '100%';
+                canvasHost.style.height = '100%';
+                canvasHost.style.minWidth = '0';
+                canvasHost.style.minHeight = '0';
+            }
 
-            const onReady = () => {
-                if (cancelled) return;
+            // Apply initial preset
+            const selection = cropper.getCropperSelection();
+            if (selection && activePreset) {
+                selection.aspectRatio = activePreset.aspectRatio ?? NaN;
+                applyShapeMask(selection, activePreset.shape);
+            }
 
-                const selection = cropperInstance.getCropperSelection();
-                const canvas = cropperInstance.getCropperCanvas() as unknown as HTMLElement | null;
-                selectionEl = selection as unknown as HTMLElement | null;
-                imageEl = cropperInstance.getCropperImage() as unknown as HTMLElement | null;
+            // Ensure the image is centered and fully visible on init
+            const image = cropper.getCropperImage();
+            image?.$resetTransform();
+            image?.$center('contain');
+            selection?.$center();
 
-                // Apply initial preset
-                if (activePreset && selection) {
-                    selection.aspectRatio = activePreset.aspectRatio ?? NaN;
-                    applyShapeMask(selection, activePreset.shape);
+            // ----------------------------------------------------------------
+            // Boundary: constrain selection move / resize
+            // ----------------------------------------------------------------
+            const refreshImageBounds = () => {
+                const canvas = cropper.getCropperCanvas();
+                const image = cropper.getCropperImage();
+                if (!canvas || !image) {
+                    imageBoundsInCanvas = null;
+                    return;
                 }
 
-                // Force initial layout
-                if (canvas && img.parentElement) {
-                    const parent = img.parentElement;
-                    const w = parent.clientWidth;
-                    const h = parent.clientHeight;
-                    if (w > 0 && h > 0) {
-                        (canvas as HTMLElement).style.width = `${w}px`;
-                        (canvas as HTMLElement).style.height = `${h}px`;
-                    }
-                }
+                const canvasRect = (canvas as unknown as HTMLElement).getBoundingClientRect();
+                const imageRect = (image as unknown as HTMLElement).getBoundingClientRect();
 
-                selection?.$center();
-
-                // ---- Boundary constraint listener (image / canvas mode) ---
-                const handleSelectionChange = (e: Event) => {
-                    if (isResettingRef.current) return;
-                    const mode = withinRef.current;
-                    if (mode === 'none') return;
-
-                    const cropperCanvas = cropperInstance.getCropperCanvas();
-                    const cropperImage = cropperInstance.getCropperImage();
-                    const cropperSelection = cropperInstance.getCropperSelection();
-                    if (!cropperCanvas || !cropperImage || !cropperSelection) return;
-
-                    const canvasRect = (cropperCanvas as unknown as HTMLElement).getBoundingClientRect();
-                    const targetRect = (
-                        mode === 'image' ? (cropperImage as unknown as HTMLElement) : (cropperCanvas as unknown as HTMLElement)
-                    ).getBoundingClientRect();
-                    const selRect = (cropperSelection as unknown as HTMLElement).getBoundingClientRect();
-
-                    if (!inBounds(selRect, targetRect, canvasRect)) {
-                        e.preventDefault();
-                    }
+                imageBoundsInCanvas = {
+                    x: imageRect.left - canvasRect.left,
+                    y: imageRect.top - canvasRect.top,
+                    width: imageRect.width,
+                    height: imageRect.height,
                 };
-
-                boundSelectionChange = handleSelectionChange;
-
-                if (selectionEl) {
-                    selectionEl.addEventListener('change', handleSelectionChange);
-                }
-
-                // ---- Track image transforms for 'image' boundary mode ----
-                const handleImageTransform = () => {
-                    refreshImageBoundsRef.current?.();
-                };
-                boundImageTransform = handleImageTransform;
-                if (imageEl) {
-                    imageEl.addEventListener('transform', handleImageTransform);
-                }
-
-                // ---- ResizeObserver: reflow on container resize ----------
-                const parent = img.parentElement;
-                if (parent && canvas) {
-                    resizeObserver = new ResizeObserver(() => {
-                        if (!cancelled) reflow();
-                    });
-                    resizeObserver.observe(parent);
-                }
-
-                setIsReady(true);
-                notifyChange();
             };
 
-            img.addEventListener('ready', onReady, { once: true });
-        });
+            refreshImageBoundsRef.current = refreshImageBounds;
+
+            refreshImageBounds();
+
+            const onSelectionChange = (event: Event) => {
+                const mode = withinRef.current;
+                if (mode === 'none') return;
+
+                const canvas = cropper.getCropperCanvas();
+                if (!canvas) return;
+
+                const canvasEl = canvas as unknown as HTMLElement;
+                const canvasRect = canvasEl.getBoundingClientRect();
+
+                const customEvent = event as CustomEvent<{
+                    x?: number;
+                    y?: number;
+                    width?: number;
+                    height?: number;
+                }>;
+                const detail = customEvent.detail;
+
+                if (
+                    detail &&
+                    typeof detail.x === 'number' &&
+                    typeof detail.y === 'number' &&
+                    typeof detail.width === 'number' &&
+                    typeof detail.height === 'number'
+                ) {
+                    const epsilon = 1.5;
+
+                    let maxX = 0;
+                    let maxY = 0;
+                    let maxWidth = canvasRect.width;
+                    let maxHeight = canvasRect.height;
+
+                    if (mode === 'image') {
+                        if (!imageBoundsInCanvas) {
+                            refreshImageBounds();
+                        }
+
+                        if (!imageBoundsInCanvas) return;
+
+                        maxX = imageBoundsInCanvas.x;
+                        maxY = imageBoundsInCanvas.y;
+                        maxWidth = imageBoundsInCanvas.width;
+                        maxHeight = imageBoundsInCanvas.height;
+                    }
+
+                    const outOfBounds =
+                        detail.x < maxX - epsilon ||
+                        detail.y < maxY - epsilon ||
+                        detail.x + detail.width > maxX + maxWidth + epsilon ||
+                        detail.y + detail.height > maxY + maxHeight + epsilon;
+
+                    if (outOfBounds) {
+                        event.preventDefault();
+                    }
+
+                    return;
+                }
+
+                const sel = cropper.getCropperSelection();
+                if (!sel) return;
+                const selRect = (sel as unknown as HTMLElement).getBoundingClientRect();
+
+                let maxRect: DOMRect;
+
+                if (mode === 'canvas') {
+                    // The canvas itself is the boundary — build a synthetic DOMRect
+                    maxRect = new DOMRect(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+                } else {
+                    // mode === 'image'
+                    const image = cropper.getCropperImage();
+                    if (!image) return;
+                    maxRect = (image as unknown as HTMLElement).getBoundingClientRect();
+                }
+
+                if (!inBounds(selRect, maxRect, canvasRect)) {
+                    event.preventDefault();
+                }
+            };
+
+            // ----------------------------------------------------------------
+            // Boundary: constrain image transforms when within === 'image'
+            // Mirrors the Vue clone trick exactly.
+            // ----------------------------------------------------------------
+            const onImageTransform = (event: Event) => {
+                if (withinRef.current !== 'image') return;
+                if (isResettingRef.current) {
+                    requestAnimationFrame(() => {
+                        refreshImageBounds();
+                    });
+                    return;
+                }
+
+                const canvas = cropper.getCropperCanvas();
+                const image = cropper.getCropperImage();
+                const sel = cropper.getCropperSelection();
+                if (!canvas || !image || !sel) return;
+
+                const customEvent = event as CustomEvent<{ matrix: number[] }>;
+                const canvasEl = canvas as unknown as HTMLElement;
+                const canvasRect = canvasEl.getBoundingClientRect();
+                const selRect = (sel as unknown as HTMLElement).getBoundingClientRect();
+
+                // 1. Clone the image element
+                const imageHTMLEl = image as unknown as HTMLElement;
+                const clone = imageHTMLEl.cloneNode() as HTMLElement;
+
+                // 2. Apply the pending transform to the clone
+                clone.style.transform = `matrix(${customEvent.detail.matrix.join(', ')})`;
+
+                // 3. Make it invisible so it doesn't flash
+                clone.style.opacity = '0';
+                clone.style.position = 'absolute';
+                clone.style.pointerEvents = 'none';
+
+                // 4. Temporarily append to canvas so the browser can calculate layout
+                canvasEl.appendChild(clone);
+
+                // 5. Read where the image *would* be after the transform
+                const cloneRect = clone.getBoundingClientRect();
+
+                // 6. Remove the clone immediately
+                canvasEl.removeChild(clone);
+
+                // 7. If the selection would no longer be inside the image, cancel
+                if (!inBounds(selRect, cloneRect, canvasRect)) {
+                    event.preventDefault();
+                    return;
+                }
+
+                requestAnimationFrame(() => {
+                    refreshImageBounds();
+                });
+            };
+
+            selectionEl = selection as unknown as HTMLElement;
+            imageEl = cropper.getCropperImage() as unknown as HTMLElement;
+
+            boundSelectionChange = onSelectionChange;
+            boundImageTransform = onImageTransform;
+
+            selectionEl?.addEventListener('change', boundSelectionChange);
+            imageEl?.addEventListener('transform', boundImageTransform);
+
+            if (img.parentElement) {
+                resizeObserver = new ResizeObserver(() => {
+                    requestAnimationFrame(() => {
+                        reflow();
+                    });
+                });
+                resizeObserver.observe(img.parentElement);
+            }
+
+            setIsReady(true);
+            notifyChange();
+        };
+
+        // Wait for the image to load before initialising
+        if (img.complete && img.naturalWidth > 0) {
+            init();
+        } else {
+            img.addEventListener('load', init, { once: true });
+        }
 
         return () => {
             cancelled = true;
+            img.removeEventListener('load', init);
 
-            // Remove event listeners
+            // Remove boundary listeners before destroying
             if (selectionEl && boundSelectionChange) {
                 selectionEl.removeEventListener('change', boundSelectionChange);
             }
             if (imageEl && boundImageTransform) {
                 imageEl.removeEventListener('transform', boundImageTransform);
             }
-
-            // Disconnect ResizeObserver
             if (resizeObserver) {
                 resizeObserver.disconnect();
                 resizeObserver = null;
