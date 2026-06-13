@@ -183,8 +183,8 @@ export function SidebarFooter() {
                 <DropdownMenuTrigger asChild>
                     <div className="group/footer flex w-full cursor-pointer items-center justify-between gap-x-2.5 rounded-md border border-line-brand bg-white p-3 transition duration-150 hover:bg-slate-100">
                         <Avatar className="size-10 rounded-lg bg-blue-700 text-blue-50 shadow shadow-blue-500 transition duration-150 group-hover/footer:shadow-md">
-                            <AvatarImage src={getInitialName(auth.user.username)} alt="User Avatar" />
-                            <AvatarFallback>RF</AvatarFallback>
+                            <AvatarImage src={auth.user.avatar || undefined} alt="User Avatar" />
+                            <AvatarFallback>{getInitialName(auth.user.username)}</AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left leading-tight">
                             <span className="truncate text-lg/tight font-medium">{auth.user.username}</span>
