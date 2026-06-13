@@ -10,7 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+import { cn, getInitialName } from '@/lib/utils';
 import type { PageDataProps, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronsUpDownIcon, Globe2Icon, LogOutIcon, PlusIcon } from 'lucide-react';
@@ -183,7 +183,7 @@ export function SidebarFooter() {
                 <DropdownMenuTrigger asChild>
                     <div className="group/footer flex w-full cursor-pointer items-center justify-between gap-x-2.5 rounded-md border border-line-brand bg-white p-3 transition duration-150 hover:bg-slate-100">
                         <Avatar className="size-10 rounded-lg bg-blue-700 text-blue-50 shadow shadow-blue-500 transition duration-150 group-hover/footer:shadow-md">
-                            <AvatarImage src={auth.user.avatar} alt="User Avatar" />
+                            <AvatarImage src={getInitialName(auth.user.username)} alt="User Avatar" />
                             <AvatarFallback>RF</AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left leading-tight">

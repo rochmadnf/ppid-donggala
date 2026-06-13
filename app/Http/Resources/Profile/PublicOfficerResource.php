@@ -28,7 +28,7 @@ class PublicOfficerResource extends JsonResource
     public function toArray(Request $request): array
     {
         $base = [
-            'id' => base64_encode($this->uuid),
+            'id' => $this->uuid,
             'name' => $this->fullname,
             'office' => [
                 'id' => $this->office->uuid,
@@ -40,7 +40,7 @@ class PublicOfficerResource extends JsonResource
                 'id' => $this->position->uuid,
                 'name' => $this->position->name,
             ],
-            'photo' => is_null($this->photo) ? $this->defautlPhoto($this->gender, $this->religion->value) : storage_asset($this->photo) . '?t=' . $this->updated_at->timestamp,
+            'photo' => is_null($this->photo) ? $this->defautlPhoto($this->gender, $this->religion->value) : storage_asset($this->photo),
             'is_active' => $this->is_active,
             'period_start' => $this->period_start,
             'period_end' => $this->period_end,

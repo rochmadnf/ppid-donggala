@@ -10,4 +10,11 @@ export function appAsset(path: string) {
     return `${appUrl}/${path.replace(/^\/+/, '')}?variant=${__ASSET_VERSION__}`;
 }
 
-export const encodeId = (uuid: string) => uuid.replace(/-/g, '');
+export function getInitialName(name: string) {
+    return name
+        .match(/(^\S\S?|\b\S)?/g)
+        ?.join('')
+        .match(/(^\S|\S$)?/g)
+        ?.join('')
+        .toUpperCase();
+}

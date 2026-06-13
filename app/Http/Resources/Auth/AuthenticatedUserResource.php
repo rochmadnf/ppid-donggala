@@ -20,7 +20,7 @@ class AuthenticatedUserResource extends JsonResource
             'id' => $this->uuid,
             'username' => $this->username,
             'email' => $this->email,
-            'avatar' => 'https://ui-avatars.com/api/?bold=true&color=eff6ff&background=1447e6&name=' . str()->of($this->username)->slug('+')->value,
+            'avatar' => is_null($this->avatar) ? null : storage_asset($this->avatar),
             'role' => $this->getRoleNames()->first(),
             'permissions' => $this->getPermissionsViaRoles()->pluck('name'),
         ];

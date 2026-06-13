@@ -88,12 +88,9 @@ class PublicOfficerController extends Controller
 
     public function show(): InertiaResponse
     {
-        $raw = request()->query('id');
+        $poid = request()->query('id');
 
-        abort_if(!$raw, 404);
-
-        $poid = base64_decode($raw, true);
-
+        abort_if(!$poid, 404);
 
         $publicOfficer = $this->poRepo->find(
             value: $poid,
