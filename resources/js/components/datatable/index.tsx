@@ -28,6 +28,7 @@ export function DataTable<T>({
     });
 
     const [search, setSearch] = useState<string>(() => {
+        if (typeof window === 'undefined') return '';
         return new URLSearchParams(window.location.search).get('keyword') || '';
     });
 
