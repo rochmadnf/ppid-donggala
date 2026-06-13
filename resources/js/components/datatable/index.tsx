@@ -27,10 +27,11 @@ export function DataTable<T>({
         pageSize: metadata.per_page,
     });
 
-    const [search, setSearch] = useState<string>(() => {
-        if (typeof window === 'undefined') return '';
-        return new URLSearchParams(window.location.search).get('keyword') || '';
-    });
+    const [search, setSearch] = useState<string>('');
+
+    useEffect(() => {
+        setSearch(new URLSearchParams(window.location.search).get('keyword') || '');
+    }, []);
 
     useEffect(() => {
         setPagination({
