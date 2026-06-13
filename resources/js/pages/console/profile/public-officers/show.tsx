@@ -2,6 +2,7 @@ import { ImageCropperDialog } from '@/components/image-cropper/image-cropper-sin
 import { MetaTag } from '@/components/metatag';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
+import { UseClient } from '@/components/use-client';
 import ConsoleLayout from '@/layouts/console-layout';
 import { formatDate } from '@/lib/date';
 import { getEndpoint } from '@/lib/endpoint';
@@ -93,30 +94,34 @@ export default function PublicOfficerShow() {
                             </div>
                         </div>
 
-                        <ImageCropperDialog
-                            open={openCrop}
-                            onOpenChange={setOpenCrop}
-                            defaultPreset="public_officer_photo"
-                            outputType="image/webp"
-                            outputQuality={0.9}
-                            presets={[
-                                {
-                                    key: 'public_officer_photo',
-                                    label: 'Foto Pejabat Publik',
-                                    aspectRatio: 4 / 5,
-                                    shape: 'rect',
-                                    outputWidth: 800,
-                                    outputHeight: 1000,
-                                },
-                            ]}
-                            onConfirm={async (blob) => {
-                                const file = new File([blob], `${officer.id}.webp`, {
-                                    type: blob.type || 'image/webp',
-                                });
-                                await submitNewPhoto(file);
-                            }}
-                            imageSourceMode="base64"
-                        />
+                        {/* ClientOnly: ImageCropperDialog tidak di-render saat SSR
+                            karena @cropper/element mengakses HTMLElement (browser-only API) */}
+                        <UseClient>
+                            <ImageCropperDialog
+                                open={openCrop}
+                                onOpenChange={setOpenCrop}
+                                defaultPreset="public_officer_photo"
+                                outputType="image/webp"
+                                outputQuality={0.9}
+                                presets={[
+                                    {
+                                        key: 'public_officer_photo',
+                                        label: 'Foto Pejabat Publik',
+                                        aspectRatio: 4 / 5,
+                                        shape: 'rect',
+                                        outputWidth: 800,
+                                        outputHeight: 1000,
+                                    },
+                                ]}
+                                onConfirm={async (blob) => {
+                                    const file = new File([blob], `${officer.id}.webp`, {
+                                        type: blob.type || 'image/webp',
+                                    });
+                                    await submitNewPhoto(file);
+                                }}
+                                imageSourceMode="base64"
+                            />
+                        </UseClient>
 
                         <div className="flex flex-1 flex-col gap-y-4 [--wth:--spacing(50)]">
                             {[
